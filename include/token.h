@@ -18,7 +18,7 @@ class Token {
 
  public:
   Token();
-  Token(token_type, std::string, uint, uint);
+  Token(token_type _type, std::string _literal, uint _column, uint _line);
 
   token_type getType();
   std::string getLiteral();
@@ -26,7 +26,7 @@ class Token {
   uint getLine();
   bool is_empty();
 
-  static token_type lookup_ident(std::string &);
+  static token_type lookup_ident(std::string &ident);
 
   /* ALL TOKEN TYPES */
 
