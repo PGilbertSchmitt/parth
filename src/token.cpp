@@ -1,64 +1,45 @@
 #include "token.h"
 
 // Constructor for empty tokens
-Token::Token()
-{
-	type = "";
-	literal = "";
+Token::Token() {
+  type = "";
+  literal = "";
 }
 
-Token::Token(token_type _type, std::string _literal, uint _column, uint _line)
-{
-	type = _type;
-	literal = _literal;
-	column = _column;
-	line = _line;
+Token::Token(token_type _type, std::string _literal, uint _column, uint _line) {
+  type = _type;
+  literal = _literal;
+  column = _column;
+  line = _line;
 }
 
 // Used for lookup of keywords in Token::lookup_ident
 keyword_map Token::keywords({
-		{"fn", Token::FUNCTION},
-		{"let", Token::LET},
-		{"if", Token::IF},
-		{"else", Token::ELSE},
-		{"return", Token::RETURN},
-		{"true", Token::TRUE_VAL},
-		{"false", Token::FALSE_VAL},
+    {"fn", Token::FUNCTION},
+    {"let", Token::LET},
+    {"if", Token::IF},
+    {"else", Token::ELSE},
+    {"return", Token::RETURN},
+    {"true", Token::TRUE_VAL},
+    {"false", Token::FALSE_VAL},
 });
 
-token_type Token::getType()
-{
-	return type;
-}
+token_type Token::getType() { return type; }
 
-std::string Token::getLiteral()
-{
-	return literal;
-}
+std::string Token::getLiteral() { return literal; }
 
-uint Token::getColumn()
-{
-	return column;
-}
+uint Token::getColumn() { return column; }
 
-uint Token::getLine()
-{
-	return line;
-}
+uint Token::getLine() { return line; }
 
-bool Token::is_empty()
-{
-	return type == "" && literal == "";
-}
+bool Token::is_empty() { return type == "" && literal == ""; }
 
-token_type Token::lookup_ident(std::string &ident)
-{
-	keyword_map::const_iterator got = keywords.find(ident);
-	if (got != keywords.end())
-	{
-		return got->second;
-	}
-	return ident;
+token_type Token::lookup_ident(std::string &ident) {
+  keyword_map::const_iterator got = keywords.find(ident);
+  if (got != keywords.end()) {
+    return got->second;
+  }
+  return ident;
 }
 
 /* ALL TOKEN TYPES */
