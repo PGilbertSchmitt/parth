@@ -7,10 +7,12 @@ Token::Token()
 	literal = "";
 }
 
-Token::Token(token_type _type, std::string _literal)
+Token::Token(token_type _type, std::string _literal, uint _column, uint _line)
 {
 	type = _type;
 	literal = _literal;
+	column = _column;
+	line = _line;
 }
 
 // Used for lookup of keywords in Token::lookup_ident
@@ -32,6 +34,16 @@ token_type Token::getType()
 std::string Token::getLiteral()
 {
 	return literal;
+}
+
+uint Token::getColumn()
+{
+	return column;
+}
+
+uint Token::getLine()
+{
+	return line;
 }
 
 bool Token::is_empty()

@@ -12,14 +12,19 @@ class Token
 private:
 	token_type type;
 	std::string literal;
+	uint column;
+	uint line;
+
 	static keyword_map keywords;
 
 public:
 	Token();
-	Token(token_type, std::string);
+	Token(token_type, std::string, uint, uint);
 
 	token_type getType();
 	std::string getLiteral();
+	uint getColumn();
+	uint getLine();
 	bool is_empty();
 
 	static token_type lookup_ident(std::string &);
