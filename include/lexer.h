@@ -4,7 +4,7 @@
 
 class Lexer {
  public:
-  Lexer(std::string);
+  Lexer(const std::string &);
 
   Token next_token();
 
@@ -21,9 +21,9 @@ class Lexer {
   std::string read_ident();
   std::string read_num();
   bool read_string(std::string &);
-  bool dual_char_token(std::string &);
   void skip_whitespace();
   char peak_char();
+  void bump_line();
 
   static bool isLetter(char);
   static bool isDigit(char);
