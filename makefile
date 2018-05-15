@@ -1,30 +1,86 @@
-# This makefile is based on the one here written by Hiltmon Lipschitz:
-# https://hiltmon.com/blog/2013/07/03/a-simple-c-plus-plus-project-structure/
-
 CC=g++
-CFLAGS=-c -Wall -std=c++11
-LDFLAGS=
-SRCDIR=src
-BUILDDIR=build
-OBJECTS=$(SOURCES:.cpp=.o)
-TARGET=bin/parth
+LD=g++
 
-SRCEXT=cpp
-SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
-OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
+EXEC=parth
+CPPFLAGS=-isystem $(GTEST_DIR)/include
+CXXFLAGS=-Wall -Wextra -std=c++11 -pthread
+LDFLAGS=
 LIB=-L lib
 INC=-I include
 
-$(TARGET): $(OBJECTS)
-	@echo " Linking..."
-	@echo " $(CC) $^ -o $(TARGET) $(LIB)"; $(CC) $^ -o $(TARGET) $(LIB)
+#*** GTEST ***#
 
-$(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
+GTEST_DIR = lib/googletest
+GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
+                $(GTEST_DIR)/include/gtest/internal/*.h
+GTEST_SRCS_ = $(GTEST_DIR)/src/*.cc $(GTEST_DIR)/src/*.h $(GTEST_HEADERS)
+
+#*** DIRECTORIES ***#
+
+SRCDIR=src
+BUILDDIR=build
+TESTDIR=test
+BINDIR=bin
+LIBDIR=lib
+
+#*** TARGETS ***#
+
+TARGET=bin/parth
+TESTTARGET=bin/runTest
+
+#*** WORKING FILE LOCATIONS ***#
+
+SOURCES := $(shell find $(SRCDIR) -type f -name *.cpp)
+OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.cpp=.o))
+
+TESTSOURCES := $(shell find $(TESTDIR) -type f -name *_test.cpp))
+TESTOBJECTS := $(patsubst $(TESTDIR)/%,$(BUILDDIR)/%,$(TESTSOURCES:.cpp=.o))
+
+#*** PROJECT DEPENDENCIES ***#
+
+$(TARGET): $(OBJECTS)
+	$(CC) $^ -o $@ $(LIB)
+
+$(BUILDDIR)/%.o: $(SRCDIR)/%.cpp $(GTEST_HEADERS)
 	@mkdir -p $(BUILDDIR)
-	@echo " $(CC) $(CFLAGS) $(INC) -c -o $@ $<"; $(CC) $(CFLAGS) $(INC) -c -o $@ $<
+	$(CC) $(CPPFLAGS) $(CXXFLAGS) $(INC) -c -o $@ $<
+
+#*** GTEST DEPENDENCIES ***#
+# Could be a bit more optimized
+
+GTEST_DEPS=gtest-all.o gtest_main.o
+GTEST_OBJS=$(patsubst %,$(BUILDDIR)/%,$(GTEST_DEPS))
+
+build/gtest-all.o : $(GTEST_SRCS_)
+	$(CXX) $(CPPFLAGS) -I$(GTEST_DIR) $(CXXFLAGS) -c \
+            $(GTEST_DIR)/src/gtest-all.cc -o $@
+
+build/gtest_main.o : $(GTEST_SRCS_)
+	$(CXX) $(CPPFLAGS) -I$(GTEST_DIR) $(CXXFLAGS) -c \
+            $(GTEST_DIR)/src/gtest_main.cc -o $@
+
+gtest.a : $(BUILDDIR)/gtest-all.o
+	$(AR) $(ARFLAGS) $@ $^
+	mv $@ $(LIBDIR)/
+
+gtest_main.a : $(BUILDDIR)/gtest-all.o $(BUILDDIR)/gtest_main.o
+	$(AR) $(ARFLAGS) $@ $^
+	mv $@ $(LIBDIR)/
+
+#*** TESTS ***#
+
+MYTEST=test/my_test.cpp
+MYOBJS=$(MYTEST:.cpp=.o)
+
+$(TESTTARGET): $(MYOBJS) lib/gtest.a lib/gtest_main.a
+	$(CC) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+test/my_test.o: test/my_test.cpp $(GTEST_HEADERS)
+	$(CC) $(CPPFLAGS) $(CXXFLAGS) $(INC) -c test/my_test.cpp -o $@
+
+#*** CLEAN ***#
 
 clean:
-	@echo " Cleaning..."; 
-	@echo " $(RM) -r $(BUILDDIR) $(TARGET)"; $(RM) -r $(BUILDDIR) $(TARGET)
+	rm -rfv $(BUILDDIR)/* $(TARGET)
 
 .PHONY: clean
