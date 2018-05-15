@@ -13,17 +13,6 @@ Token::Token(token_type _type, std::string _literal, uint _column, uint _line) {
   line = _line;
 }
 
-// Used for lookup of keywords in Token::lookup_ident
-keyword_map Token::keywords({
-    {"fn", Token::FUNCTION},
-    {"let", Token::LET},
-    {"if", Token::IF},
-    {"else", Token::ELSE},
-    {"return", Token::RETURN},
-    {"true", Token::TRUE_VAL},
-    {"false", Token::FALSE_VAL},
-});
-
 token_type Token::getType() { return type; }
 
 std::string Token::getLiteral() { return literal; }
@@ -91,3 +80,14 @@ const token_type Token::LBRACE = "{";
 const token_type Token::RBRACE = "}";
 const token_type Token::LBRACKET = "[";
 const token_type Token::RBRACKET = "]";
+
+// Used for lookup of keywords in Token::lookup_ident
+keyword_map Token::keywords({
+    {"fn", Token::FUNCTION},
+    {"let", Token::LET},
+    {"if", Token::IF},
+    {"else", Token::ELSE},
+    {"return", Token::RETURN},
+    {"true", Token::TRUE_VAL},
+    {"false", Token::FALSE_VAL},
+});
