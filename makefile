@@ -33,9 +33,6 @@ TESTTARGET=bin/runTest
 SOURCES := $(shell find $(SRCDIR) -type f -name *.cpp)
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.cpp=.o))
 
-TESTSOURCES := $(shell find $(TESTDIR) -type f -name *_test.cpp))
-TESTOBJECTS := $(patsubst $(TESTDIR)/%,$(BUILDDIR)/%,$(TESTSOURCES:.cpp=.o))
-
 #*** PROJECT DEPENDENCIES ***#
 
 $(TARGET): $(OBJECTS)
@@ -69,18 +66,18 @@ gtest_main.a : $(BUILDDIR)/gtest-all.o $(BUILDDIR)/gtest_main.o
 
 #*** TESTS ***#
 
-MYTEST=test/my_test.cpp
-MYOBJS=$(MYTEST:.cpp=.o)
+TESTSOURCES := $(shell find $(TESTDIR) -type f -name *_test.cpp)
+TESTOBJECTS := $(patsubst $(TESTDIR)/%,$(BUILDDIR)/%,$(TESTSOURCES:.cpp=.o))
 
-$(TESTTARGET): $(MYOBJS) lib/gtest.a lib/gtest_main.a
+$(TESTTARGET): $(TESTOBJECTS) $(filter-out build/main.o,$(OBJECTS)) lib/gtest_main.a
 	$(CC) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
-test/my_test.o: test/my_test.cpp $(GTEST_HEADERS)
-	$(CC) $(CPPFLAGS) $(CXXFLAGS) $(INC) -c test/my_test.cpp -o $@
+$(BUILDDIR)/%_test.o: $(TESTDIR)/%_test.cpp $(GTEST_HEADERS)
+	$(CC) $(CPPFLAGS) $(CXXFLAGS) $(INC) -c $< -o $@
 
 #*** CLEAN ***#
 
 clean:
-	rm -rfv $(BUILDDIR)/* $(TARGET)
+	rm -rfv $(BUILDDIR)/* $(TARGET) $(TESTTARGET)
 
 .PHONY: clean
