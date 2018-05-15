@@ -15,7 +15,7 @@ Lexer::Lexer(const std::string &_input) {
 
 Token Lexer::next_token() {
   // These defaults mean that these values need to be overwritten
-  token_type tok = Token::ILLEGAL;
+  TokenType tok = TokenType::ILLEGAL;
   std::string lit = "ILLEGAL";
   uint col = cur_column;
   uint line = cur_line;
@@ -25,39 +25,39 @@ Token Lexer::next_token() {
   switch (ch) {
     // Simple operators
     case '+':
-      tok = Token::PLUS;
+      tok = TokenType::PLUS;
       lit = "+";
       break;
     case '-':
-      tok = Token::MINUS;
+      tok = TokenType::MINUS;
       lit = "-";
       break;
     case '*':
-      tok = Token::ASTERISK;
+      tok = TokenType::ASTERISK;
       lit = "*";
       break;
     case '/':
-      tok = Token::SLASH;
+      tok = TokenType::SLASH;
       lit = "/";
       break;
     case '%':
-      tok = Token::MODULO;
+      tok = TokenType::MODULO;
       lit = "%";
       break;
 
     // Delimiters
     case ',':
-      tok = Token::COMMA;
+      tok = TokenType::COMMA;
       lit = ",";
       break;
     case ':':
-      tok = Token::COLON;
+      tok = TokenType::COLON;
       lit = ":";
       break;
     case '\n':
       // This is the only character at the moment that allows tracking of
       bump_line();
-      tok = Token::NEWLINE;
+      tok = TokenType::NEWLINE;
       lit = "\n";
       break;
 
@@ -65,87 +65,87 @@ Token Lexer::next_token() {
     case '=':
       if (peak_char() == '=') {
         read_char();
-        tok = Token::EQ;
+        tok = TokenType::EQ;
         lit = "==";
       } else {
-        tok = Token::ASSIGN;
+        tok = TokenType::ASSIGN;
         lit = "=";
       }
       break;
     case '!':
       if (peak_char() == '=') {
         read_char();
-        tok = Token::NEQ;
+        tok = TokenType::NEQ;
         lit = "!=";
       } else {
-        tok = Token::BANG;
+        tok = TokenType::BANG;
         lit = '!';
       }
       break;
     case '<':
       if (peak_char() == '=') {
         read_char();
-        tok = Token::LTEQ;
+        tok = TokenType::LTEQ;
         lit = "<=";
       } else {
-        tok = Token::LT;
+        tok = TokenType::LT;
         lit = "<";
       }
       break;
     case '>':
       if (peak_char() == '=') {
         read_char();
-        tok = Token::GTEQ;
+        tok = TokenType::GTEQ;
         lit = ">";
       } else {
-        tok = Token::GT;
+        tok = TokenType::GT;
         lit = ">";
       }
       break;
 
     // Braces
     case '(':
-      tok = Token::LPAREN;
+      tok = TokenType::LPAREN;
       lit = "(";
       break;
     case ')':
-      tok = Token::RPAREN;
+      tok = TokenType::RPAREN;
       lit = ")";
       break;
     case '[':
-      tok = Token::LBRACKET;
+      tok = TokenType::LBRACKET;
       lit = "]";
       break;
     case ']':
-      tok = Token::RBRACKET;
+      tok = TokenType::RBRACKET;
       lit = "]";
       break;
     case '{':
-      tok = Token::LBRACE;
+      tok = TokenType::LBRACE;
       lit = "{";
       break;
     case '}':
-      tok = Token::RBRACE;
+      tok = TokenType::RBRACE;
       lit = "}";
       break;
 
     // EOF
     case 0:
-      tok = Token::EOF_VAL;
+      tok = TokenType::EOF_VAL;
       lit = "";
       break;
 
     // Strings
-    case '"':
-      std::string str;
+    case '"': {
+      std::string str = "";
       bool ok = read_string(str);
       if (ok) {
-        tok = Token::STRING;
+        tok = TokenType::STRING;
         lit = str;
       } else {
         lit = "Unexpected EOF in string";
       }
-      break;
+    } break;
 
     // Default catches the complex multichar tokens such as numbers and
     // identifiers
@@ -155,8 +155,9 @@ Token Lexer::next_token() {
         tok = Token::lookup_ident(lit);
       } else if (isDigit(ch)) {
         lit = read_num();
-        tok = Token::INT;
+        tok = TokenType::INT;
       }
+      break;
       // If it reaches default case and isn't caught by the above checks, then
       // it's an illegal character and the authorities will be notified.
       // Your days are numbered, criminal.
