@@ -69,6 +69,10 @@ gtest_main.a : $(BUILDDIR)/gtest-all.o $(BUILDDIR)/gtest_main.o
 TESTSOURCES := $(shell find $(TESTDIR) -type f -name *_test.cpp)
 TESTOBJECTS := $(patsubst $(TESTDIR)/%,$(BUILDDIR)/%,$(TESTSOURCES:.cpp=.o))
 
+.PHONY: tests
+
+tests: $(TESTTARGET)
+
 $(TESTTARGET): $(TESTOBJECTS) $(filter-out build/main.o,$(OBJECTS)) lib/gtest_main.a
 	$(CC) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
