@@ -55,7 +55,8 @@ Token Lexer::next_token() {
       lit = ":";
       break;
     case '\n':
-      // This is the only character at the moment that allows tracking of
+      // This is the only character at the moment that allows tracking of lines
+      // and columns
       bump_line();
       tok = TokenType::NEWLINE;
       lit = "\n";
@@ -96,7 +97,7 @@ Token Lexer::next_token() {
       if (peak_char() == '=') {
         read_char();
         tok = TokenType::GTEQ;
-        lit = ">";
+        lit = ">=";
       } else {
         tok = TokenType::GT;
         lit = ">";
@@ -145,7 +146,8 @@ Token Lexer::next_token() {
       } else {
         lit = "Unexpected EOF in string";
       }
-    } break;
+      break;
+    }
 
     // Default catches the complex multichar tokens such as numbers and
     // identifiers
@@ -153,6 +155,9 @@ Token Lexer::next_token() {
       if (isLetter(ch)) {
         lit = read_ident();
         tok = Token::lookup_ident(lit);
+        if (tok == TokenType::NONE) {
+          tok = TokenType::IDENT;
+        }
       } else if (isDigit(ch)) {
         lit = read_num();
         tok = TokenType::INT;
@@ -163,6 +168,7 @@ Token Lexer::next_token() {
       // Your days are numbered, criminal.
   }
 
+  read_char();
   return Token(tok, lit, col, line);
 }
 
@@ -197,27 +203,23 @@ void Lexer::skip_whitespace() {
 
 std::string Lexer::read_num() {
   uint pos = position;
-  uint size = 0;
+  uint size = 1;
 
-  while (isDigit(ch)) {
+  while (isDigit(peak_char())) {
     read_char();
     size++;
   }
-
-  std::cout << pos << " : " << size << std::endl;
   return input.substr(pos, size);
 }
 
 std::string Lexer::read_ident() {
   uint pos = position;
-  uint size = 0;
+  uint size = 1;
 
-  while (isLetter(ch) || isDigit(ch)) {
+  while (isLetter(peak_char()) || isDigit(peak_char())) {
     read_char();
     size++;
   }
-
-  std::cout << pos << " : " << size << std::endl;
   return input.substr(pos, size);
 }
 
@@ -240,6 +242,7 @@ bool Lexer::read_string(std::string &str) {
     // quotation mark, in which we don't want to end the string, or it's not,
     // and we still don't care. It's not the lexer's job.
     if (ch == '\\') {
+      size++;
       read_char();
     }
 
