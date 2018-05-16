@@ -35,7 +35,8 @@ if (5 < 10) {
 
 "foobar"
 "foo bar"
-"foo \"bar\" baz")INPUT";
+"foo \"bar\" baz"
+)INPUT";
 
 test_row all_rows[] = {
     // Tested against
@@ -154,6 +155,8 @@ test_row all_rows[] = {
     {TokenType::NEWLINE, "\n"},
 
     {TokenType::STRING, "foo \\\"bar\\\" baz"},
+    {TokenType::NEWLINE, "\n"},
+
     {TokenType::EOF_VAL, ""},
 };
 
