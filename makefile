@@ -72,6 +72,7 @@ TESTOBJECTS := $(patsubst $(TESTDIR)/%,$(BUILDDIR)/%,$(TESTSOURCES:.cpp=.o))
 .PHONY: tests
 
 tests: $(TESTTARGET)
+	bin/runTest
 
 $(TESTTARGET): $(TESTOBJECTS) $(filter-out build/main.o,$(OBJECTS)) lib/gtest_main.a
 	$(CC) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
