@@ -185,3 +185,11 @@ TEST(Lexer, Input) {
         << " | Got literal: " << cur_lit;
   }
 }
+
+TEST(Lexer, UnendedString) {
+  Lexer l = Lexer("\"No end in sight");
+  Token tok = l.next_token();
+  ASSERT_EQ(tok.getType(), TokenType::ILLEGAL)
+      << "Expected unended string to create ILLEGAL token, instead got: "
+      << token_type_string(tok.getType());
+}
