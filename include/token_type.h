@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 enum class TokenType : int {
   // Extra special, represents a null token, useful for tokens that aren't
@@ -54,4 +55,4 @@ enum class TokenType : int {
   RBRACKET
 };
 
-// TODO: Add lookup for TokenType to a corresponding string
+std::string token_type_string(TokenType type);
