@@ -56,13 +56,11 @@ build/gtest_main.o : $(GTEST_SRCS_)
 	$(CXX) $(CPPFLAGS) -I$(GTEST_DIR) $(CXXFLAGS) -c \
             $(GTEST_DIR)/src/gtest_main.cc -o $@
 
-gtest.a : $(BUILDDIR)/gtest-all.o
+lib/gtest.a : $(BUILDDIR)/gtest-all.o
 	$(AR) $(ARFLAGS) $@ $^
-	mv $@ $(LIBDIR)/
 
-gtest_main.a : $(BUILDDIR)/gtest-all.o $(BUILDDIR)/gtest_main.o
+lib/gtest_main.a : $(BUILDDIR)/gtest-all.o $(BUILDDIR)/gtest_main.o
 	$(AR) $(ARFLAGS) $@ $^
-	mv $@ $(LIBDIR)/
 
 #*** TESTS ***#
 
