@@ -35,6 +35,11 @@ OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.cpp=.o))
 
 #*** PROJECT DEPENDENCIES ***#
 
+.PHONY: run
+
+run: $(TARGET)
+	$(TARGET)
+
 $(TARGET): $(OBJECTS)
 	$(CC) $^ -o $@ $(LIB)
 
