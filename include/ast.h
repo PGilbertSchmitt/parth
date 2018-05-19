@@ -10,6 +10,30 @@
 
 namespace Ast {
 
+class Node;
+class Block;
+class Identifier;
+class Let;
+class Assign;
+class Return;
+class Integer;
+class Boolean;
+class Prefix;
+class Infix;
+class IfElse;
+
+typedef std::shared_ptr<Node> node_ptr;
+typedef std::shared_ptr<Block> block_ptr;
+typedef std::shared_ptr<Identifier> ident_ptr;
+typedef std::shared_ptr<Let> let_ptr;
+typedef std::shared_ptr<Assign> assign_ptr;
+typedef std::shared_ptr<Return> return_ptr;
+typedef std::shared_ptr<Integer> int_ptr;
+typedef std::shared_ptr<Boolean> bool_ptr;
+typedef std::shared_ptr<Prefix> prefix_ptr;
+typedef std::shared_ptr<Infix> infix_ptr;
+typedef std::shared_ptr<IfElse> ifelse_ptr;
+
 /* Node:
  * Every node is an expression, meaning every expression can be stored and
  * interpreted as another node. A node will always evaluate to a value */
@@ -30,12 +54,12 @@ class Block : public Node {
  public:
   Block(Token token);
 
-  std::vector<std::shared_ptr<Node>> nodes;
+  std::vector<node_ptr> nodes;
 
   std::string token_literal();
   std::string to_string();
 
-  void push_node(std::shared_ptr<Node> node);
+  void push_node(node_ptr node);
 };
 
 /* Identifier:
@@ -58,12 +82,11 @@ class Identifier : public Node {
  * RETURNS: the value returned by the internal expression */
 class Let : public Node {
  public:
-  Let(Token token, std::shared_ptr<Identifier> _name,
-      std::shared_ptr<Node> expression);
+  Let(Token token, ident_ptr _name, node_ptr expression);
 
   Token token;
-  const std::shared_ptr<Identifier> name;
-  std::shared_ptr<Node> expression;
+  const ident_ptr name;
+  node_ptr expression;
 
   std::string token_literal();
   std::string to_string();
@@ -74,12 +97,11 @@ class Let : public Node {
  * RETURNS: the value returned by the internal expression */
 class Assign : public Node {
  public:
-  Assign(Token token, std::shared_ptr<Identifier> name,
-         std::shared_ptr<Node> expression);
+  Assign(Token token, ident_ptr name, node_ptr expression);
 
   Token token;
-  std::shared_ptr<Identifier> name;
-  std::shared_ptr<Node> expression;
+  ident_ptr name;
+  node_ptr expression;
 
   std::string token_literal();
   std::string to_string();
@@ -92,10 +114,10 @@ class Assign : public Node {
  * RETURNS: the value returned by the internal expression */
 class Return : public Node {
  public:
-  Return(Token token, std::shared_ptr<Node> expression);
+  Return(Token token, node_ptr expression);
 
   Token token;
-  std::shared_ptr<Node> expression;
+  node_ptr expression;
 
   std::string token_literal();
   std::string to_string();
@@ -135,11 +157,11 @@ class Boolean : public Node {
  * RETURNS: the value of the expression */
 class Prefix : public Node {
  public:
-  Prefix(Token token, std::string op, std::shared_ptr<Node> right);
+  Prefix(Token token, std::string op, node_ptr right);
 
   Token token;
   std::string op;
-  std::shared_ptr<Node> right;
+  node_ptr right;
 
   std::string token_literal();
   std::string to_string();
@@ -151,12 +173,11 @@ class Prefix : public Node {
  * RETURNS: the value of the expression */
 class Infix : public Node {
  public:
-  Infix(Token token, std::string op, std::shared_ptr<Node> left,
-        std::shared_ptr<Node> right);
+  Infix(Token token, std::string op, node_ptr left, node_ptr right);
 
   Token token;
-  std::shared_ptr<Node> left;
-  std::shared_ptr<Node> right;
+  node_ptr left;
+  node_ptr right;
   std::string op;
 
   std::string token_literal();
@@ -166,8 +187,8 @@ class Infix : public Node {
 /* A pair of a condition and the consequence should that condition be evaluated
  * to true */
 struct condition_set {
-  std::shared_ptr<Node> condition;
-  std::shared_ptr<Block> consequence;
+  node_ptr condition;
+  block_ptr consequence;
 };
 
 /* IfElse Expression
@@ -194,8 +215,7 @@ class IfElse : public Node {
   std::string token_literal();
   std::string to_string();
 
-  void push_condition_set(std::shared_ptr<Node> condition,
-                          std::shared_ptr<Block> consequence);
+  void push_condition_set(node_ptr condition, block_ptr consequence);
 };
 // TODO: Have these exceptions be raised with the line and column numbers from
 // the tokens.
@@ -218,18 +238,6 @@ class EmptyConditionListException : public std::exception {
            "at least on condition_set";
   }
 };
-
-typedef std::shared_ptr<Node> node_ptr;
-typedef std::shared_ptr<Block> block_ptr;
-typedef std::shared_ptr<Identifier> ident_ptr;
-typedef std::shared_ptr<Let> let_ptr;
-typedef std::shared_ptr<Assign> assign_ptr;
-typedef std::shared_ptr<Return> return_ptr;
-typedef std::shared_ptr<Integer> int_ptr;
-typedef std::shared_ptr<Boolean> bool_ptr;
-typedef std::shared_ptr<Prefix> prefix_ptr;
-typedef std::shared_ptr<Infix> infix_ptr;
-typedef std::shared_ptr<IfElse> ifelse_ptr;
 
 }  // namespace Ast
 
