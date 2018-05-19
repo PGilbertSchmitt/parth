@@ -1,6 +1,9 @@
 
-#pragma once
+#ifndef AST_H
+#define AST_H
+
 #include <exception>
+#include <memory>
 #include <string>
 #include <vector>
 #include "token.h"
@@ -26,14 +29,13 @@ class Node {
 class Block : public Node {
  public:
   Block(Token token);
-  ~Block();
 
-  std::vector<Node *> nodes;
+  std::vector<std::shared_ptr<Node>> nodes;
 
   std::string token_literal();
   std::string to_string();
 
-  void push_node(Node *node);
+  void push_node(std::shared_ptr<Node> node);
 };
 
 /* Identifier:
@@ -56,12 +58,12 @@ class Identifier : public Node {
  * RETURNS: the value returned by the internal expression */
 class Let : public Node {
  public:
-  Let(Token token, Identifier *name, Node *expression);
-  ~Let();
+  Let(Token token, std::shared_ptr<Identifier> _name,
+      std::shared_ptr<Node> expression);
 
   Token token;
-  const Identifier *name;
-  Node *expression;
+  const std::shared_ptr<Identifier> name;
+  std::shared_ptr<Node> expression;
 
   std::string token_literal();
   std::string to_string();
@@ -72,12 +74,12 @@ class Let : public Node {
  * RETURNS: the value returned by the internal expression */
 class Assign : public Node {
  public:
-  Assign(Token token, Identifier *name, Node *expression);
-  ~Assign();
+  Assign(Token token, std::shared_ptr<Identifier> name,
+         std::shared_ptr<Node> expression);
 
   Token token;
-  Identifier *name;
-  Node *expression;
+  std::shared_ptr<Identifier> name;
+  std::shared_ptr<Node> expression;
 
   std::string token_literal();
   std::string to_string();
@@ -90,11 +92,10 @@ class Assign : public Node {
  * RETURNS: the value returned by the internal expression */
 class Return : public Node {
  public:
-  Return(Token token, Node *expression);
-  ~Return();
+  Return(Token token, std::shared_ptr<Node> expression);
 
   Token token;
-  Node *expression;
+  std::shared_ptr<Node> expression;
 
   std::string token_literal();
   std::string to_string();
@@ -134,12 +135,11 @@ class Boolean : public Node {
  * RETURNS: the value of the expression */
 class Prefix : public Node {
  public:
-  Prefix(Token token, std::string op, Node *right);
-  ~Prefix();
+  Prefix(Token token, std::string op, std::shared_ptr<Node> right);
 
   Token token;
   std::string op;
-  Node *right;
+  std::shared_ptr<Node> right;
 
   std::string token_literal();
   std::string to_string();
@@ -151,16 +151,23 @@ class Prefix : public Node {
  * RETURNS: the value of the expression */
 class Infix : public Node {
  public:
-  Infix(Token token, std::string op, Node *left, Node *right);
-  ~Infix();
+  Infix(Token token, std::string op, std::shared_ptr<Node> left,
+        std::shared_ptr<Node> right);
 
   Token token;
-  Node *left;
-  Node *right;
+  std::shared_ptr<Node> left;
+  std::shared_ptr<Node> right;
   std::string op;
 
   std::string token_literal();
   std::string to_string();
+};
+
+/* A pair of a condition and the consequence should that condition be evaluated
+ * to true */
+struct condition_set {
+  std::shared_ptr<Node> condition;
+  std::shared_ptr<Block> consequence;
 };
 
 /* IfElse Expression
@@ -180,7 +187,6 @@ class Infix : public Node {
 class IfElse : public Node {
  public:
   IfElse(Token token);
-  ~IfElse();
 
   Token token;
   std::vector<condition_set> list;
@@ -188,16 +194,9 @@ class IfElse : public Node {
   std::string token_literal();
   std::string to_string();
 
-  void push_condition_set(Node *condition, Block *consequence);
+  void push_condition_set(std::shared_ptr<Node> condition,
+                          std::shared_ptr<Block> consequence);
 };
-
-/* A pair of a condition and the consequence should that condition be evaluated
- * to true */
-struct condition_set {
-  Node *condition;
-  Block *consequence;
-};
-
 // TODO: Have these exceptions be raised with the line and column numbers from
 // the tokens.
 
@@ -209,7 +208,7 @@ class NullNodeException : public std::exception {
     return "NullNodeException: A null node member was passed to a "
            "node object method or constructor";
   }
-} nullNodeExc;
+};
 
 /* The to_string method of the IfElse will throw this if called when the
  * condition_set list is empty */
@@ -218,6 +217,20 @@ class EmptyConditionListException : public std::exception {
     return "EmptyConditionListException: An IfElse expression node must have "
            "at least on condition_set";
   }
-} emptyCondExc;
+};
+
+typedef std::shared_ptr<Node> node_ptr;
+typedef std::shared_ptr<Block> block_ptr;
+typedef std::shared_ptr<Identifier> ident_ptr;
+typedef std::shared_ptr<Let> let_ptr;
+typedef std::shared_ptr<Assign> assign_ptr;
+typedef std::shared_ptr<Return> return_ptr;
+typedef std::shared_ptr<Integer> int_ptr;
+typedef std::shared_ptr<Boolean> bool_ptr;
+typedef std::shared_ptr<Prefix> prefix_ptr;
+typedef std::shared_ptr<Infix> infix_ptr;
+typedef std::shared_ptr<IfElse> ifelse_ptr;
 
 }  // namespace Ast
+
+#endif
