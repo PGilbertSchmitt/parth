@@ -5,7 +5,7 @@ Ast::EmptyConditionListException emptyCondExc =
     Ast::EmptyConditionListException();
 
 /*************/
-/*** BLOCK ***/
+/*** Block ***/
 /*************/
 
 Ast::Block::Block(Token token) { this->token = token; }
@@ -29,7 +29,7 @@ std::string Ast::Block::to_string() {
 }
 
 /******************/
-/*** ident_ptr **/
+/*** Identifier **/
 /******************/
 
 Ast::Identifier::Identifier(Token token, std::string value) {
@@ -43,11 +43,9 @@ std::string Ast::Identifier::to_string() { return value; }
 /*** Let Expression ***/
 /**********************/
 
-Ast::Let::Let(Token token, ident_ptr _name, node_ptr expression)
-    : name(std::move(_name)), expression(std::move(expression)) {
+Ast::Let::Let(Token token, ident_ptr name, node_ptr expression)
+    : name(name), expression(expression) {
   this->token = token;
-  // name = std::move(_name);
-  // this->expression = expression;
 }
 
 std::string Ast::Let::to_string() {
