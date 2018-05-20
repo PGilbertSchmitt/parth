@@ -1,5 +1,7 @@
 // Token.h
-#pragma once
+#ifndef TOKEN_H
+#define TOKEN_H
+
 #include <string>
 #include <unordered_map>
 #include "token_type.h"
@@ -28,3 +30,5 @@ class Token {
 
   static TokenType lookup_ident(std::string &ident);
 };
+
+#endif

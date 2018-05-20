@@ -1,4 +1,6 @@
-#pragma once
+#ifndef TOKEN_TYPE_H
+#define TOKEN_TYPE_H
+
 #include <string>
 
 enum class TokenType : int {
@@ -56,3 +58,5 @@ enum class TokenType : int {
 };
 
 std::string token_type_string(TokenType type);
+
+#endif

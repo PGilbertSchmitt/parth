@@ -1,4 +1,6 @@
-#pragma once
+#ifndef LEXER_H
+#define LEXER_H
+
 #include <string>
 #include "token.h"
 
@@ -28,3 +30,5 @@ class Lexer {
   static bool isLetter(char);
   static bool isDigit(char);
 };
+
+#endif
