@@ -40,8 +40,8 @@ typedef std::shared_ptr<IfElse> ifelse_ptr;
 class Node {
  public:
   Token token;
-  std::string token_literal() { return token.getLiteral(); };
-  std::string to_string();
+  virtual std::string token_literal() { return token.getLiteral(); };
+  virtual std::string to_string() = 0;
 };
 
 /* Block Expression
@@ -56,9 +56,7 @@ class Block : public Node {
 
   std::vector<node_ptr> nodes;
 
-  std::string token_literal();
   std::string to_string();
-
   void push_node(node_ptr node);
 };
 
@@ -73,7 +71,6 @@ class Identifier : public Node {
   Token token;
   std::string value;
 
-  std::string token_literal();
   std::string to_string();
 };
 
@@ -88,7 +85,6 @@ class Let : public Node {
   const ident_ptr name;
   node_ptr expression;
 
-  std::string token_literal();
   std::string to_string();
 };
 
@@ -103,7 +99,6 @@ class Assign : public Node {
   ident_ptr name;
   node_ptr expression;
 
-  std::string token_literal();
   std::string to_string();
 };
 
@@ -119,7 +114,6 @@ class Return : public Node {
   Token token;
   node_ptr expression;
 
-  std::string token_literal();
   std::string to_string();
 };
 
@@ -133,7 +127,6 @@ class Integer : public Node {
   Token token;
   int64_t value;
 
-  std::string token_literal();
   std::string to_string();
 };
 
@@ -147,7 +140,6 @@ class Boolean : public Node {
   Token token;
   bool value;
 
-  std::string token_literal();
   std::string to_string();
 };
 
@@ -163,7 +155,6 @@ class Prefix : public Node {
   std::string op;
   node_ptr right;
 
-  std::string token_literal();
   std::string to_string();
 };
 
@@ -180,7 +171,6 @@ class Infix : public Node {
   node_ptr right;
   std::string op;
 
-  std::string token_literal();
   std::string to_string();
 };
 
@@ -212,9 +202,7 @@ class IfElse : public Node {
   Token token;
   std::vector<condition_set> list;
 
-  std::string token_literal();
   std::string to_string();
-
   void push_condition_set(node_ptr condition, block_ptr consequence);
 };
 // TODO: Have these exceptions be raised with the line and column numbers from

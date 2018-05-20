@@ -53,7 +53,7 @@ std::string ast::Let::to_string() {
     return "<! LET STATEMENT HAS NULL MEMBERS !>";
   }
 
-  return this->Node::token_literal() + " " + name->value + " = " +
+  return this->token_literal() + " " + name->value + " = " +
          expression->to_string();
 };
 
