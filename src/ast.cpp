@@ -1,23 +1,23 @@
 #include "ast.h"
 
-Ast::NullNodeException nullNodeExc = Ast::NullNodeException();
-Ast::EmptyConditionListException emptyCondExc =
-    Ast::EmptyConditionListException();
+ast::NullNodeException nullNodeExc = ast::NullNodeException();
+ast::EmptyConditionListException emptyCondExc =
+    ast::EmptyConditionListException();
 
 /*************/
 /*** Block ***/
 /*************/
 
-Ast::Block::Block(Token token) { this->token = token; }
+ast::Block::Block(Token token) { this->token = token; }
 
-void Ast::Block::push_node(node_ptr node) {
+void ast::Block::push_node(node_ptr node) {
   if (node == NULL) {
     throw nullNodeExc;
   }
   nodes.push_back(node);
 }
 
-std::string Ast::Block::to_string() {
+std::string ast::Block::to_string() {
   std::string out;
 
   int nodes_size = sizeof(nodes) / sizeof(node_ptr);
@@ -32,23 +32,23 @@ std::string Ast::Block::to_string() {
 /*** Identifier **/
 /******************/
 
-Ast::Identifier::Identifier(Token token, std::string value) {
+ast::Identifier::Identifier(Token token, std::string value) {
   this->token = token;
   this->value = value;
 }
 
-std::string Ast::Identifier::to_string() { return value; }
+std::string ast::Identifier::to_string() { return value; }
 
 /**********************/
 /*** Let Expression ***/
 /**********************/
 
-Ast::Let::Let(Token token, ident_ptr name, node_ptr expression)
+ast::Let::Let(Token token, ident_ptr name, node_ptr expression)
     : name(name), expression(expression) {
   this->token = token;
 }
 
-std::string Ast::Let::to_string() {
+std::string ast::Let::to_string() {
   if (name == NULL or expression == NULL) {
     return "<! LET STATEMENT HAS NULL MEMBERS !>";
   }
@@ -61,7 +61,7 @@ std::string Ast::Let::to_string() {
 /*** Assign Expression ***/
 /*************************/
 
-Ast::Assign::Assign(Token token, ident_ptr name, node_ptr expression) {
+ast::Assign::Assign(Token token, ident_ptr name, node_ptr expression) {
   if (name == NULL || expression == NULL) {
     throw nullNodeExc;
   }
@@ -71,7 +71,7 @@ Ast::Assign::Assign(Token token, ident_ptr name, node_ptr expression) {
   this->expression = expression;
 }
 
-std::string Ast::Assign::to_string() {
+std::string ast::Assign::to_string() {
   return name->to_string() + " = " + expression->to_string();
 }
 
@@ -79,7 +79,7 @@ std::string Ast::Assign::to_string() {
 /*** Return Expression ***/
 /*************************/
 
-Ast::Return::Return(Token token, node_ptr expression) {
+ast::Return::Return(Token token, node_ptr expression) {
   if (expression == NULL) {
     throw nullNodeExc;
   }
@@ -88,7 +88,7 @@ Ast::Return::Return(Token token, node_ptr expression) {
   this->expression = expression;
 }
 
-std::string Ast::Return::to_string() {
+std::string ast::Return::to_string() {
   return "return " + expression->to_string();
 }
 
@@ -96,29 +96,29 @@ std::string Ast::Return::to_string() {
 /*** Integer Literal ***/
 /***********************/
 
-Ast::Integer::Integer(Token token, int64_t value) {
+ast::Integer::Integer(Token token, int64_t value) {
   this->token = token;
   this->value = value;
 }
 
-std::string Ast::Integer::to_string() { return std::to_string(value); }
+std::string ast::Integer::to_string() { return std::to_string(value); }
 
 /***********************/
 /*** Boolean Literal ***/
 /***********************/
 
-Ast::Boolean::Boolean(Token token, bool value) {
+ast::Boolean::Boolean(Token token, bool value) {
   this->token = token;
   this->value = value;
 }
 
-std::string Ast::Boolean::to_string() { return this->value ? "true" : "false"; }
+std::string ast::Boolean::to_string() { return this->value ? "true" : "false"; }
 
 /*************************/
 /*** Prefix Expression ***/
 /*************************/
 
-Ast::Prefix::Prefix(Token token, std::string op, node_ptr right) {
+ast::Prefix::Prefix(Token token, std::string op, node_ptr right) {
   if (right == NULL) {
     throw nullNodeExc;
   }
@@ -128,7 +128,7 @@ Ast::Prefix::Prefix(Token token, std::string op, node_ptr right) {
   this->right = right;
 }
 
-std::string Ast::Prefix::to_string() {
+std::string ast::Prefix::to_string() {
   return "(" + op + right->to_string() + ")";
 }
 
@@ -136,7 +136,7 @@ std::string Ast::Prefix::to_string() {
 /*** Infix Expression ***/
 /************************/
 
-Ast::Infix::Infix(Token token, std::string op, node_ptr left, node_ptr right) {
+ast::Infix::Infix(Token token, std::string op, node_ptr left, node_ptr right) {
   if (left == NULL || right == NULL) {
     throw nullNodeExc;
   }
@@ -147,7 +147,7 @@ Ast::Infix::Infix(Token token, std::string op, node_ptr left, node_ptr right) {
   this->right = right;
 }
 
-std::string Ast::Infix::to_string() {
+std::string ast::Infix::to_string() {
   return "(" + left->to_string() + " " + op + " " + right->to_string() + ")";
 }
 
@@ -155,9 +155,9 @@ std::string Ast::Infix::to_string() {
 /*** IfElse Expression ***/
 /*************************/
 
-Ast::IfElse::IfElse(Token token) { this->token = token; }
+ast::IfElse::IfElse(Token token) { this->token = token; }
 
-std::string Ast::IfElse::to_string() {
+std::string ast::IfElse::to_string() {
   if (list.empty()) {
     throw emptyCondExc;
   }
@@ -183,7 +183,7 @@ std::string Ast::IfElse::to_string() {
   return out;
 }
 
-void Ast::IfElse::push_condition_set(node_ptr condition,
+void ast::IfElse::push_condition_set(node_ptr condition,
                                      block_ptr consequence) {
   // Not checking for condition after the first since a null condition ptr
   // represents an else with no followed if. If any else-ifs follow an else, it

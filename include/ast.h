@@ -8,7 +8,7 @@
 #include <vector>
 #include "token.h"
 
-namespace Ast {
+namespace ast {
 
 class Node;
 class Block;
@@ -239,6 +239,6 @@ class EmptyConditionListException : public std::exception {
   }
 };
 
-}  // namespace Ast
+}  // namespace ast
 
 #endif
