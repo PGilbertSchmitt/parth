@@ -41,7 +41,7 @@ class Node {
  public:
   Token token;
   std::string token_literal() { return token.getLiteral(); };
-  virtual std::string to_string() = 0;
+  std::string to_string();
 };
 
 /* Block Expression
