@@ -48,7 +48,7 @@ class Parser {
   bool expect_peek(TokenType);
 
   // Token Presedence
-  std::unordered_map<int, int> precedences;
+  std::unordered_map<TokenType, int, EnumClassHash> precedences;
   enum rank {
     LOWEST,       // For restarting a precedence scope inside brackets
     ASSIGN,       // =
