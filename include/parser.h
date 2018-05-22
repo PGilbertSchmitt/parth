@@ -50,15 +50,15 @@ class Parser {
   // Token Presedence
   std::unordered_map<TokenType, int, EnumClassHash> precedences;
   enum rank {
-    LOWEST,       // For restarting a precedence scope inside brackets
-    ASSIGN,       // =
-    EQUALS,       // ==
-    LESSGREATER,  // > < >= <=
-    SUM,          // + -
-    PRODUCT,      // * / %
-    PREFIX,       // !x -y
-    CALL,         // my_func(x)
-    INDEX         // my_arr[y]
+    LOWEST,   // For restarting a precedence scope inside brackets
+    ASSIGN,   // =
+    EQUALS,   // ==
+    COMPARE,  // > < >= <=
+    SUM,      // + -
+    PRODUCT,  // * / %
+    PREFIX,   // !x -y
+    CALL,     // my_func(x)
+    INDEX     // my_arr[y]
   };
   int cur_precedence();
   int peek_precedence();
