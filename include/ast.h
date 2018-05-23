@@ -8,6 +8,19 @@
 #include <vector>
 #include "token.h"
 
+enum node_type : int {
+  BLOCK,
+  IDENT,
+  LET,
+  ASSIGN,
+  RETURN,
+  INTEGER,
+  BOOLEAN,
+  PREFIX,
+  INFIX,
+  IF_ELSE
+};
+
 namespace ast {
 
 class Node;
@@ -42,6 +55,9 @@ class Node {
   Token token;
   virtual std::string token_literal() { return token.getLiteral(); };
   virtual std::string to_string() = 0;
+  // The node type will be checked upon during evaluation so that the nodes can
+  // be dynamically cast into their proper types.
+  virtual node_type type() = 0;
 };
 
 /* Block Expression
@@ -58,6 +74,7 @@ class Block : public Node {
 
   std::string to_string();
   void push_node(node_ptr node);
+  node_type type();
 };
 
 /* Identifier:
@@ -72,6 +89,7 @@ class Identifier : public Node {
   std::string value;
 
   std::string to_string();
+  node_type type();
 };
 
 /* Let Expression
@@ -86,6 +104,7 @@ class Let : public Node {
   node_ptr expression;
 
   std::string to_string();
+  node_type type();
 };
 
 /* Assign Expression
@@ -100,6 +119,7 @@ class Assign : public Node {
   node_ptr expression;
 
   std::string to_string();
+  node_type type();
 };
 
 /* Return Expression
@@ -115,6 +135,7 @@ class Return : public Node {
   node_ptr expression;
 
   std::string to_string();
+  node_type type();
 };
 
 /* Integer Expression
@@ -128,6 +149,7 @@ class Integer : public Node {
   int64_t value;
 
   std::string to_string();
+  node_type type();
 };
 
 /* Boolean Literal
@@ -141,6 +163,7 @@ class Boolean : public Node {
   bool value;
 
   std::string to_string();
+  node_type type();
 };
 
 /* Prefix Expression
@@ -156,6 +179,7 @@ class Prefix : public Node {
   node_ptr right;
 
   std::string to_string();
+  node_type type();
 };
 
 /* Infix Expression
@@ -172,6 +196,7 @@ class Infix : public Node {
   std::string op;
 
   std::string to_string();
+  node_type type();
 };
 
 /* A pair of a condition and the consequence should that condition be evaluated
@@ -203,6 +228,7 @@ class IfElse : public Node {
   std::vector<condition_set> list;
 
   std::string to_string();
+  node_type type();
   void push_condition_set(node_ptr condition, block_ptr consequence);
 };
 // TODO: Have these exceptions be raised with the line and column numbers from
