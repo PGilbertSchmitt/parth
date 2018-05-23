@@ -23,15 +23,14 @@ typedef ast::node_ptr (*IPF)(Parser &, ast::node_ptr);
 
 typedef std::vector<std::string> error_list;
 
+typedef std::unordered_map<TokenType, int, EnumClassHash> rank_map;
+
 class Parser {
  public:
   Parser(Lexer *lexer);
 
   ast::block_ptr parse_program();
   error_list get_all_errors();
-
-  int cur_precedence();
-  int peek_precedence();
 
   Token get_cur_token();
   Token get_peek_token();
@@ -40,6 +39,21 @@ class Parser {
   bool cur_token_is(TokenType);
   bool peek_token_is(TokenType);
   bool expect_peek(TokenType);
+
+  enum rank {
+    LOWEST,   // For restarting a precedence scope inside brackets
+    ASSIGN,   // =
+    EQUALS,   // ==
+    COMPARE,  // > < >= <=
+    SUM,      // + -
+    PRODUCT,  // * / %
+    PREFIX,   // !x -y
+    CALL,     // my_func(x)
+    INDEX     // my_arr[y]
+  };
+
+  rank cur_precedence();
+  rank peek_precedence();
 
  private:
   Lexer *lexer;
@@ -56,18 +70,7 @@ class Parser {
   Token peek_token;
 
   // Token Presedence
-  static std::unordered_map<TokenType, int, EnumClassHash> precedences;
-  enum rank {
-    LOWEST,   // For restarting a precedence scope inside brackets
-    ASSIGN,   // =
-    EQUALS,   // ==
-    COMPARE,  // > < >= <=
-    SUM,      // + -
-    PRODUCT,  // * / %
-    PREFIX,   // !x -y
-    CALL,     // my_func(x)
-    INDEX     // my_arr[y]
-  };
+  static rank_map precedences;
 
   // Prefix parsing functions
 
