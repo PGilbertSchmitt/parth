@@ -56,7 +56,11 @@ class Node {
   virtual std::string token_literal() { return token.getLiteral(); };
   virtual std::string to_string() = 0;
   // The node type will be checked upon during evaluation so that the nodes can
-  // be dynamically cast into their proper types.
+  // be dynamically cast into their proper types. I fear this may be a messy way
+  // to go about this, and I'm doing something that was okay in my previous
+  // Golang code but isn't technically considered proper in C++. However, the
+  // language does allow for this, and I'm confident that it will work well
+  // enough for now.
   virtual node_type type() = 0;
 };
 
