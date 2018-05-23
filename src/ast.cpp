@@ -28,7 +28,7 @@ std::string ast::Block::to_string() {
   return out;
 }
 
-node_type ast::Block::type() { return node_type::BLOCK; }
+ast::node_type ast::Block::type() { return ast::BLOCK; }
 
 /******************/
 /*** Identifier **/
@@ -41,7 +41,7 @@ ast::Identifier::Identifier(Token token, std::string value) {
 
 std::string ast::Identifier::to_string() { return value; }
 
-node_type ast::Identifier::type() { return node_type::IDENT; }
+ast::node_type ast::Identifier::type() { return ast::IDENT; }
 
 /**********************/
 /*** Let Expression ***/
@@ -61,7 +61,7 @@ std::string ast::Let::to_string() {
          expression->to_string();
 };
 
-node_type ast::Let::type() { return node_type::LET; }
+ast::node_type ast::Let::type() { return ast::LET; }
 
 /*************************/
 /*** Assign Expression ***/
@@ -81,7 +81,7 @@ std::string ast::Assign::to_string() {
   return name->to_string() + " = " + expression->to_string();
 }
 
-node_type ast::Assign::type() { return node_type::ASSIGN; }
+ast::node_type ast::Assign::type() { return ast::ASSIGN; }
 
 /*************************/
 /*** Return Expression ***/
@@ -100,7 +100,7 @@ std::string ast::Return::to_string() {
   return "return " + expression->to_string();
 }
 
-node_type ast::Return::type() { return node_type::RETURN; }
+ast::node_type ast::Return::type() { return ast::RETURN; }
 
 /***********************/
 /*** Integer Literal ***/
@@ -113,7 +113,7 @@ ast::Integer::Integer(Token token, int64_t value) {
 
 std::string ast::Integer::to_string() { return std::to_string(value); }
 
-node_type ast::Integer::type() { return node_type::INTEGER; }
+ast::node_type ast::Integer::type() { return ast::INTEGER; }
 
 /***********************/
 /*** Boolean Literal ***/
@@ -126,7 +126,7 @@ ast::Boolean::Boolean(Token token, bool value) {
 
 std::string ast::Boolean::to_string() { return this->value ? "true" : "false"; }
 
-node_type ast::Boolean::type() { return node_type::BOOLEAN; }
+ast::node_type ast::Boolean::type() { return ast::BOOLEAN; }
 
 /*************************/
 /*** Prefix Expression ***/
@@ -146,7 +146,7 @@ std::string ast::Prefix::to_string() {
   return "(" + op + right->to_string() + ")";
 }
 
-node_type ast::Prefix::type() { return node_type::PREFIX; }
+ast::node_type ast::Prefix::type() { return ast::PREFIX; }
 
 /************************/
 /*** Infix Expression ***/
@@ -167,7 +167,7 @@ std::string ast::Infix::to_string() {
   return "(" + left->to_string() + " " + op + " " + right->to_string() + ")";
 }
 
-node_type ast::Infix::type() { return node_type::INFIX; }
+ast::node_type ast::Infix::type() { return ast::INFIX; }
 
 /*************************/
 /*** IfElse Expression ***/
@@ -201,7 +201,7 @@ std::string ast::IfElse::to_string() {
   return out;
 }
 
-node_type ast::IfElse::type() { return node_type::IF_ELSE; }
+ast::node_type ast::IfElse::type() { return ast::IF_ELSE; }
 
 void ast::IfElse::push_condition_set(node_ptr condition,
                                      block_ptr consequence) {
