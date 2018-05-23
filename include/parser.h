@@ -15,10 +15,11 @@
 // fair, I don't know much more than the basics about Pratt parsers, I'm just
 // copying Thorsten Ball.
 
+class Parser;
 // Prefix Parsing Function
-typedef ast::node_ptr (*PPF)(void);
+typedef ast::node_ptr (*PPF)(Parser &);
 // Infix Parsing Function
-typedef ast::node_ptr (*IPF)(ast::node_ptr);
+typedef ast::node_ptr (*IPF)(Parser &, ast::node_ptr);
 
 typedef std::vector<std::string> error_list;
 
@@ -28,6 +29,17 @@ class Parser {
 
   ast::block_ptr parse_program();
   error_list get_all_errors();
+
+  int cur_precedence();
+  int peek_precedence();
+
+  Token get_cur_token();
+  Token get_peek_token();
+
+  void next_token();
+  bool cur_token_is(TokenType);
+  bool peek_token_is(TokenType);
+  bool expect_peek(TokenType);
 
  private:
   Lexer *lexer;
@@ -42,13 +54,9 @@ class Parser {
   // Token management
   Token cur_token;
   Token peek_token;
-  void next_token();
-  bool cur_token_is(TokenType);
-  bool peek_token_is(TokenType);
-  bool expect_peek(TokenType);
 
   // Token Presedence
-  std::unordered_map<TokenType, int, EnumClassHash> precedences;
+  static std::unordered_map<TokenType, int, EnumClassHash> precedences;
   enum rank {
     LOWEST,   // For restarting a precedence scope inside brackets
     ASSIGN,   // =
@@ -60,12 +68,12 @@ class Parser {
     CALL,     // my_func(x)
     INDEX     // my_arr[y]
   };
-  int cur_precedence();
-  int peek_precedence();
 
   // Prefix parsing functions
 
   // Infix parsing functions
 };
+
+ast::node_ptr parse_identifier(Parser &p);
 
 #endif
