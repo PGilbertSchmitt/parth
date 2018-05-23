@@ -171,8 +171,8 @@ TEST(Lexer, Input) {
     cur_token = l.next_token();
     test_row cur_row = all_rows[i];
 
-    TokenType cur_type = cur_token.getType();
-    std::string cur_lit = cur_token.getLiteral();
+    TokenType cur_type = cur_token.get_type();
+    std::string cur_lit = cur_token.get_literal();
 
     ASSERT_EQ(cur_type, cur_row.expected_type)
         << "Token " << i + 1
@@ -189,7 +189,7 @@ TEST(Lexer, Input) {
 TEST(Lexer, UnendedString) {
   Lexer l = Lexer("\"No end in sight");
   Token tok = l.next_token();
-  ASSERT_EQ(tok.getType(), TokenType::ILLEGAL)
+  ASSERT_EQ(tok.get_type(), TokenType::ILLEGAL)
       << "Expected unended string to create ILLEGAL token, instead got: "
-      << token_type_string(tok.getType());
+      << token_type_string(tok.get_type());
 }

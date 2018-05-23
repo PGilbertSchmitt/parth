@@ -13,13 +13,13 @@ Token::Token(TokenType _type, std::string _literal, uint _column, uint _line) {
   line = _line;
 }
 
-TokenType Token::getType() { return type; }
+TokenType Token::get_type() { return type; }
 
-std::string Token::getLiteral() { return literal; }
+std::string Token::get_literal() { return literal; }
 
-uint Token::getColumn() { return column; }
+uint Token::get_column() { return column; }
 
-uint Token::getLine() { return line; }
+uint Token::get_line() { return line; }
 
 bool Token::is_empty() { return type == TokenType::NONE && literal == ""; }
 

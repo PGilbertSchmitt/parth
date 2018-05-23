@@ -31,9 +31,9 @@ Token Parser::get_cur_token() { return cur_token; }
 
 Token Parser::get_peek_token() { return peek_token; }
 
-bool Parser::cur_token_is(TokenType tt) { return tt == cur_token.getType(); }
+bool Parser::cur_token_is(TokenType tt) { return tt == cur_token.get_type(); }
 
-bool Parser::peek_token_is(TokenType tt) { return tt == peek_token.getType(); }
+bool Parser::peek_token_is(TokenType tt) { return tt == peek_token.get_type(); }
 
 bool Parser::expect_peek(TokenType tt) {
   if (peek_token_is(tt)) {
@@ -51,7 +51,7 @@ void Parser::next_token() {
 }
 
 Parser::rank Parser::cur_precedence() {
-  rank_map::iterator cur_rank = Parser::precedences.find(cur_token.getType());
+  rank_map::iterator cur_rank = Parser::precedences.find(cur_token.get_type());
   if (cur_rank == Parser::precedences.end()) {
     return rank::LOWEST;
   }
@@ -59,7 +59,8 @@ Parser::rank Parser::cur_precedence() {
 }
 
 Parser::rank Parser::peek_precedence() {
-  rank_map::iterator peek_rank = Parser::precedences.find(peek_token.getType());
+  rank_map::iterator peek_rank =
+      Parser::precedences.find(peek_token.get_type());
   if (peek_rank == Parser::precedences.end()) {
     return rank::LOWEST;
   }
@@ -70,5 +71,5 @@ Parser::rank Parser::peek_precedence() {
 
 ast::node_ptr parse_identifier(Parser& p) {
   Token cur = p.get_cur_token();
-  return ast::ident_ptr(new ast::Identifier(cur, cur.getLiteral()));
+  return ast::ident_ptr(new ast::Identifier(cur, cur.get_literal()));
 }

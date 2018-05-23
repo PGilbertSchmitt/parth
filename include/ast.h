@@ -53,7 +53,7 @@ typedef std::shared_ptr<IfElse> ifelse_ptr;
 class Node {
  public:
   Token token;
-  virtual std::string token_literal() { return token.getLiteral(); };
+  virtual std::string token_literal() { return token.get_literal(); };
   virtual std::string to_string() = 0;
   // The node type will be checked upon during evaluation so that the nodes can
   // be dynamically cast into their proper types. I fear this may be a messy way
