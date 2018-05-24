@@ -67,9 +67,54 @@ Parser::rank Parser::peek_precedence() {
   return rank(peek_rank->second);
 }
 
+ast::block_ptr Parser::parse_program() {
+  Token block_token = Token(TokenType::NONE, "block", 0, 0);
+  ast::block_ptr block = ast::block_ptr(new ast::Block(block_token));
+
+  while (cur_token.get_type() != TokenType::EOF_VAL) {
+    ast::node_ptr new_node = this->parse_line();
+    block->push_node(new_node);
+  }
+
+  return block;
+}
+
+ast::node_ptr Parser::parse_line() {
+  ast::node_ptr line = this->parse_expression(rank::LOWEST);
+
+  while (this->cur_token.get_type() == TokenType::NEWLINE) {
+    this->lexer->next_token();
+  }
+
+  return line;
+}
+
+ast::node_ptr Parser::parse_expression(rank r) {
+  int cur_type = int(this->cur_token.get_type());
+  PPF prefix = this->prefix_parsers[cur_type];
+  if (prefix == NULL) {
+    // Add prefix parsing error
+    return ast::node_ptr();
+  }
+  ast::node_ptr left_expr = prefix(*this);
+
+  while (!this->peek_token_is(TokenType::NEWLINE) &&
+         (r < this->peek_precedence())) {
+    // Do stuff
+  }
+
+  return left_expr;
+}
+
 /* Prefix Parsers */
 
 ast::node_ptr parse_identifier(Parser& p) {
   Token cur = p.get_cur_token();
   return ast::ident_ptr(new ast::Identifier(cur, cur.get_literal()));
+}
+
+ast::node_ptr parse_integer(Parser& p) {
+  Token cur = p.get_cur_token();
+  int64_t val = std::stoi(cur.get_literal());
+  return ast::int_ptr(new ast::Integer(cur, val));
 }
