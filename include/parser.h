@@ -72,11 +72,16 @@ class Parser {
   // Token Presedence
   static rank_map precedences;
 
+  ast::node_ptr parse_line();
+  ast::node_ptr parse_expression(rank r);
+
   // Prefix parsing functions
 
   // Infix parsing functions
 };
 
 ast::node_ptr parse_identifier(Parser &p);
+ast::node_ptr parse_integer(Parser &p);
+ast::node_ptr parse_let(Parser &p);
 
 #endif
