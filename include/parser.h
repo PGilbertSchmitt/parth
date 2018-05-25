@@ -18,8 +18,10 @@
 class Parser;
 // Prefix Parsing Function
 typedef ast::node_ptr (*PPF)(Parser &);
+typedef std::unordered_map<int, PPF> prefix_map;
 // Infix Parsing Function
 typedef ast::node_ptr (*IPF)(Parser &, ast::node_ptr);
+typedef std::unordered_map<int, IPF> infix_map;
 
 typedef std::vector<std::string> error_list;
 
@@ -60,8 +62,8 @@ class Parser {
   error_list errors;
 
   // Parsing functions
-  std::unordered_map<int, PPF> prefix_parsers;
-  std::unordered_map<int, IPF> infix_parsers;
+  prefix_map prefix_parsers;
+  infix_map infix_parsers;
   void register_prefix(TokenType, PPF);
   void register_infix(TokenType, IPF);
 
