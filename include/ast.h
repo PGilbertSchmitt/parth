@@ -3,6 +3,7 @@
 #define AST_H
 
 #include <exception>
+#include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
@@ -241,9 +242,13 @@ class IfElse : public Node {
  * there should be a check that throws this error. If there's a better way to go
  * about this, please let me know. This feels weirdly tedious. */
 class NullNodeException : public std::exception {
+ public:
+  NullNodeException(std::string opt = "") { this->opt = opt; }
+  std::string opt;
   virtual const char *what() const throw() {
-    return "NullNodeException: A null node member was passed to a "
-           "node object method or constructor";
+    std::cout << opt << std::endl;
+    return "NullNodeException: A null node member was passed to a node object "
+           "method or constructor";
   }
 };
 

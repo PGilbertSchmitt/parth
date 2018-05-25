@@ -12,7 +12,7 @@ ast::Block::Block(Token token) { this->token = token; }
 
 void ast::Block::push_node(node_ptr node) {
   if (node == NULL) {
-    throw nullNodeExc;
+    throw ast::NullNodeException("In Block:");
   }
   nodes.push_back(node);
 }
@@ -134,7 +134,8 @@ ast::node_type ast::Boolean::type() { return ast::BOOLEAN; }
 
 ast::Prefix::Prefix(Token token, std::string op, node_ptr right) {
   if (right == NULL) {
-    throw nullNodeExc;
+    throw ast::NullNodeException("In Prefix:");
+    ;
   }
 
   this->token = token;
@@ -154,7 +155,8 @@ ast::node_type ast::Prefix::type() { return ast::PREFIX; }
 
 ast::Infix::Infix(Token token, std::string op, node_ptr left, node_ptr right) {
   if (left == NULL || right == NULL) {
-    throw nullNodeExc;
+    throw ast::NullNodeException("In Infix:");
+    ;
   }
 
   this->token = token;
