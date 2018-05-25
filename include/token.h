@@ -22,11 +22,11 @@ class Token {
   Token();
   Token(TokenType _type, std::string _literal, uint _column, uint _line);
 
-  TokenType get_type();
-  std::string get_literal();
-  uint get_column();
-  uint get_line();
-  bool is_empty();
+  TokenType get_type() const;
+  std::string get_literal() const;
+  uint get_column() const;
+  uint get_line() const;
+  bool is_empty() const;
 
   static TokenType lookup_ident(std::string &ident);
 };
