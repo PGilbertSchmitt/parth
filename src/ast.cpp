@@ -20,10 +20,15 @@ void ast::Block::push_node(node_ptr node) {
 std::string ast::Block::to_string() {
   std::string out;
 
-  int nodes_size = sizeof(nodes) / sizeof(node_ptr);
+  int nodes_size = nodes.size();
+  out += "{ ";
   for (int i = 0; i < nodes_size; i++) {
     out += nodes[i]->to_string();
+    if (i < nodes_size - 1) {
+      out += ", ";
+    }
   }
+  out += " }";
 
   return out;
 }
