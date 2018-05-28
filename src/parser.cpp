@@ -16,6 +16,8 @@ Parser::Parser(Lexer* lexer) : lexer(lexer) {
   register_prefix(TokenType::INT, &parse_identifier);
   register_prefix(TokenType::LET, &parse_let);
   register_prefix(TokenType::RETURN, &parse_return);
+  register_prefix(TokenType::MINUS, &parse_prefix);
+  register_prefix(TokenType::BANG, &parse_prefix);
 
   // Register Infix Parsing functions here
 
@@ -175,4 +177,12 @@ ast::node_ptr parse_return(Parser& p) {
   p.next_token();
   ast::node_ptr expr = p.parse_expression(Parser::LOWEST);
   return ast::return_ptr(new ast::Return(ret_tok, expr));
+}
+
+ast::node_ptr parse_prefix(Parser& p) {
+  Token pre_tok = p.get_cur_token();
+  std::string op = pre_tok.get_literal();
+  p.next_token();
+  ast::node_ptr right_expr = p.parse_expression(Parser::PREFIX);
+  return ast::prefix_ptr(new ast::Prefix(pre_tok, op, right_expr));
 }
