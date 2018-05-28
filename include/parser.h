@@ -84,6 +84,7 @@ class Parser {
 ast::node_ptr parse_identifier(Parser &p);
 ast::node_ptr parse_integer(Parser &p);
 ast::node_ptr parse_let(Parser &p);
+ast::node_ptr parse_return(Parser &p);
 
 // Infix parsing functions
 

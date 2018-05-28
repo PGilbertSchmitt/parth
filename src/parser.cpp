@@ -15,6 +15,7 @@ Parser::Parser(Lexer* lexer) : lexer(lexer) {
   register_prefix(TokenType::IDENT, &parse_identifier);
   register_prefix(TokenType::INT, &parse_identifier);
   register_prefix(TokenType::LET, &parse_let);
+  register_prefix(TokenType::RETURN, &parse_return);
 
   // Register Infix Parsing functions here
 
@@ -160,18 +161,18 @@ ast::node_ptr parse_integer(Parser& p) {
 
 ast::node_ptr parse_let(Parser& p) {
   Token let_tok = p.get_cur_token();
-
   p.expect_peek(TokenType::IDENT);
-
   ast::ident_ptr name =
       std::dynamic_pointer_cast<ast::Identifier>(parse_identifier(p));
-
   p.expect_peek(TokenType::ASSIGN);
-
   p.next_token();
-
   ast::node_ptr right_expr = p.parse_expression(Parser::LOWEST);
-
-  std::cout << "Return from Let" << std::endl;
   return ast::let_ptr(new ast::Let(let_tok, name, right_expr));
+}
+
+ast::node_ptr parse_return(Parser& p) {
+  Token ret_tok = p.get_cur_token();
+  p.next_token();
+  ast::node_ptr expr = p.parse_expression(Parser::LOWEST);
+  return ast::return_ptr(new ast::Return(ret_tok, expr));
 }
