@@ -45,6 +45,7 @@ class Parser {
   bool peek_token_is(TokenType);
   void expect_peek(TokenType);
   void expect_end();
+  void eat_newlines();
 
   enum rank {
     LOWEST,   // For restarting a precedence scope inside brackets

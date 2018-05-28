@@ -64,6 +64,12 @@ void Parser::expect_end() {
   }
 }
 
+void Parser::eat_newlines() {
+  while (cur_token_is(TokenType::NEWLINE)) {
+    next_token();
+  }
+}
+
 void Parser::next_token() {
   cur_token = peek_token;
   peek_token = lexer->next_token();
@@ -107,15 +113,10 @@ ast::block_ptr Parser::parse_program() {
 }
 
 ast::node_ptr Parser::parse_line() {
+  this->eat_newlines();
   ast::node_ptr line = this->parse_expression(rank::LOWEST);
-  // Top level lines should only end with newlines or the end of the file
-  // Block level lines should only end with newlines or a right brace
   this->expect_end();
-
-  // To clean up, we can just eat up all newlines that follow this line.
-  while (this->cur_token_is(TokenType::NEWLINE)) {
-    this->next_token();
-  }
+  this->eat_newlines();
 
   std::cout << "Line is returned\n";
   return line;
@@ -234,6 +235,7 @@ ast::block_ptr parse_block(Parser& p) {
   Token block_tok = p.get_cur_token();
   ast::block_ptr block = ast::block_ptr(new ast::Block(block_tok));
   p.next_token();
+  p.eat_newlines();
   // We don't check for a first line; empty blocks are allowed
   while (!p.cur_token_is(TokenType::RBRACE)) {
     ast::node_ptr line = p.parse_line();
