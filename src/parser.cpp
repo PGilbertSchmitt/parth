@@ -18,6 +18,8 @@ Parser::Parser(Lexer* lexer) : lexer(lexer) {
   register_prefix(TokenType::RETURN, &parse_return);
   register_prefix(TokenType::MINUS, &parse_prefix);
   register_prefix(TokenType::BANG, &parse_prefix);
+  register_prefix(TokenType::TRUE_VAL, &parse_boolean);
+  register_prefix(TokenType::FALSE_VAL, &parse_boolean);
 
   // Register Infix Parsing functions here
 
@@ -185,4 +187,10 @@ ast::node_ptr parse_prefix(Parser& p) {
   p.next_token();
   ast::node_ptr right_expr = p.parse_expression(Parser::PREFIX);
   return ast::prefix_ptr(new ast::Prefix(pre_tok, op, right_expr));
+}
+
+ast::node_ptr parse_boolean(Parser& p) {
+  Token bool_tok = p.get_cur_token();
+  bool val = bool_tok.get_literal() == "true";
+  return ast::bool_ptr(new ast::Boolean(bool_tok, val));
 }
