@@ -35,13 +35,13 @@ OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.cpp=.o))
 
 #*** PROJECT DEPENDENCIES ***#
 
+$(TARGET): $(OBJECTS)
+	$(CC) $^ -o $@ $(LIB)
+
 .PHONY: run
 
 run: $(TARGET)
 	$(TARGET)
-
-$(TARGET): $(OBJECTS)
-	$(CC) $^ -o $@ $(LIB)
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.cpp $(GTEST_HEADERS)
 	@mkdir -p $(BUILDDIR)
