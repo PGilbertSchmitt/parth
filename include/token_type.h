@@ -5,7 +5,7 @@
 
 enum class TokenType : int {
   // Extra special, represents a null token, useful for tokens that aren't
-  // illegal, but where no other token makes sense
+  // illegal, but where no other token makes sense (such as a block expression)
   NONE = -1,
 
   // Special

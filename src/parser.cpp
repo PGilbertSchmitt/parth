@@ -20,6 +20,8 @@ Parser::Parser(Lexer* lexer) : lexer(lexer) {
   register_prefix(TokenType::BANG, &parse_prefix);
   register_prefix(TokenType::TRUE_VAL, &parse_boolean);
   register_prefix(TokenType::FALSE_VAL, &parse_boolean);
+  register_prefix(TokenType::LPAREN, &parse_group);
+  register_prefix(TokenType::IF, &parse_if_else);
 
   // Register Infix Parsing functions here
 
@@ -54,8 +56,8 @@ void Parser::expect_peek(TokenType tt) {
 }
 
 void Parser::expect_end() {
-  TokenType peek = this->peek_token.get_type();
-  if (peek == TokenType::NEWLINE || peek == TokenType::EOF_VAL) {
+  if (peek_token_is(TokenType::NEWLINE) || peek_token_is(TokenType::EOF_VAL) ||
+      peek_token_is(TokenType::RBRACE)) {
     next_token();
   } else {
     throw UnexpectedException(TokenType::EOF_VAL, peek_token);
@@ -88,7 +90,6 @@ Parser::rank Parser::peek_precedence() {
 }
 
 ast::block_ptr Parser::parse_program() {
-  // Create custom block token
   Token block_token = Token(TokenType::NONE, "block", 0, 0);
   ast::block_ptr block = ast::block_ptr(new ast::Block(block_token));
 
@@ -96,6 +97,7 @@ ast::block_ptr Parser::parse_program() {
   while (cur_token.get_type() != TokenType::EOF_VAL) {
     std::cout << "BEGIN parsing Line " << i << std::endl;
     ast::node_ptr new_node = this->parse_line();
+
     block->push_node(new_node);
     std::cout << "DONE  parsing Line " << i << std::endl;
     i++;
@@ -106,12 +108,11 @@ ast::block_ptr Parser::parse_program() {
 
 ast::node_ptr Parser::parse_line() {
   ast::node_ptr line = this->parse_expression(rank::LOWEST);
-
-  // TODO: Raise error of some kind. Line expressions (any expression not
-  // contained within another expression) must be ended with newlines. Maybe
-  // consider semicolons as an option.
+  // Top level lines should only end with newlines or the end of the file
+  // Block level lines should only end with newlines or a right brace
   this->expect_end();
 
+  // To clean up, we can just eat up all newlines that follow this line.
   while (this->cur_token_is(TokenType::NEWLINE)) {
     this->next_token();
   }
@@ -193,4 +194,52 @@ ast::node_ptr parse_boolean(Parser& p) {
   Token bool_tok = p.get_cur_token();
   bool val = bool_tok.get_literal() == "true";
   return ast::bool_ptr(new ast::Boolean(bool_tok, val));
+}
+
+ast::node_ptr parse_if_else(Parser& p) {
+  Token if_tok = p.get_cur_token();
+  ast::ifelse_ptr if_else = ast::ifelse_ptr(new ast::IfElse(if_tok));
+  p.next_token();
+
+  ast::node_ptr first_condition = parse_group(p);
+  // std::cout << "Do we get here?\n";
+  p.next_token();
+  ast::block_ptr first_block = parse_block(p);
+  if_else->push_condition_set(first_condition, first_block);
+
+  return if_else;
+}
+
+// There is no group node type, since a group is just an expression that has
+// been wrapped in parens. It parses the sub expression with the lowest
+// precedence, to shelter it from surrounding expressions
+ast::node_ptr parse_group(Parser& p) {
+  p.next_token();
+  ast::node_ptr expr = p.parse_expression(Parser::LOWEST);
+  p.expect_peek(TokenType::RPAREN);
+  return expr;
+}
+
+/* Other parsing functions:
+ * If it's not a parsing function registered by the parsing class, then it can
+ * be a more specialized parser. */
+
+// The block parser isn't found just anywhere in the code. Since it's not a full
+// expression that could be assigned to a variable, it won't be a prefix parser
+// (and the curly brace syntax would break it anyways when hashes are added).
+// Instead, it's only used by if-elses (and soon, switches), so those parsers
+// call this directly.
+// This could be abstracted away with ::parse_program()
+ast::block_ptr parse_block(Parser& p) {
+  Token block_tok = p.get_cur_token();
+  ast::block_ptr block = ast::block_ptr(new ast::Block(block_tok));
+  p.next_token();
+  // We don't check for a first line; empty blocks are allowed
+  while (!p.cur_token_is(TokenType::RBRACE)) {
+    ast::node_ptr line = p.parse_line();
+    // p.next_token();
+    // p.expect_block_line_end();
+    block->push_node(line);
+  }
+  return block;
 }
