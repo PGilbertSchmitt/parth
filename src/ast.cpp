@@ -57,8 +57,7 @@ std::string ast::Let::to_string() {
     return "<! LET STATEMENT HAS NULL MEMBERS !>";
   }
 
-  return this->token_literal() + " " + name->value + " = " +
-         expression->to_string();
+  return "let " + name->value + " = " + expression->to_string();
 };
 
 ast::node_type ast::Let::type() { return ast::LET; }
