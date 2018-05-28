@@ -7,7 +7,7 @@ Lexer::Lexer(const std::string &_input) {
   read_position = 0;
   ch = 0;
   len = input.length();
-  cur_line = 0;
+  cur_line = 1;
   cur_column = 0;
 
   read_char();
