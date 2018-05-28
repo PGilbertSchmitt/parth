@@ -14,13 +14,12 @@ Parser::Parser(Lexer* lexer) : lexer(lexer) {
   // Register Prefix Parsing functions here
   register_prefix(TokenType::IDENT, &parse_identifier);
   register_prefix(TokenType::INT, &parse_identifier);
+  register_prefix(TokenType::LET, &parse_let);
 
   // Register Infix Parsing functions here
 
   this->next_token();
   this->next_token();
-  std::cout << "CUR PARSED TOKEN IS " << token_type_string(cur_token.get_type())
-            << std::endl;
 }
 
 void Parser::register_prefix(TokenType tt, PPF ppf) {
@@ -41,19 +40,29 @@ bool Parser::cur_token_is(TokenType tt) { return tt == cur_token.get_type(); }
 
 bool Parser::peek_token_is(TokenType tt) { return tt == peek_token.get_type(); }
 
-bool Parser::expect_peek(TokenType tt) {
+void Parser::expect_peek(TokenType tt) {
   if (peek_token_is(tt)) {
     next_token();
-    return true;
+  } else {
+    throw UnexpectedException(tt, peek_token);
   }
+}
 
-  // TODO: Add peek error
-  return false;
+void Parser::expect_end() {
+  TokenType peek = this->peek_token.get_type();
+  if (peek == TokenType::NEWLINE || peek == TokenType::EOF_VAL) {
+    next_token();
+  } else {
+    throw UnexpectedException(TokenType::EOF_VAL, peek_token);
+  }
 }
 
 void Parser::next_token() {
   cur_token = peek_token;
   peek_token = lexer->next_token();
+  std::cout << "Cur token is " << token_type_string(cur_token.get_type())
+            << std::endl;
+  // std::cin.ignore();  // Good for stepping
 }
 
 Parser::rank Parser::cur_precedence() {
@@ -74,6 +83,7 @@ Parser::rank Parser::peek_precedence() {
 }
 
 ast::block_ptr Parser::parse_program() {
+  // Create custom block token
   Token block_token = Token(TokenType::NONE, "block", 0, 0);
   ast::block_ptr block = ast::block_ptr(new ast::Block(block_token));
 
@@ -82,8 +92,7 @@ ast::block_ptr Parser::parse_program() {
     std::cout << "BEGIN parsing Line " << i << std::endl;
     ast::node_ptr new_node = this->parse_line();
     block->push_node(new_node);
-    this->next_token();
-    std::cout << "DONE  psarsing Line " << i << std::endl;
+    std::cout << "DONE  parsing Line " << i << std::endl;
     i++;
   }
 
@@ -93,15 +102,16 @@ ast::block_ptr Parser::parse_program() {
 ast::node_ptr Parser::parse_line() {
   ast::node_ptr line = this->parse_expression(rank::LOWEST);
 
-  if (!this->peek_token_is(TokenType::NEWLINE)) {
-    // TODO: Raise error of some kind. Line expressions (any expression not
-    // contained within another expression) must be ended with newlines. Maybe
-    // consider semicolons as an option.
-  }
+  // TODO: Raise error of some kind. Line expressions (any expression not
+  // contained within another expression) must be ended with newlines. Maybe
+  // consider semicolons as an option.
+  this->expect_end();
 
   while (this->cur_token_is(TokenType::NEWLINE)) {
-    this->lexer->next_token();
+    this->next_token();
   }
+
+  std::cout << "Line is returned\n";
   return line;
 }
 
@@ -117,6 +127,7 @@ ast::node_ptr Parser::parse_expression(rank r) {
     return ast::node_ptr();
   }
   ast::node_ptr left_expr = prefix->second(*this);
+  std::cout << "Left expr is: " << left_expr->to_string() << std::endl;
 
   while (!this->peek_token_is(TokenType::NEWLINE) &&
          (r < this->peek_precedence())) {
@@ -129,6 +140,8 @@ ast::node_ptr Parser::parse_expression(rank r) {
     left_expr = infix->second(*this, left_expr);
   }
 
+  std::cout << "After parsing expr, cur_token is: "
+            << token_type_string(cur_token.get_type()) << std::endl;
   return left_expr;
 }
 
@@ -143,4 +156,22 @@ ast::node_ptr parse_integer(Parser& p) {
   Token cur = p.get_cur_token();
   int64_t val = std::stoi(cur.get_literal());
   return ast::int_ptr(new ast::Integer(cur, val));
+}
+
+ast::node_ptr parse_let(Parser& p) {
+  Token let_tok = p.get_cur_token();
+
+  p.expect_peek(TokenType::IDENT);
+
+  ast::ident_ptr name =
+      std::dynamic_pointer_cast<ast::Identifier>(parse_identifier(p));
+
+  p.expect_peek(TokenType::ASSIGN);
+
+  p.next_token();
+
+  ast::node_ptr right_expr = p.parse_expression(Parser::LOWEST);
+
+  std::cout << "Return from Let" << std::endl;
+  return ast::let_ptr(new ast::Let(let_tok, name, right_expr));
 }

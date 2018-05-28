@@ -13,15 +13,17 @@ Token::Token(TokenType _type, std::string _literal, uint _column, uint _line) {
   line = _line;
 }
 
-TokenType Token::get_type() { return type; }
+TokenType Token::get_type() const { return type; }
 
-std::string Token::get_literal() { return literal; }
+std::string Token::get_literal() const { return literal; }
 
-uint Token::get_column() { return column; }
+uint Token::get_column() const { return column; }
 
-uint Token::get_line() { return line; }
+uint Token::get_line() const { return line; }
 
-bool Token::is_empty() { return type == TokenType::NONE && literal == ""; }
+bool Token::is_empty() const {
+  return type == TokenType::NONE && literal == "";
+}
 
 TokenType Token::lookup_ident(std::string &ident) {
   keyword_map::const_iterator got = keywords.find(ident);

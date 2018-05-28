@@ -1,8 +1,10 @@
 #ifndef PARSER_H
 #define PARSER_H
 
+#include <exception>
 #include <iostream>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <unordered_map>
 #include "ast.h"
@@ -32,6 +34,7 @@ class Parser {
   Parser(Lexer *lexer);
 
   ast::block_ptr parse_program();
+  ast::node_ptr parse_line();
   error_list get_all_errors();
 
   Token get_cur_token();
@@ -40,7 +43,8 @@ class Parser {
   void next_token();
   bool cur_token_is(TokenType);
   bool peek_token_is(TokenType);
-  bool expect_peek(TokenType);
+  void expect_peek(TokenType);
+  void expect_end();
 
   enum rank {
     LOWEST,   // For restarting a precedence scope inside brackets
@@ -53,6 +57,7 @@ class Parser {
     CALL,     // my_func(x)
     INDEX     // my_arr[y]
   };
+  ast::node_ptr parse_expression(rank r);
 
   rank cur_precedence();
   rank peek_precedence();
@@ -73,17 +78,32 @@ class Parser {
 
   // Token Presedence
   static rank_map precedences;
-
-  ast::node_ptr parse_line();
-  ast::node_ptr parse_expression(rank r);
-
-  // Prefix parsing functions
-
-  // Infix parsing functions
 };
 
+// Prefix parsing functions
 ast::node_ptr parse_identifier(Parser &p);
 ast::node_ptr parse_integer(Parser &p);
 ast::node_ptr parse_let(Parser &p);
+
+// Infix parsing functions
+
+// Errors
+class UnexpectedException : public std::exception {
+ public:
+  explicit UnexpectedException(const TokenType &expected, const Token &got)
+      : expected(expected), got(got){};
+
+  TokenType expected;
+  Token got;
+
+  virtual const char *what() const throw() {
+    std::ostringstream oss;
+    oss << "Unexpected token \"" << got.get_literal() << "\" at line "
+        << got.get_line() << ", col " << got.get_column() << "; Expected "
+        << token_type_string(expected) << std::endl;
+    std::cout << oss.str();
+    return "";
+  }
+};
 
 #endif
