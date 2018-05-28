@@ -235,8 +235,6 @@ class IfElse : public Node {
   node_type type();
   void push_condition_set(node_ptr condition, block_ptr consequence);
 };
-// TODO: Have these exceptions be raised with the line and column numbers from
-// the tokens.
 
 /* No NULL pointers should be accepted by any node constructor or method, so
  * there should be a check that throws this error. If there's a better way to go
