@@ -36,7 +36,7 @@ std::string token_type_string(TokenType type) {
       return "ASTERISK";
       break;
     case TokenType::BANG:
-      return "BANK";
+      return "BANG";
       break;
     case TokenType::MODULO:
       return "MODULO";
