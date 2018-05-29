@@ -203,11 +203,25 @@ ast::node_ptr parse_if_else(Parser& p) {
   p.next_token();
 
   ast::node_ptr first_condition = parse_group(p);
-  // std::cout << "Do we get here?\n";
   p.next_token();
   ast::block_ptr first_block = parse_block(p);
+  // p.next_token();
   if_else->push_condition_set(first_condition, first_block);
 
+  while (p.peek_token_is(TokenType::ELSE)) {
+    p.next_token();
+    p.next_token();
+    ast::node_ptr condition = NULL;
+    if (p.cur_token_is(TokenType::IF)) {
+      p.next_token();
+      condition = parse_group(p);
+      p.next_token();
+    }
+    ast::block_ptr consequence = parse_block(p);
+    if_else->push_condition_set(condition, consequence);
+  }
+
+  std::cout << "Return from IF_ELSE\n";
   return if_else;
 }
 
