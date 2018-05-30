@@ -19,6 +19,7 @@ const node_type ASSIGN = "ASSIGN";
 const node_type RETURN = "RETURN";
 const node_type INTEGER = "INTEGER";
 const node_type BOOLEAN = "BOOLEAN";
+const node_type OPTION = "OPTION";
 const node_type PREFIX = "PREFIX";
 const node_type INFIX = "INFIX";
 const node_type IF_ELSE = "IF_ELSE";
@@ -165,6 +166,24 @@ class Boolean : public Node {
 
   Token token;
   bool value;
+
+  std::string to_string();
+  node_type type();
+};
+
+/* Option Literal
+ * A representation of an optional type that either holds one intervnal value or
+ * none at all, much like an Identifier, with the possibility of no internal
+ * value
+ * RETURNS: In this form, returns a boolean of whether the optional value
+ * contains a value */
+
+class Option : public Node {
+ public:
+  Option(Token token, std::string name);
+
+  Token token;
+  std::string name;
 
   std::string to_string();
   node_type type();

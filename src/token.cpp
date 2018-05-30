@@ -30,7 +30,10 @@ TokenType Token::lookup_ident(std::string &ident) {
   if (got != keywords.end()) {
     return got->second;
   }
-  return TokenType::NONE;
+  if (ident.back() == '?') {
+    return TokenType::OPTION;
+  }
+  return TokenType::IDENT;
 }
 
 // Used for lookup of keywords in Token::lookup_ident

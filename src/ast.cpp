@@ -132,6 +132,19 @@ std::string ast::Boolean::to_string() { return this->value ? "true" : "false"; }
 
 ast::node_type ast::Boolean::type() { return ast::BOOLEAN; }
 
+/**********************/
+/*** Option Literal ***/
+/**********************/
+
+ast::Option::Option(Token token, std::string name) {
+  this->token = token;
+  this->name = name;
+}
+
+std::string ast::Option::to_string() { return this->name; }
+
+ast::node_type ast::Option::type() { return ast::OPTION; }
+
 /*************************/
 /*** Prefix Expression ***/
 /*************************/

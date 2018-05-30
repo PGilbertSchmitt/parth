@@ -155,9 +155,6 @@ Token Lexer::next_token() {
       if (isLetter(ch)) {
         lit = read_ident();
         tok = Token::lookup_ident(lit);
-        if (tok == TokenType::NONE) {
-          tok = TokenType::IDENT;
-        }
       } else if (isDigit(ch)) {
         lit = read_num();
         tok = TokenType::INT;
@@ -218,6 +215,10 @@ std::string Lexer::read_ident() {
 
   while (isLetter(peak_char()) || isDigit(peak_char())) {
     read_char();
+    size++;
+  }
+  // Grab optionals
+  if (peak_char() == '?') {
     size++;
   }
   return input.substr(pos, size);
