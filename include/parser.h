@@ -93,6 +93,7 @@ ast::node_ptr parse_if_else(Parser &p);
 ast::node_ptr parse_group(Parser &p);
 
 // Infix parsing functions
+ast::node_ptr parse_infix(Parser &p, ast::node_ptr left_expr);
 
 // Other parsers
 ast::block_ptr parse_block(Parser &p);

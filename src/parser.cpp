@@ -24,6 +24,17 @@ Parser::Parser(Lexer* lexer) : lexer(lexer) {
   register_prefix(TokenType::IF, &parse_if_else);
 
   // Register Infix Parsing functions here
+  register_infix(TokenType::PLUS, &parse_infix);
+  register_infix(TokenType::MINUS, &parse_infix);
+  register_infix(TokenType::ASTERISK, &parse_infix);
+  register_infix(TokenType::SLASH, &parse_infix);
+  register_infix(TokenType::MODULO, &parse_infix);
+  register_infix(TokenType::EQ, &parse_infix);
+  register_infix(TokenType::NEQ, &parse_infix);
+  register_infix(TokenType::LT, &parse_infix);
+  register_infix(TokenType::GT, &parse_infix);
+  register_infix(TokenType::LTEQ, &parse_infix);
+  register_infix(TokenType::GTEQ, &parse_infix);
 
   this->next_token();
   this->next_token();
@@ -123,8 +134,8 @@ ast::node_ptr Parser::parse_line() {
 }
 
 ast::node_ptr Parser::parse_expression(rank r) {
-  int cur_type = int(this->cur_token.get_type());
-  prefix_map::iterator prefix = this->prefix_parsers.find(cur_type);
+  TokenType cur_type = this->cur_token.get_type();
+  prefix_map::iterator prefix = this->prefix_parsers.find(int(cur_type));
   if (prefix == this->prefix_parsers.end()) {
     // TODO: Add prefix parsing error
     std::cout << "NO SUCH PREFIX PARSER FOR "
@@ -138,8 +149,10 @@ ast::node_ptr Parser::parse_expression(rank r) {
 
   while (!this->peek_token_is(TokenType::NEWLINE) &&
          (r < this->peek_precedence())) {
-    infix_map::iterator infix = this->infix_parsers.find(cur_type);
+    TokenType peek_type = this->peek_token.get_type();
+    infix_map::iterator infix = this->infix_parsers.find(int(peek_type));
     if (infix == this->infix_parsers.end()) {
+      std::cout << token_type_string(peek_type) << std::endl;
       return left_expr;
     }
 
@@ -152,7 +165,9 @@ ast::node_ptr Parser::parse_expression(rank r) {
   return left_expr;
 }
 
-/* Prefix Parsers */
+/**********************/
+/*** Prefix Parsers ***/
+/**********************/
 
 ast::node_ptr parse_identifier(Parser& p) {
   Token cur = p.get_cur_token();
@@ -235,7 +250,21 @@ ast::node_ptr parse_group(Parser& p) {
   return expr;
 }
 
-/* Other parsing functions:
+/*********************/
+/*** Infix Parsers ***/
+/*********************/
+
+ast::node_ptr parse_infix(Parser& p, ast::node_ptr left_expr) {
+  Token tok = p.get_cur_token();
+  std::string op = tok.get_literal();
+  Parser::rank prec = p.cur_precedence();
+  std::cout << prec << std::endl;
+  p.next_token();
+  ast::node_ptr right_expr = p.parse_expression(prec);
+  return ast::infix_ptr(new ast::Infix(tok, op, left_expr, right_expr));
+}
+
+/*** Other parsing functions:
  * If it's not a parsing function registered by the parsing class, then it can
  * be a more specialized parser. */
 
