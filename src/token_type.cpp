@@ -14,6 +14,9 @@ std::string token_type_string(TokenType type) {
     case TokenType::IDENT:
       return "IDENT";
       break;
+    case TokenType::OPTION:
+      return "OPTION";
+      break;
     case TokenType::INT:
       return "INT";
       break;

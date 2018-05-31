@@ -219,6 +219,7 @@ std::string Lexer::read_ident() {
   }
   // Grab optionals
   if (peak_char() == '?') {
+    read_char();
     size++;
   }
   return input.substr(pos, size);

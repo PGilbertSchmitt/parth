@@ -12,6 +12,7 @@ struct test_row {
 std::string input = R"INPUT(
 let five = 5
 let ten = 10
+let maybe? = 20
 
 let add = fn(x, y) {
   x + y
@@ -36,6 +37,13 @@ if (5 < 10) {
 "foobar"
 "foo bar"
 "foo \"bar\" baz"
+
+if (maybe?) {
+  return x
+} else {
+  let y = x * x
+  return -y
+}
 )INPUT";
 
 test_row all_rows[] = {
@@ -52,6 +60,12 @@ test_row all_rows[] = {
     {TokenType::IDENT, "ten"},
     {TokenType::ASSIGN, "="},
     {TokenType::INT, "10"},
+    {TokenType::NEWLINE, "\n"},
+
+    {TokenType::LET, "let"},
+    {TokenType::OPTION, "maybe?"},
+    {TokenType::ASSIGN, "="},
+    {TokenType::INT, "20"},
     {TokenType::NEWLINE, "\n"},
     {TokenType::NEWLINE, "\n"},
 
@@ -155,6 +169,39 @@ test_row all_rows[] = {
     {TokenType::NEWLINE, "\n"},
 
     {TokenType::STRING, "foo \\\"bar\\\" baz"},
+    {TokenType::NEWLINE, "\n"},
+    {TokenType::NEWLINE, "\n"},
+
+    {TokenType::IF, "if"},
+    {TokenType::LPAREN, "("},
+    {TokenType::OPTION, "maybe?"},
+    {TokenType::RPAREN, ")"},
+    {TokenType::LBRACE, "{"},
+    {TokenType::NEWLINE, "\n"},
+
+    {TokenType::RETURN, "return"},
+    {TokenType::IDENT, "x"},
+    {TokenType::NEWLINE, "\n"},
+
+    {TokenType::RBRACE, "}"},
+    {TokenType::ELSE, "else"},
+    {TokenType::LBRACE, "{"},
+    {TokenType::NEWLINE, "\n"},
+
+    {TokenType::LET, "let"},
+    {TokenType::IDENT, "y"},
+    {TokenType::ASSIGN, "="},
+    {TokenType::IDENT, "x"},
+    {TokenType::ASTERISK, "*"},
+    {TokenType::IDENT, "x"},
+    {TokenType::NEWLINE, "\n"},
+
+    {TokenType::RETURN, "return"},
+    {TokenType::MINUS, "-"},
+    {TokenType::IDENT, "y"},
+    {TokenType::NEWLINE, "\n"},
+
+    {TokenType::RBRACE, "}"},
     {TokenType::NEWLINE, "\n"},
 
     {TokenType::EOF_VAL, ""},

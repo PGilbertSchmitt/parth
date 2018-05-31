@@ -11,9 +11,9 @@ TEST(TokenTest, Keywords) {
   ASSERT_EQ(Token::lookup_ident(fn_str), fn);
 }
 
-TEST(TokenTest, NoKeyword) {
+TEST(TokenTest, Ident) {
   std::string ident = "myVar";
-  ASSERT_EQ(Token::lookup_ident(ident), TokenType::NONE);
+  ASSERT_EQ(Token::lookup_ident(ident), TokenType::IDENT);
 }
 
 }  // namespace

@@ -62,7 +62,7 @@ class Node {
   // Golang code but isn't technically considered proper in C++. However, the
   // language does allow for this, and I'm confident that it will work well
   // enough for now.
-  virtual node_type type() = 0;
+  virtual node_type _type() = 0;
 };
 
 /* Block Expression
@@ -79,7 +79,7 @@ class Block : public Node {
 
   std::string to_string();
   void push_node(node_ptr node);
-  node_type type();
+  node_type _type();
 };
 
 /* Identifier:
@@ -94,7 +94,7 @@ class Identifier : public Node {
   std::string value;
 
   std::string to_string();
-  node_type type();
+  node_type _type();
 };
 
 /* Let Expression
@@ -109,7 +109,7 @@ class Let : public Node {
   node_ptr expression;
 
   std::string to_string();
-  node_type type();
+  node_type _type();
 };
 
 /* Assign Expression
@@ -124,7 +124,7 @@ class Assign : public Node {
   node_ptr expression;
 
   std::string to_string();
-  node_type type();
+  node_type _type();
 };
 
 /* Return Expression
@@ -140,7 +140,7 @@ class Return : public Node {
   node_ptr expression;
 
   std::string to_string();
-  node_type type();
+  node_type _type();
 };
 
 /* Integer Expression
@@ -154,7 +154,7 @@ class Integer : public Node {
   int64_t value;
 
   std::string to_string();
-  node_type type();
+  node_type _type();
 };
 
 /* Boolean Literal
@@ -168,7 +168,7 @@ class Boolean : public Node {
   bool value;
 
   std::string to_string();
-  node_type type();
+  node_type _type();
 };
 
 /* Option Literal
@@ -186,7 +186,7 @@ class Option : public Node {
   std::string name;
 
   std::string to_string();
-  node_type type();
+  node_type _type();
 };
 
 /* Prefix Expression
@@ -202,7 +202,7 @@ class Prefix : public Node {
   node_ptr right;
 
   std::string to_string();
-  node_type type();
+  node_type _type();
 };
 
 /* Infix Expression
@@ -219,7 +219,7 @@ class Infix : public Node {
   std::string op;
 
   std::string to_string();
-  node_type type();
+  node_type _type();
 };
 
 /* A pair of a condition and the consequence should that condition be evaluated
@@ -251,7 +251,7 @@ class IfElse : public Node {
   std::vector<condition_set> list;
 
   std::string to_string();
-  node_type type();
+  node_type _type();
   void push_condition_set(node_ptr condition, block_ptr consequence);
 };
 
