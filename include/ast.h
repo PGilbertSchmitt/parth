@@ -11,18 +11,19 @@
 
 namespace ast {
 
-typedef std::string node_type;
-const node_type BLOCK = "BLOCK";
-const node_type IDENT = "IDENT";
-const node_type LET = "LET";
-const node_type ASSIGN = "ASSIGN";
-const node_type RETURN = "RETURN";
-const node_type INTEGER = "INTEGER";
-const node_type BOOLEAN = "BOOLEAN";
-const node_type OPTION = "OPTION";
-const node_type PREFIX = "PREFIX";
-const node_type INFIX = "INFIX";
-const node_type IF_ELSE = "IF_ELSE";
+enum node_type {
+  BLOCK = 0,
+  IDENT,
+  LET,
+  ASSIGN,
+  RETURN,
+  INTEGER,
+  BOOLEAN,
+  OPTION,
+  PREFIX,
+  INFIX,
+  IF_ELSE
+};
 
 class Node;
 class Block;
