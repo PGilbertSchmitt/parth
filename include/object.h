@@ -1,6 +1,7 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
+#include <memory>
 #include <string>
 
 namespace obj {
@@ -13,9 +14,20 @@ const obj_type RETURN_VAL = "RETURN_VAL";
 const obj_type ERROR = "ERROR";
 const obj_type OPTION = "OPTION";
 
+class Object;
+class Boolean;
+class Integer;
+class ReturnVal;
+class Error;
+
+typedef std::shared_ptr<Object> obj_ptr;
+typedef std::shared_ptr<Boolean> bool_ptr;
+typedef std::shared_ptr<Integer> int_ptr;
+typedef std::shared_ptr<ReturnVal> return_ptr;
+typedef std::shared_ptr<Error> err_ptr;
+
 class Object {
  public:
-  virtual ~Object(){};
   virtual std::string inspect() = 0;
   virtual obj_type _type() = 0;
 };  // namespace obj
@@ -41,8 +53,16 @@ class Boolean : public Object {
 class ReturnVal : public Object {
  public:
   ReturnVal(Object *);
-  ~ReturnVal();
-  Object *value;
+  obj_ptr value;
+
+  std::string inspect();
+  obj_type _type();
+};
+
+class Error : public Object {
+ public:
+  Error(std::string err);
+  std::string err;
 
   std::string inspect();
   obj_type _type();
