@@ -30,7 +30,7 @@ class Object {
  public:
   virtual std::string inspect() = 0;
   virtual obj_type _type() = 0;
-};  // namespace obj
+};
 
 class Integer : public Object {
  public:
