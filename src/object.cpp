@@ -9,7 +9,13 @@ obj::obj_type obj::Integer::_type() { return obj::INTEGER; }
 /* Boolean */
 
 obj::Boolean::Boolean(bool value) : value(value) {}
-std::string obj::Boolean::inspect() { return std::to_string(this->value); }
+std::string obj::Boolean::inspect() {
+  if (this->value) {
+    return "true";
+  } else {
+    return "false";
+  }
+}
 obj::obj_type obj::Boolean::_type() { return obj::BOOLEAN; }
 
 /* Return Wrapper */
