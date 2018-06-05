@@ -13,6 +13,14 @@ void Environment::init(const std::string &key, obj::obj_ptr value) {
   }
 }
 
+void Environment::set(const std::string &key, obj::obj_ptr value) {
+  if (this->store.find(key) != this->store.end()) {
+    this->store[key] = value;
+  } else {
+    throw NoVarException(key);
+  }
+}
+
 obj::obj_ptr Environment::get(const std::string key) {
   if (this->store.find(key) != this->store.end()) {
     return this->store[key];
