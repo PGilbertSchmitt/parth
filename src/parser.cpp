@@ -84,9 +84,6 @@ void Parser::eat_newlines() {
 void Parser::next_token() {
   cur_token = peek_token;
   peek_token = lexer->next_token();
-  std::cout << "Cur token is " << token_type_string(cur_token.get_type())
-            << std::endl;
-  // std::cin.ignore();  // Good for stepping
 }
 
 Parser::rank Parser::cur_precedence() {
@@ -112,11 +109,8 @@ ast::block_ptr Parser::parse_program() {
 
   int i = 0;
   while (cur_token.get_type() != TokenType::EOF_VAL) {
-    std::cout << "BEGIN parsing Line " << i << std::endl;
     ast::node_ptr new_node = this->parse_line();
-
     block->push_node(new_node);
-    std::cout << "DONE  parsing Line " << i << std::endl;
     i++;
   }
 
@@ -129,7 +123,6 @@ ast::node_ptr Parser::parse_line() {
   this->expect_end();
   this->eat_newlines();
 
-  std::cout << "Line is returned\n";
   return line;
 }
 
@@ -145,14 +138,12 @@ ast::node_ptr Parser::parse_expression(rank r) {
     return ast::node_ptr();
   }
   ast::node_ptr left_expr = prefix->second(*this);
-  std::cout << "Left expr is: " << left_expr->to_string() << std::endl;
 
   while (!this->peek_token_is(TokenType::NEWLINE) &&
          (r < this->peek_precedence())) {
     TokenType peek_type = this->peek_token.get_type();
     infix_map::iterator infix = this->infix_parsers.find(int(peek_type));
     if (infix == this->infix_parsers.end()) {
-      std::cout << token_type_string(peek_type) << std::endl;
       return left_expr;
     }
 
@@ -160,8 +151,6 @@ ast::node_ptr Parser::parse_expression(rank r) {
     left_expr = infix->second(*this, left_expr);
   }
 
-  std::cout << "After parsing expr, cur_token is: "
-            << token_type_string(cur_token.get_type()) << std::endl;
   return left_expr;
 }
 
@@ -236,7 +225,6 @@ ast::node_ptr parse_if_else(Parser& p) {
     if_else->push_condition_set(condition, consequence);
   }
 
-  std::cout << "Return from IF_ELSE\n";
   return if_else;
 }
 
@@ -258,7 +246,6 @@ ast::node_ptr parse_infix(Parser& p, ast::node_ptr left_expr) {
   Token tok = p.get_cur_token();
   std::string op = tok.get_literal();
   Parser::rank prec = p.cur_precedence();
-  std::cout << prec << std::endl;
   p.next_token();
   ast::node_ptr right_expr = p.parse_expression(prec);
   return ast::infix_ptr(new ast::Infix(tok, op, left_expr, right_expr));
