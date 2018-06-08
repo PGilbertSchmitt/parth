@@ -60,4 +60,27 @@ TEST(Environment, StackedInit) {
   ASSERT_NO_THROW(inner->init(key, new_int));
 }
 
-// TEST(Environment, Set)
+TEST(Environment, StackedGet) {
+  env_ptr outer = env_ptr(new Environment());
+  int value = 25;
+  std::string key = "key";
+  obj::obj_ptr int_obj = obj::int_ptr(new obj::Integer(value));
+  outer->init(key, int_obj);
+
+  env_ptr inner = env_ptr(new Environment(outer));
+  ASSERT_EQ(inner->get(key), int_obj);
+}
+
+TEST(Environment, StackedSet) {
+  env_ptr outer = env_ptr(new Environment());
+  int value = 25;
+  std::string key = "key";
+  obj::obj_ptr int_obj = obj::int_ptr(new obj::Integer(value));
+  outer->init(key, int_obj);
+
+  env_ptr inner = env_ptr(new Environment(outer));
+  obj::obj_ptr new_int_obj = obj::int_ptr(new obj::Integer(50));
+  ASSERT_NO_THROW(inner->set(key, new_int_obj));
+  ASSERT_EQ(inner->get(key), new_int_obj);
+  ASSERT_EQ(outer->get(key), new_int_obj);
+}
