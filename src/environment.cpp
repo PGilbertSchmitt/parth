@@ -30,6 +30,6 @@ obj::obj_ptr Environment::get(const std::string key) {
   } else if (this->outer != nullptr) {
     return this->outer->get(key);
   } else {
-    throw NoVarException(key);
+    return nullptr;
   }
 }
