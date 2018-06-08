@@ -4,10 +4,16 @@ obj::obj_ptr eval(ast::node_ptr node, env::env_ptr envir) {
   switch (node->_type()) {
     case ast::BLOCK: {
       ast::block_ptr block_node = std::dynamic_pointer_cast<ast::Block>(node);
-    }
+      return evalBlock(block_node, envir);
+    } break;
 
       // case ast::IDENT:
-      // case ast::LET:
+
+    case ast::LET: {
+      ast::let_ptr let_node = std::dynamic_pointer_cast<ast::Let>(node);
+      return evalLet(let_node, envir);
+    } break;
+
       // case ast::ASSIGN:
       // case ast::RETURN:
       // case ast::INTEGER:
@@ -15,7 +21,7 @@ obj::obj_ptr eval(ast::node_ptr node, env::env_ptr envir) {
     case ast::BOOLEAN: {
       ast::bool_ptr bool_node = std::dynamic_pointer_cast<ast::Boolean>(node);
       return evalBoolean(bool_node);
-    }
+    } break;
 
       // case ast::OPTION:
       // case ast::PREFIX:
@@ -48,6 +54,14 @@ obj::obj_ptr evalBlock(ast::block_ptr block_node, env::env_ptr envir) {
   }
 
   return result;
+}
+
+obj::obj_ptr evalLet(ast::let_ptr let, env::env_ptr envir) {
+  obj::obj_ptr right = eval(let->expression, envir);
+  if (right->_type() == obj::ERROR) {
+    return right;
+  }
+  envir->init(let->name->value, right);
 }
 
 obj::bool_ptr evalBoolean(ast::bool_ptr bool_node) {
