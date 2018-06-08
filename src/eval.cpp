@@ -56,6 +56,16 @@ obj::obj_ptr evalBlock(ast::block_ptr block_node, env::env_ptr envir) {
   return result;
 }
 
+obj::obj_ptr evalIdent(ast::ident_ptr ident, env::env_ptr envir) {
+  obj::obj_ptr value = envir->get(ident->value);
+  if (value != nullptr) {
+    return value;
+  } else {
+    std::cout << "No such identifier " << ident->value
+              << ". Must be a builtin?\n";
+  }
+}
+
 obj::obj_ptr evalLet(ast::let_ptr let, env::env_ptr envir) {
   obj::obj_ptr right = eval(let->expression, envir);
   if (right->_type() == obj::ERROR) {
