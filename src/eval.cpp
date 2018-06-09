@@ -7,7 +7,11 @@ obj::obj_ptr eval(ast::node_ptr node, env::env_ptr envir) {
       return evalBlock(block_node, envir);
     } break;
 
-      // case ast::IDENT:
+    case ast::IDENT: {
+      ast::ident_ptr ident_node =
+          std::dynamic_pointer_cast<ast::Identifier>(node);
+      return evalIdent(ident_node, envir);
+    } break;
 
     case ast::LET: {
       ast::let_ptr let_node = std::dynamic_pointer_cast<ast::Let>(node);
