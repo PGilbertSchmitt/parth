@@ -13,7 +13,7 @@ rank_map Parser::precedences{
 Parser::Parser(Lexer* lexer) : lexer(lexer) {
   // Register Prefix Parsing functions here
   register_prefix(TokenType::IDENT, &parse_identifier);
-  register_prefix(TokenType::INT, &parse_identifier);
+  register_prefix(TokenType::INT, &parse_integer);
   register_prefix(TokenType::LET, &parse_let);
   register_prefix(TokenType::RETURN, &parse_return);
   register_prefix(TokenType::MINUS, &parse_prefix);
