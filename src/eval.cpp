@@ -18,7 +18,12 @@ obj::obj_ptr eval(ast::node_ptr node, env::env_ptr envir) {
       return evalLet(let_node, envir);
     } break;
 
-      // case ast::ASSIGN:
+    case ast::ASSIGN: {
+      ast::assign_ptr assign_node =
+          std::dynamic_pointer_cast<ast::Assign>(node);
+      return evalAssign(assign_node, envir);
+    } break;
+
       // case ast::RETURN:
       // case ast::INTEGER:
 
@@ -72,10 +77,18 @@ obj::obj_ptr evalIdent(ast::ident_ptr ident, env::env_ptr envir) {
 
 obj::obj_ptr evalLet(ast::let_ptr let, env::env_ptr envir) {
   obj::obj_ptr right = eval(let->expression, envir);
-  if (right->_type() == obj::ERROR) {
-    return right;
+  if (right->_type() != obj::ERROR) {
+    envir->init(let->name->value, right);
   }
-  envir->init(let->name->value, right);
+  return right;
+}
+
+obj::obj_ptr evalAssign(ast::assign_ptr assign, env::env_ptr envir) {
+  obj::obj_ptr right = eval(assign->expression, envir);
+  if (right->_type() != obj::ERROR) {
+    envir->set(assign->name->value, right);
+  }
+  return right;
 }
 
 obj::bool_ptr evalBoolean(ast::bool_ptr bool_node) {
