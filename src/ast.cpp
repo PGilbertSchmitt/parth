@@ -149,7 +149,7 @@ ast::node_type ast::Option::_type() { return ast::OPTION; }
 /*** Prefix Expression ***/
 /*************************/
 
-ast::Prefix::Prefix(Token token, std::string op, node_ptr right) {
+ast::Prefix::Prefix(Token token, Token op, node_ptr right) {
   if (right == NULL) {
     throw ast::NullNodeException("In Prefix:");
     ;
@@ -161,7 +161,7 @@ ast::Prefix::Prefix(Token token, std::string op, node_ptr right) {
 }
 
 std::string ast::Prefix::to_string() {
-  return "(" + op + right->to_string() + ")";
+  return "(" + op.get_literal() + right->to_string() + ")";
 }
 
 ast::node_type ast::Prefix::_type() { return ast::PREFIX; }
@@ -170,7 +170,7 @@ ast::node_type ast::Prefix::_type() { return ast::PREFIX; }
 /*** Infix Expression ***/
 /************************/
 
-ast::Infix::Infix(Token token, std::string op, node_ptr left, node_ptr right) {
+ast::Infix::Infix(Token token, Token op, node_ptr left, node_ptr right) {
   if (left == NULL || right == NULL) {
     throw ast::NullNodeException("In Infix:");
     ;
@@ -183,7 +183,8 @@ ast::Infix::Infix(Token token, std::string op, node_ptr left, node_ptr right) {
 }
 
 std::string ast::Infix::to_string() {
-  return "(" + left->to_string() + " " + op + " " + right->to_string() + ")";
+  return "(" + left->to_string() + " " + op.get_literal() + " " +
+         right->to_string() + ")";
 }
 
 ast::node_type ast::Infix::_type() { return ast::INFIX; }

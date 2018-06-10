@@ -190,7 +190,7 @@ ast::node_ptr parse_return(Parser& p) {
 
 ast::node_ptr parse_prefix(Parser& p) {
   Token pre_tok = p.get_cur_token();
-  std::string op = pre_tok.get_literal();
+  Token op = pre_tok;
   p.next_token();
   ast::node_ptr right_expr = p.parse_expression(Parser::PREFIX);
   return ast::prefix_ptr(new ast::Prefix(pre_tok, op, right_expr));
@@ -245,7 +245,7 @@ ast::node_ptr parse_group(Parser& p) {
 
 ast::node_ptr parse_infix(Parser& p, ast::node_ptr left_expr) {
   Token tok = p.get_cur_token();
-  std::string op = tok.get_literal();
+  Token op = tok;
   Parser::rank prec = p.cur_precedence();
   p.next_token();
   ast::node_ptr right_expr = p.parse_expression(prec);

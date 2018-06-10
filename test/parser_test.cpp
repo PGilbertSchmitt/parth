@@ -61,7 +61,7 @@ TEST(Parser, MinusTest) {
 
   ast::prefix_ptr prefix_node = std::dynamic_pointer_cast<ast::Prefix>(first);
   ASSERT_EQ(prefix_node->to_string(), "(-13)");
-  ASSERT_EQ(prefix_node->op, "-");
+  ASSERT_EQ(prefix_node->op.get_literal(), "-");
 }
 
 TEST(Parser, BangTest) {
@@ -70,7 +70,7 @@ TEST(Parser, BangTest) {
 
   ast::prefix_ptr prefix_node = std::dynamic_pointer_cast<ast::Prefix>(first);
   ASSERT_EQ(prefix_node->to_string(), "(!fact)");
-  ASSERT_EQ(prefix_node->op, "!");
+  ASSERT_EQ(prefix_node->op.get_literal(), "!");
 }
 
 TEST(Parser, BoolTest) {
@@ -142,6 +142,6 @@ TEST(Parser, InfixTests) {
 
     ast::infix_ptr infix_node = std::dynamic_pointer_cast<ast::Infix>(node);
     ASSERT_EQ(infix_node->to_string(), cur_test.to_string);
-    ASSERT_EQ(infix_node->op, cur_test.op);
+    ASSERT_EQ(infix_node->op.get_literal(), cur_test.op);
   }
 }

@@ -196,10 +196,10 @@ class Option : public Node {
  * RETURNS: the value of the expression */
 class Prefix : public Node {
  public:
-  Prefix(Token token, std::string op, node_ptr right);
+  Prefix(Token token, Token op, node_ptr right);
 
   Token token;
-  std::string op;
+  Token op;
   node_ptr right;
 
   std::string to_string();
@@ -212,12 +212,12 @@ class Prefix : public Node {
  * RETURNS: the value of the expression */
 class Infix : public Node {
  public:
-  Infix(Token token, std::string op, node_ptr left, node_ptr right);
+  Infix(Token token, Token op, node_ptr left, node_ptr right);
 
   Token token;
+  Token op;
   node_ptr left;
   node_ptr right;
-  std::string op;
 
   std::string to_string();
   node_type _type();
