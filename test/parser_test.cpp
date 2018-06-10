@@ -116,3 +116,32 @@ if (x) {
 }
 
 // Infix Parsing
+
+struct infix_test_set {
+  std::string input;
+  std::string to_string;
+  std::string op;
+};
+
+infix_test_set infix_tests[] = {
+    {"a = b", "(a = b)", "="},    {"a + b", "(a + b)", "+"},
+    {"a - b", "(a - b)", "-"},    {"a * b", "(a * b)", "*"},
+    {"a / b", "(a / b)", "/"},    {"a % b", "(a % b)", "%"},
+    {"a < b", "(a < b)", "<"},    {"a > b", "(a > b)", ">"},
+    {"a == b", "(a == b)", "=="}, {"a != b", "(a != b)", "!="},
+    {"a <= b", "(a <= b)", "<="}, {"a >= b", "(a >= b)", ">="},
+};
+
+TEST(Parser, InfixTests) {
+  int iterations = sizeof(infix_tests) / sizeof(infix_tests[0]);
+  for (int i = 0; i < iterations; i++) {
+    infix_test_set cur_test = infix_tests[i];
+    std::cout << "Testing infix parse for: " << cur_test.input << std::endl;
+    ast::node_ptr node = get_first_expression(cur_test.input);
+    ASSERT_EQ(node->_type(), ast::INFIX);
+
+    ast::infix_ptr infix_node = std::dynamic_pointer_cast<ast::Infix>(node);
+    ASSERT_EQ(infix_node->to_string(), cur_test.to_string);
+    ASSERT_EQ(infix_node->op, cur_test.op);
+  }
+}
