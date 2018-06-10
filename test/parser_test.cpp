@@ -14,6 +14,8 @@ ast::node_ptr get_first_expression(std::string input) {
   return block->nodes.front();
 }
 
+// Prefix Parsing
+
 TEST(Parser, IntTest) {
   ast::node_ptr first = get_first_expression("5");
   ASSERT_EQ(first->_type(), ast::INTEGER);
@@ -94,3 +96,23 @@ TEST(Parser, GroupExpressionTest) {
   ast::node_ptr second = get_first_expression("(!myVar)");
   ASSERT_EQ(second->_type(), ast::PREFIX);
 }
+
+TEST(Parser, IfElseTest) {
+  std::string input = R"INPUT(
+if (x) {
+  return 0
+} else if (y) {
+  return 1
+} else {
+  return 2
+}
+)INPUT";
+  ast::node_ptr first = get_first_expression(input);
+  ASSERT_EQ(first->_type(), ast::IF_ELSE);
+
+  ast::ifelse_ptr ifelse_node = std::dynamic_pointer_cast<ast::IfElse>(first);
+  ASSERT_EQ(ifelse_node->to_string(),
+            "if x { return 0 } else if y { return 1 } else  { return 2 }");
+}
+
+// Infix Parsing
