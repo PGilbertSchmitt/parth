@@ -24,6 +24,7 @@ Parser::Parser(Lexer* lexer) : lexer(lexer) {
   register_prefix(TokenType::IF, &parse_if_else);
 
   // Register Infix Parsing functions here
+  register_infix(TokenType::ASSIGN, &parse_infix);
   register_infix(TokenType::PLUS, &parse_infix);
   register_infix(TokenType::MINUS, &parse_infix);
   register_infix(TokenType::ASTERISK, &parse_infix);
