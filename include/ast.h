@@ -25,6 +25,8 @@ enum node_type {
   IF_ELSE
 };
 
+std::string node_type_string(node_type);
+
 class Node;
 class Block;
 class Identifier;

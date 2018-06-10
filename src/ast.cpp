@@ -237,3 +237,32 @@ void ast::IfElse::push_condition_set(node_ptr condition,
   set.consequence = consequence;
   list.push_back(set);
 }
+
+std::string ast::node_type_string(node_type _type) {
+  switch (_type) {
+    case ast::BLOCK:
+      return "BLOCK";
+    case ast::IDENT:
+      return "IDENT";
+    case ast::LET:
+      return "LET";
+    case ast::ASSIGN:
+      return "ASSIGN";
+    case ast::RETURN:
+      return "RETURN";
+    case ast::INTEGER:
+      return "INT";
+    case ast::BOOLEAN:
+      return "BOOLEAN";
+    case ast::OPTION:
+      return "OPTION";
+    case ast::PREFIX:
+      return "PREFIX";
+    case ast::INFIX:
+      return "INFIX";
+    case ast::IF_ELSE:
+      return "IF_ELSE";
+    default:
+      return "UNKNOWN";
+  }
+}
