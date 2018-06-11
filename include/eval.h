@@ -20,6 +20,6 @@ obj::int_ptr evalInteger(ast::int_ptr);
 obj::bool_ptr evalBoolean(ast::bool_ptr);
 obj::obj_ptr evalInfix(ast::infix_ptr, env::env_ptr);
 obj::obj_ptr evalAssign(ast::ident_ptr, ast::node_ptr, env::env_ptr);
-obj::obj_ptr evalIntegerInfixOperator(Token, ast::int_ptr, ast::int_ptr);
+obj::obj_ptr evalIntegerInfixOperator(Token, obj::int_ptr, obj::int_ptr);
 
 #endif

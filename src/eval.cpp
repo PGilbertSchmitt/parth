@@ -106,16 +106,17 @@ obj::obj_ptr evalInfix(ast::infix_ptr infix_node, env::env_ptr envir) {
   ast::node_ptr right_node = infix_node->right;
 
   if (left_node->_type() == ast::IDENT && op.get_type() == TokenType::ASSIGN) {
-    std::cout << "WE HAVE ASSIGNMENT!\n";
     ast::ident_ptr left = std::dynamic_pointer_cast<ast::Identifier>(left_node);
     return evalAssign(left, right_node, envir);
   }
 
-  if (left_node->_type() == ast::INTEGER &&
-      right_node->_type() == ast::INTEGER) {
-    std::cout << "WE HAVE OPERATION!\n";
-    ast::int_ptr left = std::dynamic_pointer_cast<ast::Integer>(left_node);
-    ast::int_ptr right = std::dynamic_pointer_cast<ast::Integer>(right_node);
+  obj::obj_ptr left_eval = eval(left_node, envir);
+  obj::obj_ptr right_eval = eval(right_node, envir);
+
+  if (left_eval->_type() == obj::INTEGER &&
+      right_eval->_type() == obj::INTEGER) {
+        obj::int_ptr left = std::dynamic_pointer_cast<obj::Integer>(left_eval);
+    obj::int_ptr right = std::dynamic_pointer_cast<obj::Integer>(right_eval);
     return evalIntegerInfixOperator(op, left, right);
   }
 
@@ -134,8 +135,8 @@ obj::obj_ptr evalAssign(ast::ident_ptr left, ast::node_ptr right,
   return value;
 }
 
-obj::obj_ptr evalIntegerInfixOperator(Token op, ast::int_ptr left,
-                                      ast::int_ptr right) {
+obj::obj_ptr evalIntegerInfixOperator(Token op, obj::int_ptr left,
+                                      obj::int_ptr right) {
   switch (op.get_type()) {
     case TokenType::PLUS: {
       return obj::int_ptr(new obj::Integer(left->value + right->value));
