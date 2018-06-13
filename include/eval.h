@@ -25,5 +25,6 @@ obj::obj_ptr evalIntegerInfixOperator(Token, obj::int_ptr, obj::int_ptr);
 obj::obj_ptr evalBooleanInfixOperator(Token, obj::bool_ptr, obj::bool_ptr);
 obj::obj_ptr evalBangOperator(obj::obj_ptr);
 obj::obj_ptr evalMinusOperator(obj::int_ptr);
+obj::bool_ptr isTruthy(obj::obj_ptr);
 
 #endif

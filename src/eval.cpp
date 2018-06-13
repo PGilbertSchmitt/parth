@@ -237,4 +237,30 @@ obj::obj_ptr evalMinusOperator(obj::int_ptr num) {
   return obj::int_ptr(new obj::Integer(-1 * num->value));
 }
 
-obj::obj_ptr evalBangOperator(obj::obj_ptr input) { return TRUE_OBJ; }
+obj::obj_ptr evalBangOperator(obj::obj_ptr input) {
+  obj::bool_ptr init_val = isTruthy(input);
+  return (init_val == TRUE_OBJ) ? FALSE_OBJ : TRUE_OBJ;
+}
+
+// Here is where truthiness is determined. Any value is truthy if it's no falsy.
+// Any value is falsy if it's one of:
+// - false (bool)
+// - 0     (int)
+// - ""    (string)
+// - []    (array)
+// - {}    (hash)
+// - none  (option)
+obj::bool_ptr isTruthy(obj::obj_ptr input) {
+  bool new_val = false;
+  switch (input->_type()) {
+    case obj::BOOLEAN: {
+      new_val = input == TRUE_OBJ;
+    } break;
+    case obj::INTEGER: {
+      obj::int_ptr int_obj = std::dynamic_pointer_cast<obj::Integer>(input);
+      new_val = int_obj->value != 0;
+    } break;
+    default: {}
+  }
+  return new_val ? TRUE_OBJ : FALSE_OBJ;
+}
