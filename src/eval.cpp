@@ -31,7 +31,11 @@ obj::obj_ptr eval(ast::node_ptr node, env::env_ptr envir) {
     } break;
 
       // case ast::OPTION:
-      // case ast::PREFIX:
+    case ast::PREFIX: {
+      ast::prefix_ptr prefix_node =
+          std::dynamic_pointer_cast<ast::Prefix>(node);
+      return evalPrefix(prefix_node, envir);
+    } break;
 
     case ast::INFIX: {
       ast::infix_ptr infix_node = std::dynamic_pointer_cast<ast::Infix>(node);
@@ -115,7 +119,7 @@ obj::obj_ptr evalInfix(ast::infix_ptr infix_node, env::env_ptr envir) {
 
   if (left_eval->_type() == obj::INTEGER &&
       right_eval->_type() == obj::INTEGER) {
-        obj::int_ptr left = std::dynamic_pointer_cast<obj::Integer>(left_eval);
+    obj::int_ptr left = std::dynamic_pointer_cast<obj::Integer>(left_eval);
     obj::int_ptr right = std::dynamic_pointer_cast<obj::Integer>(right_eval);
     return evalIntegerInfixOperator(op, left, right);
   }
@@ -124,6 +128,28 @@ obj::obj_ptr evalInfix(ast::infix_ptr infix_node, env::env_ptr envir) {
       "No such operation " + ast::node_type_string(left_node->_type()) + " " +
       op.get_literal() + " " + ast::node_type_string(right_node->_type());
   throw NoSuchOperatorException(message);
+}
+
+obj::obj_ptr evalPrefix(ast::prefix_ptr prefix_node, env::env_ptr envir) {
+  Token op = prefix_node->op;
+  obj::obj_ptr right = eval(prefix_node->right, envir);
+  switch (op.get_type()) {
+    case TokenType::MINUS: {
+      if (right->_type() != obj::INTEGER) {
+        throw NoSuchOperatorException("No such operation -(" +
+                                      right->inspect() + ")");
+      }
+      obj::int_ptr int_obj = std::dynamic_pointer_cast<obj::Integer>(right);
+      return evalMinusOperator(int_obj);
+    }
+    case TokenType::BANG: {
+      return evalBangOperator(right);
+    }
+    default:
+      std::string message =
+          "No such operation " + op.get_literal() + right->inspect();
+      throw NoSuchOperatorException(message);
+  }
 }
 
 obj::obj_ptr evalAssign(ast::ident_ptr left, ast::node_ptr right,
@@ -183,3 +209,9 @@ obj::obj_ptr evalIntegerInfixOperator(Token op, obj::int_ptr left,
     }
   }
 }
+
+obj::obj_ptr evalMinusOperator(obj::int_ptr num) {
+  return obj::int_ptr(new obj::Integer(-1 * num->value));
+}
+
+obj::obj_ptr evalBangOperator(obj::obj_ptr input) { return TRUE_OBJ; }
