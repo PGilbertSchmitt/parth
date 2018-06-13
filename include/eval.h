@@ -22,6 +22,7 @@ obj::obj_ptr evalInfix(ast::infix_ptr, env::env_ptr);
 obj::obj_ptr evalPrefix(ast::prefix_ptr, env::env_ptr);
 obj::obj_ptr evalAssign(ast::ident_ptr, ast::node_ptr, env::env_ptr);
 obj::obj_ptr evalIntegerInfixOperator(Token, obj::int_ptr, obj::int_ptr);
+obj::obj_ptr evalBooleanInfixOperator(Token, obj::bool_ptr, obj::bool_ptr);
 obj::obj_ptr evalBangOperator(obj::obj_ptr);
 obj::obj_ptr evalMinusOperator(obj::int_ptr);
 

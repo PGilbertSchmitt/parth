@@ -124,6 +124,13 @@ obj::obj_ptr evalInfix(ast::infix_ptr infix_node, env::env_ptr envir) {
     return evalIntegerInfixOperator(op, left, right);
   }
 
+  if (left_eval->_type() == obj::BOOLEAN &&
+      right_eval->_type() == obj::BOOLEAN) {
+    obj::bool_ptr left = std::dynamic_pointer_cast<obj::Boolean>(left_eval);
+    obj::bool_ptr right = std::dynamic_pointer_cast<obj::Boolean>(right_eval);
+    return evalBooleanInfixOperator(op, left, right);
+  }
+
   std::string message =
       "No such operation " + ast::node_type_string(left_node->_type()) + " " +
       op.get_literal() + " " + ast::node_type_string(right_node->_type());
@@ -206,6 +213,22 @@ obj::obj_ptr evalIntegerInfixOperator(Token op, obj::int_ptr left,
     default: {
       throw NoSuchOperatorException("No such operation INT " +
                                     op.get_literal() + " INT\n");
+    }
+  }
+}
+
+obj::obj_ptr evalBooleanInfixOperator(Token op, obj::bool_ptr left,
+                                      obj::bool_ptr right) {
+  switch (op.get_type()) {
+    case TokenType::EQ: {
+      return obj::bool_ptr(new obj::Boolean(left->value == right->value));
+    }
+    case TokenType::NEQ: {
+      return obj::bool_ptr(new obj::Boolean(left->value != right->value));
+    }
+    default: {
+      throw NoSuchOperatorException("No such operator BOOLEAN " +
+                                    op.get_literal() + "BOOLEAN");
     }
   }
 }
