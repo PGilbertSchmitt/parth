@@ -6,13 +6,14 @@
 
 namespace obj {
 
-typedef std::string obj_type;
-const obj_type INTEGER = "INTEGER";
-const obj_type BOOLEAN = "BOOLEAN";
-const obj_type STRING = "STRING";
-const obj_type RETURN_VAL = "RETURN_VAL";
-const obj_type ERROR = "ERROR";
-const obj_type OPTION = "OPTION";
+enum obj_type {
+  INTEGER = 0,
+  BOOLEAN,
+  // STRING,
+  RETURN_VAL,
+  ERROR,
+  // OPTION
+};
 
 class Object;
 class Boolean;
