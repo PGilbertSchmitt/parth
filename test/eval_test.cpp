@@ -40,8 +40,46 @@ TEST(Eval, IntEval) {
   for (int i = 0; i < iterations; i++) {
     test_suite cur_test = tests[i];
     obj::obj_ptr eval_obj = test_eval(cur_test.input);
+    ASSERT_EQ(eval_obj->_type(), obj::INTEGER);
     obj::int_ptr eval_int = std::dynamic_pointer_cast<obj::Integer>(eval_obj);
     std::cout << "Testing eval of " << cur_test.input << std::endl;
     ASSERT_EQ(cur_test.expected, eval_int->value);
+  }
+}
+
+TEST(Eval, BooleanEval) {
+  struct test_suite {
+    std::string input;
+    bool expected;
+  };
+
+  test_suite tests[] = {{"true", true},
+                        {"false", false},
+                        {"1 < 2", true},
+                        {"1 > 2", false},
+                        {"1 < 1", false},
+                        {"1 > 1", false},
+                        {"1 == 1", true},
+                        {"1 != 1", false},
+                        {"1 == 2", false},
+                        {"1 != 2", true},
+                        {"true == true", true},
+                        {"false == false", true},
+                        {"true == false", false},
+                        {"true != false", true},
+                        {"false != true", true},
+                        {"(1 < 2) == true", true},
+                        {"(1 < 2) == false", false},
+                        {"(1 > 2) == true", false},
+                        {"(1 > 2) == false", true}};
+
+  int iterations = sizeof(tests) / sizeof(tests[0]);
+  for (int i = 0; i < iterations; i++) {
+    test_suite cur_test = tests[i];
+    obj::obj_ptr eval_obj = test_eval(cur_test.input);
+    ASSERT_EQ(eval_obj->_type(), obj::BOOLEAN);
+    obj::bool_ptr eval_bool = std::dynamic_pointer_cast<obj::Boolean>(eval_obj);
+    std::cout << "Testing eval of " << cur_test.input << std::endl;
+    ASSERT_EQ(cur_test.expected, eval_bool->value);
   }
 }
