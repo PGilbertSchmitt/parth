@@ -39,10 +39,10 @@ TEST(Eval, IntEval) {
   int iterations = sizeof(tests) / sizeof(tests[0]);
   for (int i = 0; i < iterations; i++) {
     test_suite cur_test = tests[i];
+    std::cout << "Testing eval of " << cur_test.input << std::endl;
     obj::obj_ptr eval_obj = test_eval(cur_test.input);
     ASSERT_EQ(eval_obj->_type(), obj::INTEGER);
     obj::int_ptr eval_int = std::dynamic_pointer_cast<obj::Integer>(eval_obj);
-    std::cout << "Testing eval of " << cur_test.input << std::endl;
     ASSERT_EQ(cur_test.expected, eval_int->value);
   }
 }
@@ -76,10 +76,10 @@ TEST(Eval, BooleanEval) {
   int iterations = sizeof(tests) / sizeof(tests[0]);
   for (int i = 0; i < iterations; i++) {
     test_suite cur_test = tests[i];
+    std::cout << "Testing eval of " << cur_test.input << std::endl;
     obj::obj_ptr eval_obj = test_eval(cur_test.input);
     ASSERT_EQ(eval_obj->_type(), obj::BOOLEAN);
     obj::bool_ptr eval_bool = std::dynamic_pointer_cast<obj::Boolean>(eval_obj);
-    std::cout << "Testing eval of " << cur_test.input << std::endl;
     ASSERT_EQ(cur_test.expected, eval_bool->value);
   }
 }
@@ -91,15 +91,17 @@ TEST(Eval, BangEval) {
   };
 
   test_suite tests[] = {{"!true", false}, {"!false", true},   {"!5", false},
-                        {"!!true", true}, {"!!false", false}, {"!!5", true}};
+                        {"!!true", true}, {"!!false", false}, {"!!5", true},
+                        {"!0", true},     {"!!0", false}};
 
   int iterations = sizeof(tests) / sizeof(tests[0]);
   for (int i = 0; i < iterations; i++) {
     test_suite cur_test = tests[i];
+    std::cout << "Testing eval of " << cur_test.input << std::endl;
     obj::obj_ptr eval_obj = test_eval(cur_test.input);
     ASSERT_EQ(eval_obj->_type(), obj::BOOLEAN);
     obj::bool_ptr eval_bool = std::dynamic_pointer_cast<obj::Boolean>(eval_obj);
-    std::cout << "Testing eval of " << cur_test.input << std::endl;
-    ASSERT_EQ(cur_test.expected, eval_bool->value);
+    ASSERT_EQ(cur_test.expected, eval_bool->value)
+        << "Failed on test " << i + 1;
   }
 }
