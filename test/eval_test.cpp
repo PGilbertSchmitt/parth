@@ -83,3 +83,23 @@ TEST(Eval, BooleanEval) {
     ASSERT_EQ(cur_test.expected, eval_bool->value);
   }
 }
+
+TEST(Eval, BangEval) {
+  struct test_suite {
+    std::string input;
+    bool expected;
+  };
+
+  test_suite tests[] = {{"!true", false}, {"!false", true},   {"!5", false},
+                        {"!!true", true}, {"!!false", false}, {"!!5", true}};
+
+  int iterations = sizeof(tests) / sizeof(tests[0]);
+  for (int i = 0; i < iterations; i++) {
+    test_suite cur_test = tests[i];
+    obj::obj_ptr eval_obj = test_eval(cur_test.input);
+    ASSERT_EQ(eval_obj->_type(), obj::BOOLEAN);
+    obj::bool_ptr eval_bool = std::dynamic_pointer_cast<obj::Boolean>(eval_obj);
+    std::cout << "Testing eval of " << cur_test.input << std::endl;
+    ASSERT_EQ(cur_test.expected, eval_bool->value);
+  }
+}
