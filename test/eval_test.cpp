@@ -14,6 +14,7 @@ obj::obj_ptr test_eval(const std::string &input) {
   return eval(program, envir);
 }
 
+// No need to test the minus op separately
 TEST(Eval, IntEval) {
   struct test_suite {
     std::string input;
@@ -104,4 +105,10 @@ TEST(Eval, BangEval) {
     ASSERT_EQ(cur_test.expected, eval_bool->value)
         << "Failed on test " << i + 1;
   }
+}
+
+TEST(Eval, OptionEval) {
+  std::string input = "let opt? = 5";
+
+  std::cout << "Testing eval of " << input << std::endl;
 }
