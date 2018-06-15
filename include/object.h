@@ -12,7 +12,7 @@ enum obj_type {
   // STRING,
   RETURN_VAL,
   ERROR,
-  // OPTION
+  OPTION
 };
 
 class Object;
@@ -20,12 +20,14 @@ class Boolean;
 class Integer;
 class ReturnVal;
 class Error;
+class Option;
 
 typedef std::shared_ptr<Object> obj_ptr;
 typedef std::shared_ptr<Boolean> bool_ptr;
 typedef std::shared_ptr<Integer> int_ptr;
 typedef std::shared_ptr<ReturnVal> return_ptr;
 typedef std::shared_ptr<Error> err_ptr;
+typedef std::shared_ptr<Option> opt_ptr;
 
 class Object {
  public:
@@ -64,6 +66,16 @@ class Error : public Object {
  public:
   Error(std::string err);
   std::string err;
+
+  std::string inspect();
+  obj_type _type();
+};
+
+class Option : public Object {
+ public:
+  Option();
+  Option(obj_ptr);
+  obj_ptr value;
 
   std::string inspect();
   obj_type _type();
