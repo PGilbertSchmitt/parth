@@ -13,6 +13,7 @@ rank_map Parser::precedences{
 Parser::Parser(Lexer* lexer) : lexer(lexer) {
   // Register Prefix Parsing functions here
   register_prefix(TokenType::IDENT, &parse_identifier);
+  register_prefix(TokenType::OPTION, &parse_option);
   register_prefix(TokenType::INT, &parse_integer);
   register_prefix(TokenType::LET, &parse_let);
   register_prefix(TokenType::RETURN, &parse_return);
@@ -200,6 +201,11 @@ ast::node_ptr parse_boolean(Parser& p) {
   Token bool_tok = p.get_cur_token();
   bool val = bool_tok.get_literal() == "true";
   return ast::bool_ptr(new ast::Boolean(bool_tok, val));
+}
+
+ast::node_ptr parse_option(Parser& p) {
+  Token cur = p.get_cur_token();
+  return ast::opt_ptr(new ast::Option(cur, cur.get_literal()));
 }
 
 ast::node_ptr parse_if_else(Parser& p) {

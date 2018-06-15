@@ -89,6 +89,14 @@ TEST(Parser, BoolTest) {
   ASSERT_EQ(false_node->value, false);
 }
 
+TEST(Parser, OptionTest) {
+  ast::node_ptr first = get_first_expression("maybe?");
+  ASSERT_EQ(first->_type(), ast::OPTION);
+
+  ast::opt_ptr opt_node = std::dynamic_pointer_cast<ast::Option>(first);
+  ASSERT_EQ(opt_node->to_string(), "maybe?");
+}
+
 TEST(Parser, GroupExpressionTest) {
   ast::node_ptr first = get_first_expression("(4)");
   ASSERT_EQ(first->_type(), ast::INTEGER);
