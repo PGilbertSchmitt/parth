@@ -35,6 +35,8 @@ std::string ast::Block::to_string() {
 
 ast::node_type ast::Block::_type() { return ast::BLOCK; }
 
+bool ast::Block::is_reducible() { return true; };
+
 /******************/
 /*** Identifier **/
 /******************/
@@ -47,6 +49,8 @@ ast::Identifier::Identifier(Token token, std::string value) {
 std::string ast::Identifier::to_string() { return value; }
 
 ast::node_type ast::Identifier::_type() { return ast::IDENT; }
+
+bool ast::Identifier::is_reducible() { return false; }
 
 /**********************/
 /*** Let Expression ***/
@@ -66,6 +70,8 @@ std::string ast::Let::to_string() {
 };
 
 ast::node_type ast::Let::_type() { return ast::LET; }
+
+bool ast::Let::is_reducible() { return true; }
 
 /*************************/
 /*** Assign Expression ***/
@@ -87,6 +93,8 @@ std::string ast::Assign::to_string() {
 
 ast::node_type ast::Assign::_type() { return ast::ASSIGN; }
 
+bool ast::Assign::is_reducible() { return true; }
+
 /*************************/
 /*** Return Expression ***/
 /*************************/
@@ -106,6 +114,8 @@ std::string ast::Return::to_string() {
 
 ast::node_type ast::Return::_type() { return ast::RETURN; }
 
+bool ast::Return::is_reducible() { return false; }
+
 /***********************/
 /*** Integer Literal ***/
 /***********************/
@@ -118,6 +128,8 @@ ast::Integer::Integer(Token token, int64_t value) {
 std::string ast::Integer::to_string() { return std::to_string(value); }
 
 ast::node_type ast::Integer::_type() { return ast::INTEGER; }
+
+bool ast::Integer::is_reducible() { return false; }
 
 /***********************/
 /*** Boolean Literal ***/
@@ -132,6 +144,8 @@ std::string ast::Boolean::to_string() { return this->value ? "true" : "false"; }
 
 ast::node_type ast::Boolean::_type() { return ast::BOOLEAN; }
 
+bool ast::Boolean::is_reducible() { return false; }
+
 /**********************/
 /*** Option Literal ***/
 /**********************/
@@ -144,6 +158,8 @@ ast::Option::Option(Token token, std::string name) {
 std::string ast::Option::to_string() { return this->name; }
 
 ast::node_type ast::Option::_type() { return ast::OPTION; }
+
+bool ast::Option::is_reducible() { return false; }
 
 /*************************/
 /*** Prefix Expression ***/
@@ -165,6 +181,8 @@ std::string ast::Prefix::to_string() {
 }
 
 ast::node_type ast::Prefix::_type() { return ast::PREFIX; }
+
+bool ast::Prefix::is_reducible() { return true; }
 
 /************************/
 /*** Infix Expression ***/
@@ -188,6 +206,8 @@ std::string ast::Infix::to_string() {
 }
 
 ast::node_type ast::Infix::_type() { return ast::INFIX; }
+
+bool ast::Infix::is_reducible() { return true; }
 
 /*************************/
 /*** IfElse Expression ***/
@@ -222,6 +242,8 @@ std::string ast::IfElse::to_string() {
 }
 
 ast::node_type ast::IfElse::_type() { return ast::IF_ELSE; }
+
+bool ast::IfElse::is_reducible() { return true; }
 
 void ast::IfElse::push_condition_set(node_ptr condition,
                                      block_ptr consequence) {

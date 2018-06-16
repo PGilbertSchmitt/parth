@@ -68,6 +68,7 @@ class Node {
   // language does allow for this, and I'm confident that it will work well
   // enough for now.
   virtual node_type _type() = 0;
+  virtual bool is_reducible() = 0;
 };
 
 /* Block Expression
@@ -85,6 +86,7 @@ class Block : public Node {
   std::string to_string();
   void push_node(node_ptr node);
   node_type _type();
+  bool is_reducible();
 };
 
 /* Identifier:
@@ -100,6 +102,7 @@ class Identifier : public Node {
 
   std::string to_string();
   node_type _type();
+  bool is_reducible();
 };
 
 /* Let Expression
@@ -115,6 +118,7 @@ class Let : public Node {
 
   std::string to_string();
   node_type _type();
+  bool is_reducible();
 };
 
 /* Assign Expression
@@ -130,6 +134,7 @@ class Assign : public Node {
 
   std::string to_string();
   node_type _type();
+  bool is_reducible();
 };
 
 /* Return Expression
@@ -146,6 +151,7 @@ class Return : public Node {
 
   std::string to_string();
   node_type _type();
+  bool is_reducible();
 };
 
 /* Integer Expression
@@ -160,6 +166,7 @@ class Integer : public Node {
 
   std::string to_string();
   node_type _type();
+  bool is_reducible();
 };
 
 /* Boolean Literal
@@ -174,6 +181,7 @@ class Boolean : public Node {
 
   std::string to_string();
   node_type _type();
+  bool is_reducible();
 };
 
 /* Option Literal
@@ -192,6 +200,7 @@ class Option : public Node {
 
   std::string to_string();
   node_type _type();
+  bool is_reducible();
 };
 
 /* Prefix Expression
@@ -208,6 +217,7 @@ class Prefix : public Node {
 
   std::string to_string();
   node_type _type();
+  bool is_reducible();
 };
 
 /* Infix Expression
@@ -225,6 +235,7 @@ class Infix : public Node {
 
   std::string to_string();
   node_type _type();
+  bool is_reducible();
 };
 
 /* A pair of a condition and the consequence should that condition be evaluated
@@ -257,6 +268,7 @@ class IfElse : public Node {
 
   std::string to_string();
   node_type _type();
+  bool is_reducible();
   void push_condition_set(node_ptr condition, block_ptr consequence);
 };
 
