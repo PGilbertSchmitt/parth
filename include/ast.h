@@ -103,6 +103,9 @@ class Identifier : public Node {
   std::string to_string();
   node_type _type();
   bool is_reducible();
+
+ protected:
+  Identifier();
 };
 
 /* Let Expression
@@ -191,12 +194,12 @@ class Boolean : public Node {
  * RETURNS: In this form, returns a boolean of whether the optional value
  * contains a value */
 
-class Option : public Node {
+class Option : public Identifier {
  public:
   Option(Token token, std::string name);
 
   Token token;
-  std::string name;
+  std::string value;
 
   std::string to_string();
   node_type _type();

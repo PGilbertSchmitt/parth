@@ -41,6 +41,8 @@ bool ast::Block::is_reducible() { return true; };
 /*** Identifier **/
 /******************/
 
+ast::Identifier::Identifier(){};
+
 ast::Identifier::Identifier(Token token, std::string value) {
   this->token = token;
   this->value = value;
@@ -150,12 +152,12 @@ bool ast::Boolean::is_reducible() { return false; }
 /*** Option Literal ***/
 /**********************/
 
-ast::Option::Option(Token token, std::string name) {
+ast::Option::Option(Token token, std::string value) {
   this->token = token;
-  this->name = name;
+  this->value = value;
 }
 
-std::string ast::Option::to_string() { return this->name; }
+std::string ast::Option::to_string() { return this->value; }
 
 ast::node_type ast::Option::_type() { return ast::OPTION; }
 
