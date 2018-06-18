@@ -113,6 +113,7 @@ class Identifier : public Node {
  * RETURNS: the value returned by the internal expression */
 class Let : public Node {
  public:
+  Let(Token token, ident_ptr name);
   Let(Token token, ident_ptr name, node_ptr expression);
 
   Token token;

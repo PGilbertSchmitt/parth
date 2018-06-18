@@ -58,6 +58,10 @@ bool ast::Identifier::is_reducible() { return false; }
 /*** Let Expression ***/
 /**********************/
 
+ast::Let::Let(Token token, ident_ptr name) : name(name), expression(nullptr) {
+  this->token = token;
+}
+
 ast::Let::Let(Token token, ident_ptr name, node_ptr expression)
     : name(name), expression(expression) {
   this->token = token;

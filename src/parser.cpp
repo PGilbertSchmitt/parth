@@ -173,9 +173,20 @@ ast::node_ptr parse_integer(Parser& p) {
 
 ast::node_ptr parse_let(Parser& p) {
   Token let_tok = p.get_cur_token();
-  p.expect_peek(TokenType::IDENT);
-  ast::ident_ptr name =
-      std::dynamic_pointer_cast<ast::Identifier>(parse_identifier(p));
+  p.next_token();
+  ast::ident_ptr name;
+  if (p.cur_token_is(TokenType::IDENT)) {
+    name = std::dynamic_pointer_cast<ast::Identifier>(parse_identifier(p));
+  } else if (p.cur_token_is(TokenType::OPTION)) {
+    name = std::dynamic_pointer_cast<ast::Option>(parse_option(p));
+  } else {
+    throw UnexpectedException(TokenType::IDENT, p.get_peek_token());
+  }
+
+  if (!p.peek_token_is(TokenType::ASSIGN) && name->_type() == ast::OPTION) {
+    std::cout << "We don't need no stinking assigns!\n";
+    return ast::let_ptr(new ast::Let(let_tok, name));
+  }
   p.expect_peek(TokenType::ASSIGN);
   p.next_token();
   ast::node_ptr right_expr = p.parse_expression(Parser::LOWEST);
