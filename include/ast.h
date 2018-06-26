@@ -7,6 +7,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include "object.h"
 #include "token.h"
 
 namespace ast {
@@ -22,7 +23,8 @@ enum node_type {
   OPTION,
   PREFIX,
   INFIX,
-  IF_ELSE
+  IF_ELSE,
+  VALUE
 };
 
 std::string node_type_string(node_type);
@@ -39,6 +41,7 @@ class Option;
 class Prefix;
 class Infix;
 class IfElse;
+class Value;
 
 typedef std::shared_ptr<Node> node_ptr;
 typedef std::shared_ptr<Block> block_ptr;
@@ -52,6 +55,7 @@ typedef std::shared_ptr<Option> opt_ptr;
 typedef std::shared_ptr<Prefix> prefix_ptr;
 typedef std::shared_ptr<Infix> infix_ptr;
 typedef std::shared_ptr<IfElse> ifelse_ptr;
+typedef std::shared_ptr<Value> val_ptr;
 
 /* Node:
  * Every node is an expression, meaning every expression can be stored and
@@ -274,6 +278,29 @@ class IfElse : public Node {
   node_type _type();
   bool is_reducible();
   void push_condition_set(node_ptr condition, block_ptr consequence);
+};
+
+/* Value Node
+ * The value node is unique, in that it is not something that is put into the
+ * AST by the parser but by the evaluator. In order to handle step-by-step
+ * evaluation, I've decided to design the AST so that the tree can be reduced in
+ * discrete steps. When the lowest node with irreducible children is evaluated,
+ * it is replaced by a value node containing the object recording a value (as
+ * opposed to a literal, which would be cumbersome to deal with as a value).
+ * This adds complexity to the AST and to the evaluator, but saves me having to
+ * write my own custom assembly-like intermediate language and interpreter
+ * (which I have zero clue on how to do).
+ */
+class Value : public Node {
+ public:
+  Value(Token token, obj::obj_ptr object);
+
+  Token token;
+  obj::obj_ptr object;
+
+  std::string to_string();
+  node_type _type();
+  bool is_reducible();
 };
 
 /* No NULL pointers should be accepted by any node constructor or method, so

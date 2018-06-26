@@ -266,6 +266,25 @@ void ast::IfElse::push_condition_set(node_ptr condition,
   list.push_back(set);
 }
 
+/******************/
+/*** Value Node ***/
+/******************/
+
+ast::Value::Value(Token token, obj::obj_ptr object) {
+  this->token = token;
+  this->object = object;
+}
+
+std::string ast::Value::to_string() { return this->object->inspect(); }
+
+ast::node_type ast::Value::_type() { return ast::VALUE; }
+
+bool ast::Value::is_reducible() { return false; }
+
+/***************/
+/*** Helpers ***/
+/***************/
+
 std::string ast::node_type_string(node_type _type) {
   switch (_type) {
     case ast::BLOCK:
