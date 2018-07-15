@@ -195,9 +195,10 @@ class Boolean : public Node {
 /* Option Literal
  * A representation of an optional type that either holds one internal value (in
  * the environment) or none at all, much like an Identifier, with the
- * possibility of no internal value
- * RETURNS: In this form, returns a boolean of whether the optional value
- * contains a value */
+ * possibility of no internal value. Since optionals are referenced by
+ * identifiers after initialization, this should only ever appear in a let
+ * statement.
+ * NO RETURN, DOES NOT (CURRENTLY) APPEAR IN EXPRESSIONS */
 
 class Option : public Identifier {
  public:
