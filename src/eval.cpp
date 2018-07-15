@@ -30,7 +30,6 @@ obj::obj_ptr eval(ast::node_ptr node, env::env_ptr envir) {
       return evalBoolean(bool_node);
     } break;
 
-      // case ast::OPTION:
     case ast::PREFIX: {
       ast::prefix_ptr prefix_node =
           std::dynamic_pointer_cast<ast::Prefix>(node);
@@ -84,11 +83,39 @@ obj::obj_ptr evalIdent(ast::ident_ptr ident, env::env_ptr envir) {
 }
 
 obj::obj_ptr evalLet(ast::let_ptr let, env::env_ptr envir) {
+  if (let->name->_type() == ast::OPTION) {
+    return evalOptLet(let, envir);
+  } else {
+    return evalIdentLet(let, envir);
+  }
+}
+
+obj::obj_ptr evalIdentLet(ast::let_ptr let, env::env_ptr envir) {
   obj::obj_ptr right = eval(let->expression, envir);
   if (right->_type() != obj::ERROR) {
     envir->init(let->name->value, right);
   }
   return right;
+}
+
+obj::obj_ptr evalOptLet(ast::let_ptr let, env::env_ptr envir) {
+  if (let->expression != nullptr) {
+    obj::obj_ptr right = eval(let->expression, envir);
+    if (right->_type() != obj::ERROR) {
+      obj::opt_ptr opt = obj::opt_ptr(new obj::Option(right));
+      std::string name =
+          std::dynamic_pointer_cast<ast::Option>(let->name)->value;
+      std::cout << "Name: " << name << std::endl;
+      envir->init(name, opt);
+      return opt;
+    } else {
+      return right;
+    }
+  } else {
+    obj::opt_ptr opt = obj::opt_ptr(new obj::Option());
+    envir->init(let->name->value, opt);
+    return opt;
+  }
 }
 
 obj::int_ptr evalInteger(ast::int_ptr int_node) {
@@ -238,19 +265,19 @@ obj::obj_ptr evalMinusOperator(obj::int_ptr num) {
 }
 
 obj::obj_ptr evalBangOperator(obj::obj_ptr input) {
-  obj::bool_ptr init_val = isTruthy(input);
-  return (init_val == TRUE_OBJ) ? FALSE_OBJ : TRUE_OBJ;
+  // obj::bool_ptr init_val = truthiness(input);
+  return truthiness(input, true);
 }
 
-// Here is where truthiness is determined. Any value is truthy if it's no falsy.
-// Any value is falsy if it's one of:
+// Here is where truthiness is determined. Any value is truthy if it's not
+// falsy. Any value is falsy if it's one of:
 // - false (bool)
 // - 0     (int)
 // - ""    (string)
 // - []    (array)
 // - {}    (hash)
 // - none  (option)
-obj::bool_ptr isTruthy(obj::obj_ptr input) {
+obj::bool_ptr truthiness(obj::obj_ptr input, bool negate = false) {
   bool new_val = false;
   switch (input->_type()) {
     case obj::BOOLEAN: {
@@ -260,7 +287,10 @@ obj::bool_ptr isTruthy(obj::obj_ptr input) {
       obj::int_ptr int_obj = std::dynamic_pointer_cast<obj::Integer>(input);
       new_val = int_obj->value != 0;
     } break;
-    default: {}
+    case obj::OPTION: {
+      obj::opt_ptr opt_obj = std::dynamic_pointer_cast<obj::Option>(input);
+      new_val = opt_obj->value != nullptr;
+    }
   }
-  return new_val ? TRUE_OBJ : FALSE_OBJ;
+  return new_val ^ negate ? TRUE_OBJ : FALSE_OBJ;
 }
