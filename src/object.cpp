@@ -36,7 +36,7 @@ obj::Option::Option() : value(nullptr){};
 obj::Option::Option(obj_ptr value) : value(value){};
 std::string obj::Option::inspect() {
   if (this->value == nullptr) {
-    return "NONE";
+    return "?()";
   } else {
     // The printed syntax is not to resemble the input code, but to make it
     // clear during inspection that the value is wrapped by a contruct, so any
