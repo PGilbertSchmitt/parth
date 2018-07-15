@@ -120,7 +120,7 @@ std::string ast::Return::to_string() {
 
 ast::node_type ast::Return::_type() { return ast::RETURN; }
 
-bool ast::Return::is_reducible() { return false; }
+bool ast::Return::is_reducible() { return true; }
 
 /***********************/
 /*** Integer Literal ***/
