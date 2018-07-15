@@ -13,7 +13,8 @@ rank_map Parser::precedences{
 Parser::Parser(Lexer* lexer) : lexer(lexer) {
   // Register Prefix Parsing functions here
   register_prefix(TokenType::IDENT, &parse_identifier);
-  register_prefix(TokenType::OPTION, &parse_option);
+  // currently, parse_option should not be used outside of let expressions
+  // register_prefix(TokenType::OPTION, &parse_option);
   register_prefix(TokenType::INT, &parse_integer);
   register_prefix(TokenType::LET, &parse_let);
   register_prefix(TokenType::RETURN, &parse_return);
@@ -184,7 +185,6 @@ ast::node_ptr parse_let(Parser& p) {
   }
 
   if (!p.peek_token_is(TokenType::ASSIGN) && name->_type() == ast::OPTION) {
-    std::cout << "We don't need no stinking assigns!\n";
     return ast::let_ptr(new ast::Let(let_tok, name));
   }
   p.expect_peek(TokenType::ASSIGN);

@@ -68,11 +68,16 @@ ast::Let::Let(Token token, ident_ptr name, node_ptr expression)
 }
 
 std::string ast::Let::to_string() {
-  if (name == NULL or expression == NULL) {
-    return "<! LET STATEMENT HAS NULL MEMBERS !>";
+  if (name == NULL) {
+    return "<! LET STATEMENT HAS NULL IDENT !>";
   }
 
-  return "let " + name->value + " = " + expression->to_string();
+  std::string out = "let " + name->to_string();
+  if (expression != NULL) {
+    out += (" = " + expression->to_string());
+  }
+
+  return out;
 };
 
 ast::node_type ast::Let::_type() { return ast::LET; }

@@ -155,6 +155,10 @@ Token Lexer::next_token() {
       if (isLetter(ch)) {
         lit = read_ident();
         tok = Token::lookup_ident(lit);
+        if (tok == TokenType::OPTION) {
+          // Strip the `?`
+          lit = lit.substr(0, lit.length() - 1);
+        }
       } else if (isDigit(ch)) {
         lit = read_num();
         tok = TokenType::INT;
