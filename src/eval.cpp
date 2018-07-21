@@ -45,11 +45,12 @@ obj::obj_ptr eval(ast::node_ptr node, env::env_ptr envir) {
       return evalInfix(infix_node, envir);
     } break;
 
-      // case ast::IF_ELSE:
+    case ast::IF_ELSE:
 
     default: {
       return obj::err_ptr(
-          new obj::Error("Unknown node type: " + node->to_string()));
+          new obj::Error("Unknown node type: " + node->to_string() +
+                         ", not sure how to evaluate."));
     }
   }
 }
@@ -107,6 +108,8 @@ obj::obj_ptr evalOptLet(ast::let_ptr let, env::env_ptr envir) {
     obj::obj_ptr right = eval(let->expression, envir);
     if (right->_type() != obj::ERROR) {
       obj::opt_ptr opt = obj::opt_ptr(new obj::Option(right));
+      // Casting is required. Attempting to access `value` won't work otherwise.
+      // I'm not certain why this is, but I do not question Bjarne Stroustrup
       std::string name =
           std::dynamic_pointer_cast<ast::Option>(let->name)->value;
       std::cout << "Name: " << name << std::endl;
@@ -116,7 +119,7 @@ obj::obj_ptr evalOptLet(ast::let_ptr let, env::env_ptr envir) {
       return right;
     }
   } else {
-    obj::opt_ptr opt = obj::opt_ptr(new obj::Option());
+    obj::opt_ptr opt = NONE_OBJ;
     envir->init(let->name->value, opt);
     return opt;
   }
@@ -271,6 +274,27 @@ obj::obj_ptr evalMinusOperator(obj::int_ptr num) {
 obj::obj_ptr evalBangOperator(obj::obj_ptr input) {
   // obj::bool_ptr init_val = truthiness(input);
   return truthiness(input, true);
+}
+
+/* Conditional structures are expressions just like everything else, so they
+ * have to return something. However, if none of the conditions are true and
+ * there's no `else` or default case, they can't return nothing, or NULL, since
+ * that doesn't exist in this language. So, in order to enforce uniformity on
+ * returns for safe coding, a decision was made to require all conditional
+ * expressions to always return optionals. Currently, everything is wrapped in
+ * an optional (or a NONE is returned if there is no default), including other
+ * optionals. This may change in the future.
+ */
+obj::opt_ptr evalIf(ast::ifelse_ptr ifelse_node, env::env_ptr envir) {
+  std::vector<ast::condition_set>::iterator set;
+  for (set = ifelse_node->list.begin(); set != ifelse_node->list.end(); set++) {
+    obj::obj_ptr condition = eval(set->condition, envir);
+    if (truthiness(condition, false) == TRUE_OBJ) {
+      obj::obj_ptr consequence = eval(set->consequence, envir);
+      return obj::opt_ptr(new obj::Option(consequence));
+    }
+  }
+  return NONE_OBJ;
 }
 
 // Here is where truthiness is determined. Any value is truthy if it's not

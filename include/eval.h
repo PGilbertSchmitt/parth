@@ -10,6 +10,7 @@
 
 const obj::bool_ptr TRUE_OBJ = obj::bool_ptr(new obj::Boolean(true));
 const obj::bool_ptr FALSE_OBJ = obj::bool_ptr(new obj::Boolean(false));
+const obj::opt_ptr NONE_OBJ = obj::opt_ptr(new obj::Option());
 
 obj::obj_ptr eval(ast::node_ptr, env::env_ptr);
 
@@ -28,6 +29,7 @@ obj::obj_ptr evalIntegerInfixOperator(Token, obj::int_ptr, obj::int_ptr);
 obj::obj_ptr evalBooleanInfixOperator(Token, obj::bool_ptr, obj::bool_ptr);
 obj::obj_ptr evalBangOperator(obj::obj_ptr);
 obj::obj_ptr evalMinusOperator(obj::int_ptr);
+obj::opt_ptr evalIfElse(ast::ifelse_ptr, env::env_ptr);
 obj::bool_ptr truthiness(obj::obj_ptr, bool);
 
 #endif
