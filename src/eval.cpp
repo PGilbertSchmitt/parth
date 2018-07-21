@@ -293,8 +293,15 @@ obj::obj_ptr evalBangOperator(obj::obj_ptr input) {
 obj::opt_ptr evalIfElse(ast::ifelse_ptr ifelse_node, env::env_ptr envir) {
   std::vector<ast::condition_set>::iterator set;
   for (set = ifelse_node->list.begin(); set != ifelse_node->list.end(); set++) {
-    obj::obj_ptr condition = eval(set->condition, envir);
-    if (truthiness(condition, false) == TRUE_OBJ) {
+    bool execute_block = false;
+    if (set->condition == NULL) {
+      execute_block = true;
+    } else {
+      obj::obj_ptr condition = eval(set->condition, envir);
+      execute_block = truthiness(condition, false) == TRUE_OBJ;
+    }
+
+    if (execute_block) {
       obj::obj_ptr consequence = eval(set->consequence, envir);
       return obj::opt_ptr(new obj::Option(consequence));
     }
