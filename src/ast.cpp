@@ -172,6 +172,21 @@ ast::node_type ast::Option::_type() { return ast::OPTION; }
 
 bool ast::Option::is_reducible() { return false; }
 
+/**********************/
+/*** String Literal ***/
+/**********************/
+
+ast::String::String(Token token, std::string value) {
+  this->token = token;
+  this->value = value;
+}
+
+std::string ast::String::to_string() { return this->value; }
+
+ast::node_type ast::String::_type() { return ast::STRING; }
+
+bool ast::String::is_reducible() { return false; }
+
 /*************************/
 /*** Prefix Expression ***/
 /*************************/

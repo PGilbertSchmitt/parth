@@ -7,9 +7,10 @@
 namespace obj {
 
 enum obj_type {
+  // For some reason, this comment keeps my autolinter happy. Meta...
   INTEGER = 0,
   BOOLEAN,
-  // STRING,
+  STRING,
   RETURN_VAL,
   ERROR,
   OPTION
@@ -18,6 +19,7 @@ enum obj_type {
 class Object;
 class Boolean;
 class Integer;
+class String;
 class ReturnVal;
 class Error;
 class Option;
@@ -25,6 +27,7 @@ class Option;
 typedef std::shared_ptr<Object> obj_ptr;
 typedef std::shared_ptr<Boolean> bool_ptr;
 typedef std::shared_ptr<Integer> int_ptr;
+typedef std::shared_ptr<String> str_ptr;
 typedef std::shared_ptr<ReturnVal> return_ptr;
 typedef std::shared_ptr<Error> err_ptr;
 typedef std::shared_ptr<Option> opt_ptr;
@@ -50,6 +53,15 @@ class Boolean : public Object {
  public:
   Boolean(bool value);
   const bool value;
+
+  std::string inspect();
+  obj_type _type();
+};
+
+class String : public Object {
+ public:
+  String(std::string value);
+  const std::string value;
 
   std::string inspect();
   obj_type _type();

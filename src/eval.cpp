@@ -34,6 +34,11 @@ obj::obj_ptr eval(ast::node_ptr node, env::env_ptr envir) {
       return evalBoolean(bool_node);
     } break;
 
+    case ast::STRING: {
+      ast::str_ptr str_node = std::dynamic_pointer_cast<ast::String>(node);
+      return evalString(str_node);
+    }
+
     case ast::PREFIX: {
       ast::prefix_ptr prefix_node =
           std::dynamic_pointer_cast<ast::Prefix>(node);
@@ -140,6 +145,10 @@ obj::bool_ptr evalBoolean(ast::bool_ptr bool_node) {
   } else {
     return FALSE_OBJ;
   };
+}
+
+obj::str_ptr evalString(ast::str_ptr str_node) {
+  return obj::str_ptr(new obj::String(str_node->value));
 }
 
 obj::obj_ptr evalInfix(ast::infix_ptr infix_node, env::env_ptr envir) {

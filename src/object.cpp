@@ -18,6 +18,12 @@ std::string obj::Boolean::inspect() {
 }
 obj::obj_type obj::Boolean::_type() { return obj::BOOLEAN; }
 
+/* String */
+
+obj::String::String(std::string value) : value(value) {}
+std::string obj::String::inspect() { return this->value; }
+obj::obj_type obj::String::_type() { return obj::STRING; }
+
 /* Return Wrapper */
 
 obj::ReturnVal::ReturnVal(obj_ptr o) : value(o) {}

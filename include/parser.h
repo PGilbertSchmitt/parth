@@ -89,6 +89,7 @@ ast::node_ptr parse_return(Parser &p);
 ast::node_ptr parse_prefix(Parser &p);
 ast::node_ptr parse_boolean(Parser &p);
 ast::node_ptr parse_option(Parser &p);
+ast::node_ptr parse_string(Parser &p);
 ast::node_ptr parse_if_else(Parser &p);
 ast::node_ptr parse_group(Parser &p);
 

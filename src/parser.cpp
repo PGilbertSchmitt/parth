@@ -22,6 +22,7 @@ Parser::Parser(Lexer* lexer) : lexer(lexer) {
   register_prefix(TokenType::BANG, &parse_prefix);
   register_prefix(TokenType::TRUE_VAL, &parse_boolean);
   register_prefix(TokenType::FALSE_VAL, &parse_boolean);
+  register_prefix(TokenType::STRING, &parse_string);
   register_prefix(TokenType::LPAREN, &parse_group);
   register_prefix(TokenType::IF, &parse_if_else);
 
@@ -217,6 +218,11 @@ ast::node_ptr parse_boolean(Parser& p) {
 ast::node_ptr parse_option(Parser& p) {
   Token cur = p.get_cur_token();
   return ast::opt_ptr(new ast::Option(cur, cur.get_literal()));
+}
+
+ast::node_ptr parse_string(Parser& p) {
+  Token cur = p.get_cur_token();
+  return ast::str_ptr(new ast::String(cur, cur.get_literal()));
 }
 
 ast::node_ptr parse_if_else(Parser& p) {

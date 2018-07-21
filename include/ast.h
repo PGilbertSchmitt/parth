@@ -21,6 +21,7 @@ enum node_type {
   INTEGER,
   BOOLEAN,
   OPTION,
+  STRING,
   PREFIX,
   INFIX,
   IF_ELSE,
@@ -38,6 +39,7 @@ class Return;
 class Integer;
 class Boolean;
 class Option;
+class String;
 class Prefix;
 class Infix;
 class IfElse;
@@ -52,6 +54,7 @@ typedef std::shared_ptr<Return> return_ptr;
 typedef std::shared_ptr<Integer> int_ptr;
 typedef std::shared_ptr<Boolean> bool_ptr;
 typedef std::shared_ptr<Option> opt_ptr;
+typedef std::shared_ptr<String> str_ptr;
 typedef std::shared_ptr<Prefix> prefix_ptr;
 typedef std::shared_ptr<Infix> infix_ptr;
 typedef std::shared_ptr<IfElse> ifelse_ptr;
@@ -203,6 +206,23 @@ class Boolean : public Node {
 class Option : public Identifier {
  public:
   Option(Token token, std::string name);
+
+  Token token;
+  std::string value;
+
+  std::string to_string();
+  node_type _type();
+  bool is_reducible();
+};
+
+/* String Literal
+ * A representation of a string of characters
+ * RETURNS: A string
+ */
+
+class String : public Node {
+ public:
+  String(Token token, std::string value);
 
   Token token;
   std::string value;
