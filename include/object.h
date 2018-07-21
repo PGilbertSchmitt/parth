@@ -44,6 +44,8 @@ class Integer : public Object {
   obj_type _type();
 };
 
+// IMPORTANT! These should only be created once each for either boolean value
+// to maintain two global singletons throughout evaluation.
 class Boolean : public Object {
  public:
   Boolean(bool value);
