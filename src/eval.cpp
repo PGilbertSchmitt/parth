@@ -45,7 +45,13 @@ obj::obj_ptr eval(ast::node_ptr node, env::env_ptr envir) {
       return evalInfix(infix_node, envir);
     } break;
 
-    case ast::IF_ELSE:
+    case ast::IF_ELSE: {
+      ast::ifelse_ptr ifelse_node =
+          std::dynamic_pointer_cast<ast::IfElse>(node);
+      obj::obj_ptr if_else_val = evalIfElse(ifelse_node, envir);
+      std::cout << "Finished if_else evaluation\n";
+      return if_else_val;
+    } break;
 
     default: {
       return obj::err_ptr(
@@ -112,7 +118,6 @@ obj::obj_ptr evalOptLet(ast::let_ptr let, env::env_ptr envir) {
       // I'm not certain why this is, but I do not question Bjarne Stroustrup
       std::string name =
           std::dynamic_pointer_cast<ast::Option>(let->name)->value;
-      std::cout << "Name: " << name << std::endl;
       envir->init(name, opt);
       return opt;
     } else {
@@ -227,22 +232,22 @@ obj::obj_ptr evalIntegerInfixOperator(Token op, obj::int_ptr left,
       return obj::int_ptr(new obj::Integer(left->value % right->value));
     }
     case TokenType::EQ: {
-      return obj::bool_ptr(new obj::Boolean(left->value == right->value));
+      return nativeBoolToObject(left->value == right->value);
     }
     case TokenType::NEQ: {
-      return obj::bool_ptr(new obj::Boolean(left->value != right->value));
+      return nativeBoolToObject(left->value != right->value);
     }
     case TokenType::LT: {
-      return obj::bool_ptr(new obj::Boolean(left->value < right->value));
+      return nativeBoolToObject(left->value < right->value);
     }
     case TokenType::GT: {
-      return obj::bool_ptr(new obj::Boolean(left->value > right->value));
+      return nativeBoolToObject(left->value > right->value);
     }
     case TokenType::LTEQ: {
-      return obj::bool_ptr(new obj::Boolean(left->value <= right->value));
+      return nativeBoolToObject(left->value <= right->value);
     }
     case TokenType::GTEQ: {
-      return obj::bool_ptr(new obj::Boolean(left->value >= right->value));
+      return nativeBoolToObject(left->value >= right->value);
     }
     default: {
       throw NoSuchOperatorException("No such operation INT " +
@@ -255,10 +260,10 @@ obj::obj_ptr evalBooleanInfixOperator(Token op, obj::bool_ptr left,
                                       obj::bool_ptr right) {
   switch (op.get_type()) {
     case TokenType::EQ: {
-      return obj::bool_ptr(new obj::Boolean(left->value == right->value));
+      return nativeBoolToObject(left->value == right->value);
     }
     case TokenType::NEQ: {
-      return obj::bool_ptr(new obj::Boolean(left->value != right->value));
+      return nativeBoolToObject(left->value != right->value);
     }
     default: {
       throw NoSuchOperatorException("No such operator BOOLEAN " +
@@ -285,7 +290,7 @@ obj::obj_ptr evalBangOperator(obj::obj_ptr input) {
  * an optional (or a NONE is returned if there is no default), including other
  * optionals. This may change in the future.
  */
-obj::opt_ptr evalIf(ast::ifelse_ptr ifelse_node, env::env_ptr envir) {
+obj::opt_ptr evalIfElse(ast::ifelse_ptr ifelse_node, env::env_ptr envir) {
   std::vector<ast::condition_set>::iterator set;
   for (set = ifelse_node->list.begin(); set != ifelse_node->list.end(); set++) {
     obj::obj_ptr condition = eval(set->condition, envir);
@@ -296,6 +301,10 @@ obj::opt_ptr evalIf(ast::ifelse_ptr ifelse_node, env::env_ptr envir) {
   }
   return NONE_OBJ;
 }
+
+/***********/
+/* HELPERS */
+/***********/
 
 // Here is where truthiness is determined. Any value is truthy if it's not
 // falsy. Any value is falsy if it's one of:
@@ -321,5 +330,9 @@ obj::bool_ptr truthiness(obj::obj_ptr input, bool negate = false) {
     } break;
     default: {}
   }
-  return new_val ^ negate ? TRUE_OBJ : FALSE_OBJ;
+  return nativeBoolToObject(new_val ^ negate);
+}
+
+obj::bool_ptr nativeBoolToObject(bool val) {
+  return val ? TRUE_OBJ : FALSE_OBJ;
 }

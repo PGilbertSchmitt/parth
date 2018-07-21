@@ -31,5 +31,6 @@ obj::obj_ptr evalBangOperator(obj::obj_ptr);
 obj::obj_ptr evalMinusOperator(obj::int_ptr);
 obj::opt_ptr evalIfElse(ast::ifelse_ptr, env::env_ptr);
 obj::bool_ptr truthiness(obj::obj_ptr, bool);
+obj::bool_ptr nativeBoolToObject(bool);
 
 #endif
