@@ -18,7 +18,11 @@ obj::obj_ptr eval(ast::node_ptr node, env::env_ptr envir) {
       return evalLet(let_node, envir);
     } break;
 
-      // case ast::RETURN:
+    case ast::RETURN: {
+      ast::return_ptr ret_node = std::dynamic_pointer_cast<ast::Return>(node);
+      obj::obj_ptr returned_value = eval(ret_node->expression, envir);
+      return obj::return_ptr(new obj::ReturnVal(returned_value));
+    } break;
 
     case ast::INTEGER: {
       ast::int_ptr int_node = std::dynamic_pointer_cast<ast::Integer>(node);
@@ -290,7 +294,8 @@ obj::bool_ptr truthiness(obj::obj_ptr input, bool negate = false) {
     case obj::OPTION: {
       obj::opt_ptr opt_obj = std::dynamic_pointer_cast<obj::Option>(input);
       new_val = opt_obj->value != nullptr;
-    }
+    } break;
+    default: {}
   }
   return new_val ^ negate ? TRUE_OBJ : FALSE_OBJ;
 }

@@ -20,7 +20,7 @@ obj::obj_type obj::Boolean::_type() { return obj::BOOLEAN; }
 
 /* Return Wrapper */
 
-obj::ReturnVal::ReturnVal(Object *o) : value(o) {}
+obj::ReturnVal::ReturnVal(obj_ptr o) : value(o) {}
 std::string obj::ReturnVal::inspect() { return this->value->inspect(); }
 obj::obj_type obj::ReturnVal::_type() { return obj::RETURN_VAL; }
 

@@ -55,7 +55,7 @@ class Boolean : public Object {
 
 class ReturnVal : public Object {
  public:
-  ReturnVal(Object *);
+  ReturnVal(obj_ptr o);
   obj_ptr value;
 
   std::string inspect();
