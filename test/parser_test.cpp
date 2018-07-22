@@ -77,14 +77,14 @@ TEST(Parser, BoolTest) {
   ast::node_ptr first = get_first_expression("true");
   ASSERT_EQ(first->_type(), ast::BOOLEAN);
 
-  ast::bool_ptr true_node = std::dynamic_pointer_cast<ast::Boolean>(first);
+  ast::bool_ptr true_node = std::dynamic_pointer_cast<ast::Bool>(first);
   ASSERT_EQ(true_node->to_string(), "true");
   ASSERT_EQ(true_node->value, true);
 
   ast::node_ptr second = get_first_expression("false");
   ASSERT_EQ(second->_type(), ast::BOOLEAN);
 
-  ast::bool_ptr false_node = std::dynamic_pointer_cast<ast::Boolean>(second);
+  ast::bool_ptr false_node = std::dynamic_pointer_cast<ast::Bool>(second);
   ASSERT_EQ(false_node->to_string(), "false");
   ASSERT_EQ(false_node->value, false);
 }

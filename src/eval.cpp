@@ -30,8 +30,8 @@ obj::obj_ptr eval(ast::node_ptr node, env::env_ptr envir) {
     } break;
 
     case ast::BOOLEAN: {
-      ast::bool_ptr bool_node = std::dynamic_pointer_cast<ast::Boolean>(node);
-      return evalBoolean(bool_node);
+      ast::bool_ptr bool_node = std::dynamic_pointer_cast<ast::Bool>(node);
+      return evalBool(bool_node);
     } break;
 
     case ast::STRING: {
@@ -138,7 +138,7 @@ obj::int_ptr evalInteger(ast::int_ptr int_node) {
   return obj::int_ptr(new obj::Integer(int_node->value));
 }
 
-obj::bool_ptr evalBoolean(ast::bool_ptr bool_node) {
+obj::bool_ptr evalBool(ast::bool_ptr bool_node) {
   if (bool_node->value) {
     return TRUE_OBJ;
   } else {
@@ -173,9 +173,9 @@ obj::obj_ptr evalInfix(ast::infix_ptr infix_node, env::env_ptr envir) {
 
   if (left_eval->_type() == obj::BOOLEAN &&
       right_eval->_type() == obj::BOOLEAN) {
-    obj::bool_ptr left = std::dynamic_pointer_cast<obj::Boolean>(left_eval);
-    obj::bool_ptr right = std::dynamic_pointer_cast<obj::Boolean>(right_eval);
-    return evalBooleanInfixOperator(op, left, right);
+    obj::bool_ptr left = std::dynamic_pointer_cast<obj::Bool>(left_eval);
+    obj::bool_ptr right = std::dynamic_pointer_cast<obj::Bool>(right_eval);
+    return evalBoolInfixOperator(op, left, right);
   }
 
   if (left_eval->_type() == obj::STRING && right_eval->_type() == obj::STRING) {
@@ -270,8 +270,8 @@ obj::obj_ptr evalIntegerInfixOperator(Token op, obj::int_ptr left,
   }
 }
 
-obj::obj_ptr evalBooleanInfixOperator(Token op, obj::bool_ptr left,
-                                      obj::bool_ptr right) {
+obj::obj_ptr evalBoolInfixOperator(Token op, obj::bool_ptr left,
+                                   obj::bool_ptr right) {
   switch (op.get_type()) {
     case TokenType::EQ: {
       return nativeBoolToObject(left->value == right->value);

@@ -143,19 +143,19 @@ ast::node_type ast::Integer::_type() { return ast::INTEGER; }
 bool ast::Integer::is_reducible() { return false; }
 
 /***********************/
-/*** Boolean Literal ***/
+/*** Bool Literal ***/
 /***********************/
 
-ast::Boolean::Boolean(Token token, bool value) {
+ast::Bool::Bool(Token token, bool value) {
   this->token = token;
   this->value = value;
 }
 
-std::string ast::Boolean::to_string() { return this->value ? "true" : "false"; }
+std::string ast::Bool::to_string() { return this->value ? "true" : "false"; }
 
-ast::node_type ast::Boolean::_type() { return ast::BOOLEAN; }
+ast::node_type ast::Bool::_type() { return ast::BOOLEAN; }
 
-bool ast::Boolean::is_reducible() { return false; }
+bool ast::Bool::is_reducible() { return false; }
 
 /**********************/
 /*** Option Literal ***/

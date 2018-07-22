@@ -17,7 +17,7 @@ enum obj_type {
 };
 
 class Object;
-class Boolean;
+class Bool;
 class Integer;
 class String;
 class ReturnVal;
@@ -25,7 +25,7 @@ class Error;
 class Option;
 
 typedef std::shared_ptr<Object> obj_ptr;
-typedef std::shared_ptr<Boolean> bool_ptr;
+typedef std::shared_ptr<Bool> bool_ptr;
 typedef std::shared_ptr<Integer> int_ptr;
 typedef std::shared_ptr<String> str_ptr;
 typedef std::shared_ptr<ReturnVal> return_ptr;
@@ -47,11 +47,11 @@ class Integer : public Object {
   obj_type _type();
 };
 
-// IMPORTANT! These should only be created once each for either boolean value
+// IMPORTANT! These should only be created once each for either bool value
 // to maintain two global singletons throughout evaluation.
-class Boolean : public Object {
+class Bool : public Object {
  public:
-  Boolean(bool value);
+  Bool(bool value);
   const bool value;
 
   std::string inspect();

@@ -37,7 +37,7 @@ class Let;
 class Assign;
 class Return;
 class Integer;
-class Boolean;
+class Bool;
 class Option;
 class String;
 class Prefix;
@@ -52,7 +52,7 @@ typedef std::shared_ptr<Let> let_ptr;
 typedef std::shared_ptr<Assign> assign_ptr;
 typedef std::shared_ptr<Return> return_ptr;
 typedef std::shared_ptr<Integer> int_ptr;
-typedef std::shared_ptr<Boolean> bool_ptr;
+typedef std::shared_ptr<Bool> bool_ptr;
 typedef std::shared_ptr<Option> opt_ptr;
 typedef std::shared_ptr<String> str_ptr;
 typedef std::shared_ptr<Prefix> prefix_ptr;
@@ -180,12 +180,12 @@ class Integer : public Node {
   bool is_reducible();
 };
 
-/* Boolean Literal
+/* Bool Literal
  * A representation of true or false
- * RETURNS: the boolean value of the expression */
-class Boolean : public Node {
+ * RETURNS: the bool value of the expression */
+class Bool : public Node {
  public:
-  Boolean(Token token, bool value);
+  Bool(Token token, bool value);
 
   Token token;
   bool value;

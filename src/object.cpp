@@ -6,17 +6,17 @@ obj::Integer::Integer(int64_t value) : value(value) {}
 std::string obj::Integer::inspect() { return std::to_string(this->value); }
 obj::obj_type obj::Integer::_type() { return obj::INTEGER; }
 
-/* Boolean */
+/* Bool */
 
-obj::Boolean::Boolean(bool value) : value(value) {}
-std::string obj::Boolean::inspect() {
+obj::Bool::Bool(bool value) : value(value) {}
+std::string obj::Bool::inspect() {
   if (this->value) {
     return "true";
   } else {
     return "false";
   }
 }
-obj::obj_type obj::Boolean::_type() { return obj::BOOLEAN; }
+obj::obj_type obj::Bool::_type() { return obj::BOOLEAN; }
 
 /* String */
 

@@ -48,7 +48,7 @@ TEST(Eval, IntEval) {
   }
 }
 
-TEST(Eval, BooleanEval) {
+TEST(Eval, BoolEval) {
   struct test_suite {
     std::string input;
     bool expected;
@@ -80,7 +80,7 @@ TEST(Eval, BooleanEval) {
     std::cout << "Testing eval of " << cur_test.input << std::endl;
     obj::obj_ptr eval_obj = test_eval(cur_test.input);
     ASSERT_EQ(eval_obj->_type(), obj::BOOLEAN);
-    obj::bool_ptr eval_bool = std::dynamic_pointer_cast<obj::Boolean>(eval_obj);
+    obj::bool_ptr eval_bool = std::dynamic_pointer_cast<obj::Bool>(eval_obj);
     ASSERT_EQ(cur_test.expected, eval_bool->value);
   }
 }
@@ -101,7 +101,7 @@ TEST(Eval, BangEval) {
     std::cout << "Testing eval of " << cur_test.input << std::endl;
     obj::obj_ptr eval_obj = test_eval(cur_test.input);
     ASSERT_EQ(eval_obj->_type(), obj::BOOLEAN);
-    obj::bool_ptr eval_bool = std::dynamic_pointer_cast<obj::Boolean>(eval_obj);
+    obj::bool_ptr eval_bool = std::dynamic_pointer_cast<obj::Bool>(eval_obj);
     ASSERT_EQ(cur_test.expected, eval_bool->value)
         << "Failed on test " << i + 1;
   }
