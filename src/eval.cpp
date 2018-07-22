@@ -54,7 +54,6 @@ obj::obj_ptr eval(ast::node_ptr node, env::env_ptr envir) {
       ast::ifelse_ptr ifelse_node =
           std::dynamic_pointer_cast<ast::IfElse>(node);
       obj::obj_ptr if_else_val = evalIfElse(ifelse_node, envir);
-      std::cout << "Finished if_else evaluation\n";
       return if_else_val;
     } break;
 
@@ -179,6 +178,12 @@ obj::obj_ptr evalInfix(ast::infix_ptr infix_node, env::env_ptr envir) {
     return evalBooleanInfixOperator(op, left, right);
   }
 
+  if (left_eval->_type() == obj::STRING && right_eval->_type() == obj::STRING) {
+    obj::str_ptr left = std::dynamic_pointer_cast<obj::String>(left_eval);
+    obj::str_ptr right = std::dynamic_pointer_cast<obj::String>(right_eval);
+    return evalStringInfixOperator(op, left, right);
+  }
+
   std::string message =
       "No such operation " + ast::node_type_string(left_node->_type()) + " " +
       op.get_literal() + " " + ast::node_type_string(right_node->_type());
@@ -276,7 +281,28 @@ obj::obj_ptr evalBooleanInfixOperator(Token op, obj::bool_ptr left,
     }
     default: {
       throw NoSuchOperatorException("No such operator BOOLEAN " +
-                                    op.get_literal() + "BOOLEAN");
+                                    op.get_literal() + " BOOLEAN");
+    }
+  }
+}
+
+obj::obj_ptr evalStringInfixOperator(Token op, obj::str_ptr left,
+                                     obj::str_ptr right) {
+  switch (op.get_type()) {
+    case TokenType::EQ: {
+      return nativeBoolToObject(left->value == right->value);
+    } break;
+    case TokenType::NEQ: {
+      return nativeBoolToObject(left->value != right->value);
+    } break;
+    case TokenType::PLUS: {
+      std::string new_string = left->value + right->value;
+      std::cout << new_string << "\n";
+      return obj::str_ptr(new obj::String(new_string));
+    } break;
+    default: {
+      throw NoSuchOperatorException("No such operator STRING " +
+                                    op.get_literal() + " STRING");
     }
   }
 }
@@ -344,6 +370,10 @@ obj::bool_ptr truthiness(obj::obj_ptr input, bool negate = false) {
       obj::opt_ptr opt_obj = std::dynamic_pointer_cast<obj::Option>(input);
       new_val = opt_obj->value != nullptr;
     } break;
+    case obj::STRING: {
+      obj::str_ptr str_obj = std::dynamic_pointer_cast<obj::String>(input);
+      new_val = str_obj->value != "";
+    }
     default: {}
   }
   return nativeBoolToObject(new_val ^ negate);
