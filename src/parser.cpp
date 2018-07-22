@@ -23,6 +23,7 @@ Parser::Parser(Lexer* lexer) : lexer(lexer) {
   register_prefix(TokenType::TRUE_VAL, &parse_bool);
   register_prefix(TokenType::FALSE_VAL, &parse_bool);
   register_prefix(TokenType::STRING, &parse_string);
+  register_prefix(TokenType::LBRACKET, &parse_array_literal);
   register_prefix(TokenType::LPAREN, &parse_group);
   register_prefix(TokenType::IF, &parse_if_else);
 
@@ -225,6 +226,13 @@ ast::node_ptr parse_string(Parser& p) {
   return ast::str_ptr(new ast::String(cur, cur.get_literal()));
 }
 
+ast::node_ptr parse_array_literal(Parser& p) {
+  Token cur = p.get_cur_token();
+  std::vector<ast::node_ptr> values =
+      parse_expression_list(p, TokenType::RBRACKET);
+  return ast::arr_ptr(new ast::Array(cur, values));
+}
+
 ast::node_ptr parse_if_else(Parser& p) {
   Token if_tok = p.get_cur_token();
   ast::ifelse_ptr if_else = ast::ifelse_ptr(new ast::IfElse(if_tok));
@@ -279,12 +287,12 @@ ast::node_ptr parse_infix(Parser& p, ast::node_ptr left_expr) {
  * If it's not a parsing function registered by the parsing class, then it can
  * be a more specialized parser. */
 
-// The block parser isn't found just anywhere in the code. Since it's not a full
-// expression that could be assigned to a variable, it won't be a prefix parser
-// (and the curly brace syntax would break it anyways when hashes are added).
-// Instead, it's only used by if-elses (and soon, switches), so those parsers
-// call this directly.
-// This could be abstracted away with ::parse_program()
+// The block parser isn't found just anywhere in the code. Since it's not a
+// full expression that could be assigned to a variable, it won't be a prefix
+// parser (and the curly brace syntax would break it anyways when hashes are
+// added). Instead, it's only used by if-elses (and soon, switches), so those
+// parsers call this directly. This could be abstracted away with
+// ::parse_program()
 ast::block_ptr parse_block(Parser& p) {
   Token block_tok = p.get_cur_token();
   ast::block_ptr block = ast::block_ptr(new ast::Block(block_tok));
@@ -298,4 +306,28 @@ ast::block_ptr parse_block(Parser& p) {
     block->push_node(line);
   }
   return block;
+}
+
+std::vector<ast::node_ptr> parse_expression_list(Parser& p,
+                                                 TokenType end_token) {
+  std::vector<ast::node_ptr> list;
+
+  if (p.peek_token_is(end_token)) {
+    p.next_token();
+    return list;
+  }
+
+  p.next_token();
+  list.push_back(p.parse_expression(Parser::LOWEST));
+
+  while (p.peek_token_is(TokenType::COMMA)) {
+    p.next_token();
+    p.next_token();
+
+    list.push_back(p.parse_expression(Parser::LOWEST));
+  }
+
+  p.expect_peek(end_token);
+
+  return list;
 }

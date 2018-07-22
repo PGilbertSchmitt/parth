@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace obj {
 
@@ -11,26 +12,29 @@ enum obj_type {
   INTEGER = 0,
   BOOLEAN,
   STRING,
+  ARRAY,
+  OPTION,
   RETURN_VAL,
-  ERROR,
-  OPTION
+  ERROR
 };
 
 class Object;
 class Bool;
 class Integer;
 class String;
+class Option;
+class Array;
 class ReturnVal;
 class Error;
-class Option;
 
 typedef std::shared_ptr<Object> obj_ptr;
 typedef std::shared_ptr<Bool> bool_ptr;
 typedef std::shared_ptr<Integer> int_ptr;
 typedef std::shared_ptr<String> str_ptr;
+typedef std::shared_ptr<Option> opt_ptr;
+typedef std::shared_ptr<Array> arr_ptr;
 typedef std::shared_ptr<ReturnVal> return_ptr;
 typedef std::shared_ptr<Error> err_ptr;
-typedef std::shared_ptr<Option> opt_ptr;
 
 class Object {
  public:
@@ -67,6 +71,25 @@ class String : public Object {
   obj_type _type();
 };
 
+class Option : public Object {
+ public:
+  Option();
+  Option(obj_ptr);
+  obj_ptr value;
+
+  std::string inspect();
+  obj_type _type();
+};
+
+class Array : public Object {
+ public:
+  Array(std::vector<obj_ptr> values);
+  std::vector<obj_ptr> values;
+
+  std::string inspect();
+  obj_type _type();
+};
+
 class ReturnVal : public Object {
  public:
   ReturnVal(obj_ptr o);
@@ -80,16 +103,6 @@ class Error : public Object {
  public:
   Error(std::string err);
   std::string err;
-
-  std::string inspect();
-  obj_type _type();
-};
-
-class Option : public Object {
- public:
-  Option();
-  Option(obj_ptr);
-  obj_ptr value;
 
   std::string inspect();
   obj_type _type();

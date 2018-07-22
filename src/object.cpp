@@ -21,20 +21,8 @@ obj::obj_type obj::Bool::_type() { return obj::BOOLEAN; }
 /* String */
 
 obj::String::String(std::string value) : value(value) {}
-std::string obj::String::inspect() { return this->value; }
+std::string obj::String::inspect() { return "\"" + this->value + "\""; }
 obj::obj_type obj::String::_type() { return obj::STRING; }
-
-/* Return Wrapper */
-
-obj::ReturnVal::ReturnVal(obj_ptr o) : value(o) {}
-std::string obj::ReturnVal::inspect() { return this->value->inspect(); }
-obj::obj_type obj::ReturnVal::_type() { return obj::RETURN_VAL; }
-
-/* Error Value */
-
-obj::Error::Error(std::string err) : err(err) {}
-std::string obj::Error::inspect() { return this->err; }
-obj::obj_type obj::Error::_type() { return obj::ERROR; }
 
 /* Option Value */
 
@@ -52,3 +40,34 @@ std::string obj::Option::inspect() {
   }
 }
 obj::obj_type obj::Option::_type() { return obj::OPTION; }
+
+/* Array */
+
+obj::Array::Array(std::vector<obj::obj_ptr> values) : values(values){};
+std::string obj::Array::inspect() {
+  std::string out = "[";
+
+  std::vector<obj::obj_ptr>::iterator element, last;
+  last = --(values.end());
+  for (element = values.begin(); element != values.end(); element++) {
+    out += (*element)->inspect();
+    if (element != last) {
+      out += ", ";
+    }
+  }
+
+  return out + "]";
+}
+obj::obj_type obj::Array::_type() { return obj::ARRAY; }
+
+/* Return Wrapper */
+
+obj::ReturnVal::ReturnVal(obj_ptr o) : value(o) {}
+std::string obj::ReturnVal::inspect() { return this->value->inspect(); }
+obj::obj_type obj::ReturnVal::_type() { return obj::RETURN_VAL; }
+
+/* Error Value */
+
+obj::Error::Error(std::string err) : err(err) {}
+std::string obj::Error::inspect() { return this->err; }
+obj::obj_type obj::Error::_type() { return obj::ERROR; }

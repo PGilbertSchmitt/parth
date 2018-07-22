@@ -181,11 +181,39 @@ ast::String::String(Token token, std::string value) {
   this->value = value;
 }
 
-std::string ast::String::to_string() { return this->value; }
+std::string ast::String::to_string() { return "\"" + this->value + "\""; }
 
 ast::node_type ast::String::_type() { return ast::STRING; }
 
 bool ast::String::is_reducible() { return false; }
+
+/*********************/
+/*** Array Literal ***/
+/*********************/
+
+ast::Array::Array(Token token, std::vector<ast::node_ptr> values) {
+  this->token = token;
+  this->values = values;
+}
+
+std::string ast::Array::to_string() {
+  std::string out = "[";
+
+  std::vector<ast::node_ptr>::iterator iter, last;
+  last = --(values.end());
+  for (iter = values.begin(); iter != values.end(); iter++) {
+    out += (*iter)->to_string();
+    if (iter != last) {
+      out += ", ";
+    }
+  }
+
+  return out + "]";
+}
+
+ast::node_type ast::Array::_type() { return ast::ARRAY; }
+
+bool ast::Array::is_reducible() { return false; }
 
 /*************************/
 /*** Prefix Expression ***/

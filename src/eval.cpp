@@ -39,6 +39,11 @@ obj::obj_ptr eval(ast::node_ptr node, env::env_ptr envir) {
       return evalString(str_node);
     }
 
+    case ast::ARRAY: {
+      ast::arr_ptr arr_node = std::dynamic_pointer_cast<ast::Array>(node);
+      return evalArray(arr_node, envir);
+    }
+
     case ast::PREFIX: {
       ast::prefix_ptr prefix_node =
           std::dynamic_pointer_cast<ast::Prefix>(node);
@@ -150,6 +155,16 @@ obj::str_ptr evalString(ast::str_ptr str_node) {
   return obj::str_ptr(new obj::String(str_node->value));
 }
 
+obj::arr_ptr evalArray(ast::arr_ptr arr_node, env::env_ptr envir) {
+  std::vector<obj::obj_ptr> elements;
+  std::vector<ast::node_ptr>::iterator cur_node;
+  for (cur_node = arr_node->values.begin(); cur_node != arr_node->values.end();
+       cur_node++) {
+    elements.push_back(eval(*cur_node, envir));
+  }
+  return obj::arr_ptr(new obj::Array(elements));
+}
+
 obj::obj_ptr evalInfix(ast::infix_ptr infix_node, env::env_ptr envir) {
   // Special cases first
   Token op = infix_node->op;
@@ -216,6 +231,8 @@ obj::obj_ptr evalAssign(ast::ident_ptr left, ast::node_ptr right,
                         env::env_ptr envir) {
   obj::obj_ptr value = eval(right, envir);
   if (value->_type() != obj::ERROR) {
+    // We will need to do some checks to make sure certain types are cloned so
+    // that they aren't passed around by reference (int, float, bool, string)
     envir->set(left->value, value);
   }
   return value;
