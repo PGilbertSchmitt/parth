@@ -39,9 +39,9 @@ obj::obj_ptr eval(ast::node_ptr node, env::env_ptr envir) {
       return evalString(str_node);
     }
 
-    case ast::ARRAY: {
-      ast::arr_ptr arr_node = std::dynamic_pointer_cast<ast::Array>(node);
-      return evalArray(arr_node, envir);
+    case ast::LIST: {
+      ast::arr_ptr arr_node = std::dynamic_pointer_cast<ast::List>(node);
+      return evalList(arr_node, envir);
     }
 
     case ast::PREFIX: {
@@ -155,14 +155,14 @@ obj::str_ptr evalString(ast::str_ptr str_node) {
   return obj::str_ptr(new obj::String(str_node->value));
 }
 
-obj::arr_ptr evalArray(ast::arr_ptr arr_node, env::env_ptr envir) {
+obj::arr_ptr evalList(ast::arr_ptr arr_node, env::env_ptr envir) {
   std::vector<obj::obj_ptr> elements;
   std::vector<ast::node_ptr>::iterator cur_node;
   for (cur_node = arr_node->values.begin(); cur_node != arr_node->values.end();
        cur_node++) {
     elements.push_back(eval(*cur_node, envir));
   }
-  return obj::arr_ptr(new obj::Array(elements));
+  return obj::arr_ptr(new obj::List(elements));
 }
 
 obj::obj_ptr evalInfix(ast::infix_ptr infix_node, env::env_ptr envir) {
@@ -197,6 +197,11 @@ obj::obj_ptr evalInfix(ast::infix_ptr infix_node, env::env_ptr envir) {
     obj::str_ptr left = std::dynamic_pointer_cast<obj::String>(left_eval);
     obj::str_ptr right = std::dynamic_pointer_cast<obj::String>(right_eval);
     return evalStringInfixOperator(op, left, right);
+  }
+
+  if (left_eval->_type() == obj::LIST) {
+    if (right_eval->_type() == obj::LIST) {
+    }
   }
 
   std::string message =
@@ -324,6 +329,26 @@ obj::obj_ptr evalStringInfixOperator(Token op, obj::str_ptr left,
   }
 }
 
+obj::arr_ptr evalListSetOperation(Token op, obj::arr_ptr left,
+                                  obj::arr_ptr right) {
+  switch (op.get_type()) {
+    case TokenType::PLUS: {
+      // Append right list to left list
+      obj::internal_list obj_list;
+      obj_list.insert(obj_list.end(), left->values.begin(), left->values.end());
+      obj_list.insert(obj_list.end(), right->values.begin(),
+                      right->values.end());
+      return obj::arr_ptr(new obj::List(obj_list));
+    } break;
+    case TokenType::MINUS: {
+    } break;
+    default: {
+      throw NoSuchOperatorException("No such operator LIST " +
+                                    op.get_literal() + " LIST");
+    }
+  }
+}
+
 obj::obj_ptr evalMinusOperator(obj::int_ptr num) {
   return obj::int_ptr(new obj::Integer(-1 * num->value));
 }
@@ -370,7 +395,7 @@ obj::opt_ptr evalIfElse(ast::ifelse_ptr ifelse_node, env::env_ptr envir) {
 // - false (bool)
 // - 0     (int)
 // - ""    (string)
-// - []    (array)
+// - []    (list)
 // - {}    (hash)
 // - none  (option)
 obj::bool_ptr truthiness(obj::obj_ptr input, bool negate = false) {
