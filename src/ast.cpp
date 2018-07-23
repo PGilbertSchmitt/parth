@@ -188,15 +188,15 @@ ast::node_type ast::String::_type() { return ast::STRING; }
 bool ast::String::is_reducible() { return false; }
 
 /*********************/
-/*** Array Literal ***/
+/*** List Literal ***/
 /*********************/
 
-ast::Array::Array(Token token, std::vector<ast::node_ptr> values) {
+ast::List::List(Token token, std::vector<ast::node_ptr> values) {
   this->token = token;
   this->values = values;
 }
 
-std::string ast::Array::to_string() {
+std::string ast::List::to_string() {
   std::string out = "[";
 
   std::vector<ast::node_ptr>::iterator iter, last;
@@ -211,9 +211,9 @@ std::string ast::Array::to_string() {
   return out + "]";
 }
 
-ast::node_type ast::Array::_type() { return ast::ARRAY; }
+ast::node_type ast::List::_type() { return ast::LIST; }
 
-bool ast::Array::is_reducible() { return false; }
+bool ast::List::is_reducible() { return false; }
 
 /*************************/
 /*** Prefix Expression ***/

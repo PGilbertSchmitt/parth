@@ -23,7 +23,7 @@ Parser::Parser(Lexer* lexer) : lexer(lexer) {
   register_prefix(TokenType::TRUE_VAL, &parse_bool);
   register_prefix(TokenType::FALSE_VAL, &parse_bool);
   register_prefix(TokenType::STRING, &parse_string);
-  register_prefix(TokenType::LBRACKET, &parse_array_literal);
+  register_prefix(TokenType::LBRACKET, &parse_list_literal);
   register_prefix(TokenType::LPAREN, &parse_group);
   register_prefix(TokenType::IF, &parse_if_else);
 
@@ -226,11 +226,11 @@ ast::node_ptr parse_string(Parser& p) {
   return ast::str_ptr(new ast::String(cur, cur.get_literal()));
 }
 
-ast::node_ptr parse_array_literal(Parser& p) {
+ast::node_ptr parse_list_literal(Parser& p) {
   Token cur = p.get_cur_token();
   std::vector<ast::node_ptr> values =
       parse_expression_list(p, TokenType::RBRACKET);
-  return ast::arr_ptr(new ast::Array(cur, values));
+  return ast::arr_ptr(new ast::List(cur, values));
 }
 
 ast::node_ptr parse_if_else(Parser& p) {

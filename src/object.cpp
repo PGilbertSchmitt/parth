@@ -41,10 +41,10 @@ std::string obj::Option::inspect() {
 }
 obj::obj_type obj::Option::_type() { return obj::OPTION; }
 
-/* Array */
+/* List */
 
-obj::Array::Array(std::vector<obj::obj_ptr> values) : values(values){};
-std::string obj::Array::inspect() {
+obj::List::List(std::vector<obj::obj_ptr> values) : values(values){};
+std::string obj::List::inspect() {
   std::string out = "[";
 
   std::vector<obj::obj_ptr>::iterator element, last;
@@ -58,7 +58,7 @@ std::string obj::Array::inspect() {
 
   return out + "]";
 }
-obj::obj_type obj::Array::_type() { return obj::ARRAY; }
+obj::obj_type obj::List::_type() { return obj::LIST; }
 
 /* Return Wrapper */
 

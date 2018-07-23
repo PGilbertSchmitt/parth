@@ -22,7 +22,7 @@ enum node_type {
   BOOLEAN,
   OPTION,
   STRING,
-  ARRAY,
+  LIST,
   PREFIX,
   INFIX,
   IF_ELSE,
@@ -41,7 +41,7 @@ class Integer;
 class Bool;
 class Option;
 class String;
-class Array;
+class List;
 class Prefix;
 class Infix;
 class IfElse;
@@ -57,7 +57,7 @@ typedef std::shared_ptr<Integer> int_ptr;
 typedef std::shared_ptr<Bool> bool_ptr;
 typedef std::shared_ptr<Option> opt_ptr;
 typedef std::shared_ptr<String> str_ptr;
-typedef std::shared_ptr<Array> arr_ptr;
+typedef std::shared_ptr<List> arr_ptr;
 typedef std::shared_ptr<Prefix> prefix_ptr;
 typedef std::shared_ptr<Infix> infix_ptr;
 typedef std::shared_ptr<IfElse> ifelse_ptr;
@@ -235,14 +235,14 @@ class String : public Node {
   bool is_reducible();
 };
 
-/* Array Literal
+/* ListLiteral
  * A representation of a type-independent ordered collection
- * RETURNS: An array
+ * RETURNS: A list
  */
 
-class Array : public Node {
+class List : public Node {
  public:
-  Array(Token token, std::vector<node_ptr> values);
+  List(Token token, std::vector<node_ptr> values);
 
   Token token;
   std::vector<node_ptr> values;
