@@ -199,9 +199,10 @@ obj::obj_ptr evalInfix(ast::infix_ptr infix_node, env::env_ptr envir) {
     return evalStringInfixOperator(op, left, right);
   }
 
-  if (left_eval->_type() == obj::LIST) {
-    if (right_eval->_type() == obj::LIST) {
-    }
+  if (left_eval->_type() == obj::LIST && right_eval->_type() == obj::LIST) {
+    obj::arr_ptr left = std::dynamic_pointer_cast<obj::List>(left_eval);
+    obj::arr_ptr right = std::dynamic_pointer_cast<obj::List>(right_eval);
+    return evalListInfixOperator(op, left, right);
   }
 
   std::string message =
@@ -329,9 +330,15 @@ obj::obj_ptr evalStringInfixOperator(Token op, obj::str_ptr left,
   }
 }
 
-obj::arr_ptr evalListSetOperation(Token op, obj::arr_ptr left,
-                                  obj::arr_ptr right) {
+obj::obj_ptr evalListInfixOperator(Token op, obj::arr_ptr left,
+                                   obj::arr_ptr right) {
   switch (op.get_type()) {
+    case TokenType::EQ: {
+      return nativeBoolToObject(left == right);
+    } break;
+    case TokenType::NEQ: {
+      return nativeBoolToObject(left != right);
+    } break;
     case TokenType::PLUS: {
       // Append right list to left list
       obj::internal_list obj_list;
@@ -339,8 +346,6 @@ obj::arr_ptr evalListSetOperation(Token op, obj::arr_ptr left,
       obj_list.insert(obj_list.end(), right->values.begin(),
                       right->values.end());
       return obj::arr_ptr(new obj::List(obj_list));
-    } break;
-    case TokenType::MINUS: {
     } break;
     default: {
       throw NoSuchOperatorException("No such operator LIST " +
