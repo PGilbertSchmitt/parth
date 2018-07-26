@@ -44,6 +44,18 @@ Token Lexer::next_token() {
       tok = TokenType::MODULO;
       lit = "%";
       break;
+    case '&':
+      tok = TokenType::AMP;
+      lit = "&";
+      break;
+    case '|':
+      tok = TokenType::PIPE;
+      lit = "|";
+      break;
+    case '^':
+      tok = TokenType::CARET;
+      lit = "^";
+      break;
 
     // Delimiters
     case ',':

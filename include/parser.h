@@ -50,6 +50,7 @@ class Parser {
   enum rank {
     LOWEST,   // For restarting a precedence scope inside brackets
     ASSIGN,   // =
+    BITWISE,  // & | ^
     EQUALS,   // ==
     COMPARE,  // > < >= <=
     SUM,      // + -

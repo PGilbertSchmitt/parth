@@ -44,6 +44,15 @@ std::string token_type_string(TokenType type) {
     case TokenType::MODULO:
       return "MODULO";
       break;
+    case TokenType::AMP:
+      return "AMP";
+      break;
+    case TokenType::PIPE:
+      return "PIPE";
+      break;
+    case TokenType::CARET:
+      return "CARET";
+      break;
     case TokenType::LT:
       return "LT";
       break;

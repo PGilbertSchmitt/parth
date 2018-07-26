@@ -26,6 +26,9 @@ enum class TokenType : int {
   ASTERISK,
   BANG,
   MODULO,
+  AMP,
+  PIPE,
+  CARET,
 
   // Comparison
   LT,
