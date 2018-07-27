@@ -179,6 +179,13 @@ obj::obj_ptr evalInfix(ast::infix_ptr infix_node, env::env_ptr envir) {
   obj::obj_ptr left_eval = eval(left_node, envir);
   obj::obj_ptr right_eval = eval(right_node, envir);
 
+  if (op.get_type() == TokenType::DOUBLE_AMP ||
+      op.get_type() == TokenType::DOUBLE_PIPE) {
+    obj::bool_ptr left_bool = truthiness(left_eval);
+    obj::bool_ptr right_bool = truthiness(right_eval);
+    return evalBoolInfixOperator(op, left_bool, right_bool);
+  }
+
   if (left_eval->_type() == obj::INTEGER &&
       right_eval->_type() == obj::INTEGER) {
     obj::int_ptr left = std::dynamic_pointer_cast<obj::Integer>(left_eval);
@@ -302,6 +309,12 @@ obj::obj_ptr evalBoolInfixOperator(Token op, obj::bool_ptr left,
     case TokenType::NEQ: {
       return nativeBoolToObject(left->value != right->value);
     }
+    case TokenType::DOUBLE_AMP: {
+      return nativeBoolToObject(left->value && right->value);
+    }
+    case TokenType::DOUBLE_PIPE: {
+      return nativeBoolToObject(left->value || right->value);
+    }
     default: {
       throw NoSuchOperatorException("No such operator BOOLEAN " +
                                     op.get_literal() + " BOOLEAN");
@@ -403,7 +416,7 @@ obj::opt_ptr evalIfElse(ast::ifelse_ptr ifelse_node, env::env_ptr envir) {
 // - []    (list)
 // - {}    (hash)
 // - none  (option)
-obj::bool_ptr truthiness(obj::obj_ptr input, bool negate = false) {
+obj::bool_ptr truthiness(obj::obj_ptr input, bool negate) {
   bool new_val = false;
   switch (input->_type()) {
     case obj::BOOLEAN: {

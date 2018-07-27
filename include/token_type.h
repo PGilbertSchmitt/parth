@@ -29,6 +29,8 @@ enum class TokenType : int {
   AMP,
   PIPE,
   CARET,
+  DOUBLE_AMP,
+  DOUBLE_PIPE,
 
   // Comparison
   LT,

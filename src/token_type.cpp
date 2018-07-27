@@ -53,6 +53,12 @@ std::string token_type_string(TokenType type) {
     case TokenType::CARET:
       return "CARET";
       break;
+    case TokenType::DOUBLE_AMP:
+      return "DOUBLE_AMP";
+      break;
+    case TokenType::DOUBLE_PIPE:
+      return "DOUBLE_PIPE";
+      break;
     case TokenType::LT:
       return "LT";
       break;

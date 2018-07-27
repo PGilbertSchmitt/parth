@@ -44,14 +44,6 @@ Token Lexer::next_token() {
       tok = TokenType::MODULO;
       lit = "%";
       break;
-    case '&':
-      tok = TokenType::AMP;
-      lit = "&";
-      break;
-    case '|':
-      tok = TokenType::PIPE;
-      lit = "|";
-      break;
     case '^':
       tok = TokenType::CARET;
       lit = "^";
@@ -75,6 +67,26 @@ Token Lexer::next_token() {
       break;
 
     // Dual char tokens
+    case '&':
+      if (peak_char() == '&') {
+        read_char();
+        tok = TokenType::DOUBLE_AMP;
+        lit = "&&";
+      } else {
+        tok = TokenType::AMP;
+        lit = "&";
+      }
+      break;
+    case '|':
+      if (peak_char() == '|') {
+        read_char();
+        tok = TokenType::DOUBLE_PIPE;
+        lit = "||";
+      } else {
+        tok = TokenType::PIPE;
+        lit = "|";
+      }
+      break;
     case '=':
       if (peak_char() == '=') {
         read_char();

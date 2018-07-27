@@ -2,14 +2,15 @@
 
 // Defining static rank mappings
 rank_map Parser::precedences{
-    {TokenType::ASSIGN, rank::ASSIGN},    {TokenType::AMP, rank::BITWISE},
-    {TokenType::PIPE, rank::BITWISE},     {TokenType::CARET, rank::BITWISE},
-    {TokenType::EQ, rank::EQUALS},        {TokenType::NEQ, rank::EQUALS},
-    {TokenType::LT, rank::COMPARE},       {TokenType::GT, rank::COMPARE},
-    {TokenType::LTEQ, rank::COMPARE},     {TokenType::GTEQ, rank::COMPARE},
-    {TokenType::PLUS, rank::SUM},         {TokenType::MINUS, rank::SUM},
-    {TokenType::ASTERISK, rank::PRODUCT}, {TokenType::SLASH, rank::PRODUCT},
-    {TokenType::MODULO, rank::PRODUCT},   {TokenType::LPAREN, rank::CALL},
+    {TokenType::ASSIGN, rank::ASSIGN},     {TokenType::DOUBLE_AMP, rank::LOGIC},
+    {TokenType::DOUBLE_PIPE, rank::LOGIC}, {TokenType::AMP, rank::BITWISE},
+    {TokenType::PIPE, rank::BITWISE},      {TokenType::CARET, rank::BITWISE},
+    {TokenType::EQ, rank::EQUALS},         {TokenType::NEQ, rank::EQUALS},
+    {TokenType::LT, rank::COMPARE},        {TokenType::GT, rank::COMPARE},
+    {TokenType::LTEQ, rank::COMPARE},      {TokenType::GTEQ, rank::COMPARE},
+    {TokenType::PLUS, rank::SUM},          {TokenType::MINUS, rank::SUM},
+    {TokenType::ASTERISK, rank::PRODUCT},  {TokenType::SLASH, rank::PRODUCT},
+    {TokenType::MODULO, rank::PRODUCT},    {TokenType::LPAREN, rank::CALL},
     {TokenType::LBRACKET, rank::INDEX}};
 
 Parser::Parser(Lexer* lexer) : lexer(lexer) {
@@ -39,6 +40,8 @@ Parser::Parser(Lexer* lexer) : lexer(lexer) {
   register_infix(TokenType::AMP, &parse_infix);
   register_infix(TokenType::PIPE, &parse_infix);
   register_infix(TokenType::CARET, &parse_infix);
+  register_infix(TokenType::DOUBLE_AMP, &parse_infix);
+  register_infix(TokenType::DOUBLE_PIPE, &parse_infix);
   register_infix(TokenType::EQ, &parse_infix);
   register_infix(TokenType::NEQ, &parse_infix);
   register_infix(TokenType::LT, &parse_infix);
