@@ -420,6 +420,10 @@ obj::bool_ptr truthiness(obj::obj_ptr input, bool negate = false) {
     case obj::STRING: {
       obj::str_ptr str_obj = std::dynamic_pointer_cast<obj::String>(input);
       new_val = str_obj->value != "";
+    } break;
+    case obj::LIST: {
+      obj::arr_ptr arr_obj = std::dynamic_pointer_cast<obj::List>(input);
+      new_val = !(arr_obj->values.size() == 0);
     }
     default: {}
   }
