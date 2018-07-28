@@ -26,6 +26,7 @@ enum node_type {
   PREFIX,
   INFIX,
   IF_ELSE,
+  FUNCTION,
   VALUE
 };
 
@@ -45,6 +46,7 @@ class List;
 class Prefix;
 class Infix;
 class IfElse;
+class Function;
 class Value;
 
 typedef std::shared_ptr<Node> node_ptr;
@@ -61,6 +63,7 @@ typedef std::shared_ptr<List> arr_ptr;
 typedef std::shared_ptr<Prefix> prefix_ptr;
 typedef std::shared_ptr<Infix> infix_ptr;
 typedef std::shared_ptr<IfElse> ifelse_ptr;
+typedef std::shared_ptr<Function> func_ptr;
 typedef std::shared_ptr<Value> val_ptr;
 
 /* Node:
@@ -319,6 +322,21 @@ class IfElse : public Node {
   node_type _type();
   bool is_reducible();
   void push_condition_set(node_ptr condition, block_ptr consequence);
+};
+
+typedef std::vector<ident_ptr> param_list;
+
+class Function : public Node {
+ public:
+  Function(Token token, param_list params, block_ptr body);
+
+  Token token;
+  param_list params;
+  block_ptr body;
+
+  std::string to_string();
+  node_type _type();
+  bool is_reducible();
 };
 
 /* Value Node

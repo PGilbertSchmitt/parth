@@ -38,7 +38,6 @@ TokenType Token::lookup_ident(std::string &ident) {
 
 // Used for lookup of keywords in Token::lookup_ident
 keyword_map Token::keywords({
-    {"fn", TokenType::FUNCTION},
     {"let", TokenType::LET},
     {"if", TokenType::IF},
     {"else", TokenType::ELSE},

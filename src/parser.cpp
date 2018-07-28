@@ -27,7 +27,7 @@ Parser::Parser(Lexer* lexer) : lexer(lexer) {
   register_prefix(TokenType::FALSE_VAL, &parse_bool);
   register_prefix(TokenType::STRING, &parse_string);
   register_prefix(TokenType::LBRACKET, &parse_list_literal);
-  register_prefix(TokenType::LPAREN, &parse_group);
+  register_prefix(TokenType::LPAREN, &parse_lparen);
   register_prefix(TokenType::IF, &parse_if_else);
 
   // Register Infix Parsing functions here
@@ -59,6 +59,19 @@ void Parser::register_prefix(TokenType tt, PPF ppf) {
 
 void Parser::register_infix(TokenType tt, IPF ipf) {
   infix_parsers.emplace(int(tt), ipf);
+}
+
+Token Parser::enqueue_next_token() {
+  Token queued_token = lexer->next_token();
+  unprocessed_tokens.push(queued_token);
+  return queued_token;
+}
+
+Token Parser::pop_queued_token() {
+  // Won't be called if empty, so no worries about checking
+  Token next_tok = unprocessed_tokens.front();
+  unprocessed_tokens.pop();
+  return next_tok;
 }
 
 /* Accessors and checkers for parsing functions */
@@ -94,9 +107,39 @@ void Parser::eat_newlines() {
   }
 }
 
+// Eats lexer tokens, but stores them in a queue so that we eventually process
+// them. This allows arbitrary lookahead without having to drastically change
+// how we read tokens. Currently only searching for what follows a closed paren
+// (must keep track of recursion level)
+Token Parser::after_paren() {
+  Token read_token = peek_token;
+  if (read_token.get_type() == TokenType::RPAREN) {
+    return enqueue_next_token();
+  }
+
+  int paren_level = 1;
+  while (!(paren_level == 0 && read_token.get_type() == TokenType::RPAREN)) {
+    read_token = enqueue_next_token();
+
+    // Making sure we're in the correct paren level
+    if (read_token.get_type() == TokenType::LPAREN) {
+      paren_level++;
+    }
+    if (read_token.get_type() == TokenType::RPAREN) {
+      paren_level--;
+    }
+  }
+
+  return enqueue_next_token();
+}
+
 void Parser::next_token() {
   cur_token = peek_token;
-  peek_token = lexer->next_token();
+  if (unprocessed_tokens.empty()) {
+    peek_token = lexer->next_token();
+  } else {
+    peek_token = pop_queued_token();
+  }
 }
 
 Parser::rank Parser::cur_precedence() {
@@ -268,14 +311,16 @@ ast::node_ptr parse_if_else(Parser& p) {
   return if_else;
 }
 
-// There is no group node type, since a group is just an expression that has
-// been wrapped in parens. It parses the sub expression with the lowest
-// precedence, to shelter it from surrounding expressions
-ast::node_ptr parse_group(Parser& p) {
-  p.next_token();
-  ast::node_ptr expr = p.parse_expression(Parser::LOWEST);
-  p.expect_peek(TokenType::RPAREN);
-  return expr;
+// This can be either a grouped expression or a function literal, so we need to
+// look after the closing paren to check which it is before using the correct
+// parser
+ast::node_ptr parse_lparen(Parser& p) {
+  Token after_close = p.after_paren();
+  if (after_close.get_type() == TokenType::FAT_ARROW) {
+    return parse_function_literal(p);
+  } else {
+    return parse_group(p);
+  }
 }
 
 /*********************/
@@ -291,8 +336,10 @@ ast::node_ptr parse_infix(Parser& p, ast::node_ptr left_expr) {
   return ast::infix_ptr(new ast::Infix(tok, op, left_expr, right_expr));
 }
 
-/*** Other parsing functions:
- * If it's not a parsing function registered by the parsing class, then it can
+/********************************/
+/*** Other parsing functions: ***/
+/********************************/
+/* If it's not a parsing function registered by the parsing class, then it can
  * be a more specialized parser. */
 
 // The block parser isn't found just anywhere in the code. Since it's not a
@@ -338,4 +385,47 @@ std::vector<ast::node_ptr> parse_expression_list(Parser& p,
   p.expect_peek(end_token);
 
   return list;
+}
+
+ast::param_list parse_function_parameters(Parser& p) {
+  ast::param_list params;
+
+  ast::ident_ptr cur_ident =
+      std::dynamic_pointer_cast<ast::Identifier>(parse_identifier(p));
+  params.push_back(cur_ident);
+
+  while (!p.peek_token_is(TokenType::RPAREN)) {
+    p.expect_peek(TokenType::COMMA);
+    p.next_token();
+    cur_ident = std::dynamic_pointer_cast<ast::Identifier>(parse_identifier(p));
+    params.push_back(cur_ident);
+  }
+
+  return params;
+}
+
+ast::node_ptr parse_function_literal(Parser& p) {
+  Token tok = p.get_cur_token();
+
+  ast::param_list params;
+  if (!p.peek_token_is(TokenType::RPAREN)) {
+    p.next_token();
+    params = parse_function_parameters(p);
+  }
+
+  p.next_token();
+  p.next_token();
+  p.expect_peek(TokenType::LBRACE);
+  ast::block_ptr body = parse_block(p);
+  return ast::func_ptr(new ast::Function(tok, params, body));
+}
+
+// There is no group node type, since a group is just an expression that has
+// been wrapped in parens. It parses the sub expression with the lowest
+// precedence, to shelter it from surrounding expressions
+ast::node_ptr parse_group(Parser& p) {
+  p.next_token();
+  ast::node_ptr expr = p.parse_expression(Parser::LOWEST);
+  p.expect_peek(TokenType::RPAREN);
+  return expr;
 }

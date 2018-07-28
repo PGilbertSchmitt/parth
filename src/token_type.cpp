@@ -86,8 +86,8 @@ std::string token_type_string(TokenType type) {
     case TokenType::NEWLINE:
       return "NEWLINE";
       break;
-    case TokenType::FUNCTION:
-      return "FUNCTION";
+    case TokenType::FAT_ARROW:
+      return "FAT_ARROW";
       break;
     case TokenType::LET:
       return "LET";

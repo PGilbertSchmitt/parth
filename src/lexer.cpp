@@ -92,6 +92,10 @@ Token Lexer::next_token() {
         read_char();
         tok = TokenType::EQ;
         lit = "==";
+      } else if (peak_char() == '>') {
+        read_char();
+        tok = TokenType::FAT_ARROW;
+        lit = "=>";
       } else {
         tok = TokenType::ASSIGN;
         lit = "=";

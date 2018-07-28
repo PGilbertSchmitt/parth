@@ -4,6 +4,7 @@
 #include <exception>
 #include <iostream>
 #include <memory>
+#include <queue>
 #include <sstream>
 #include <string>
 #include <unordered_map>
@@ -46,6 +47,7 @@ class Parser {
   void expect_peek(TokenType);
   void expect_end();
   void eat_newlines();
+  Token after_paren();
 
   enum rank {
     LOWEST,   // For restarting a precedence scope inside brackets
@@ -78,6 +80,9 @@ class Parser {
   // Token management
   Token cur_token;
   Token peek_token;
+  std::queue<Token> unprocessed_tokens;
+  Token enqueue_next_token();
+  Token pop_queued_token();
 
   // Token Presedence
   static rank_map precedences;
@@ -94,12 +99,15 @@ ast::node_ptr parse_option(Parser &p);
 ast::node_ptr parse_string(Parser &p);
 ast::node_ptr parse_list_literal(Parser &p);
 ast::node_ptr parse_if_else(Parser &p);
-ast::node_ptr parse_group(Parser &p);
+ast::node_ptr parse_lparen(Parser &p);
 
 // Infix parsing functions
 ast::node_ptr parse_infix(Parser &p, ast::node_ptr left_expr);
 
 // Other parsers
+ast::param_list parse_function_parameters(Parser &p);
+ast::node_ptr parse_function_literal(Parser &p);
+ast::node_ptr parse_group(Parser &p);
 ast::block_ptr parse_block(Parser &p);
 std::vector<ast::node_ptr> parse_expression_list(Parser &p,
                                                  TokenType end_token);

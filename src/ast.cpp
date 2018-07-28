@@ -314,6 +314,36 @@ void ast::IfElse::push_condition_set(node_ptr condition,
   list.push_back(set);
 }
 
+/************************/
+/*** Function Literal ***/
+/************************/
+
+ast::Function::Function(Token token, ast::param_list params,
+                        ast::block_ptr body) {
+  this->token = token;
+  this->params = params;
+  this->body = body;
+}
+
+std::string ast::Function::to_string() {
+  std::string out = "(";
+  ast::param_list::iterator last = --(params.end());
+  for (ast::param_list::iterator iter = params.begin(); iter != params.end();
+       iter++) {
+    out += (*iter)->to_string();
+    if (iter != last) {
+      out += ", ";
+    }
+  }
+  out += ") => {\n";
+  out += body->to_string();
+  return out + "\n}\n";
+}
+
+ast::node_type ast::Function::_type() { return ast::FUNCTION; }
+
+bool ast::Function::is_reducible() { return true; }
+
 /******************/
 /*** Value Node ***/
 /******************/

@@ -44,9 +44,9 @@ enum class TokenType : int {
   COMMA,
   COLON,
   NEWLINE,
+  FAT_ARROW,
 
   // Keywords
-  FUNCTION,
   LET,
   IF,
   ELSE,
