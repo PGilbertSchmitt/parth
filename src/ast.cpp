@@ -342,7 +342,10 @@ std::string ast::Function::to_string() {
 
 ast::node_type ast::Function::_type() { return ast::FUNCTION; }
 
-bool ast::Function::is_reducible() { return true; }
+// A function literal itself is not actually reducible. When it's being called,
+// it's body is reduced, but the function literal itself is good to go
+// immediately.
+bool ast::Function::is_reducible() { return false; }
 
 /******************/
 /*** Value Node ***/
