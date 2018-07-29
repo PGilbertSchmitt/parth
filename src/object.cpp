@@ -1,4 +1,5 @@
 #include "object.h"
+#include "environment.h"
 
 /* Integer */
 
@@ -59,6 +60,17 @@ std::string obj::List::inspect() {
   return out + "]";
 }
 obj::obj_type obj::List::_type() { return obj::LIST; }
+
+/* Function */
+
+obj::Function::Function(/*ast::func_ptr func_node, */ env::env_ptr envir)
+    : /*func_node(func_node), */ envir(envir) {}
+
+std::string obj::Function::inspect() {
+  return /*func_node->to_string()*/ envir->get("igor")->inspect();
+}
+
+obj::obj_type obj::Function::_type() { return obj::FUNCTION; }
 
 /* Return Wrapper */
 

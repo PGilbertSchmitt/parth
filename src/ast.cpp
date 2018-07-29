@@ -1,4 +1,5 @@
 #include "ast.h"
+#include "object.h"
 
 ast::NullNodeException nullNodeExc = ast::NullNodeException();
 ast::EmptyConditionListException emptyCondExc =

@@ -5,6 +5,12 @@
 #include <string>
 #include <vector>
 
+// Need to forward declare environment
+namespace env {
+class Environment;
+typedef std::shared_ptr<Environment> env_ptr;
+}  // namespace env
+
 namespace obj {
 
 enum obj_type {
@@ -14,6 +20,7 @@ enum obj_type {
   STRING,
   LIST,
   OPTION,
+  FUNCTION,
   RETURN_VAL,
   ERROR
 };
@@ -24,6 +31,7 @@ class Integer;
 class String;
 class Option;
 class List;
+class Function;
 class ReturnVal;
 class Error;
 
@@ -33,6 +41,7 @@ typedef std::shared_ptr<Integer> int_ptr;
 typedef std::shared_ptr<String> str_ptr;
 typedef std::shared_ptr<Option> opt_ptr;
 typedef std::shared_ptr<List> arr_ptr;
+typedef std::shared_ptr<Function> func_ptr;
 typedef std::shared_ptr<ReturnVal> return_ptr;
 typedef std::shared_ptr<Error> err_ptr;
 
@@ -87,6 +96,16 @@ class List : public Object {
  public:
   List(internal_list values);
   internal_list values;
+
+  std::string inspect();
+  obj_type _type();
+};
+
+class Function : public Object {
+ public:
+  Function(/*ast::func_ptr func_node, */ env::env_ptr envir);
+  // ast::func_ptr func_node;
+  env::env_ptr envir;
 
   std::string inspect();
   obj_type _type();

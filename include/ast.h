@@ -7,8 +7,13 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include "object.h"
 #include "token.h"
+
+// Need to forward declare object
+namespace obj {
+class Object;
+typedef std::shared_ptr<Object> obj_ptr;
+}  // namespace obj
 
 namespace ast {
 
