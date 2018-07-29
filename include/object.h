@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include "ast.h"
 
 // Need to forward declare environment
 namespace env {
@@ -103,8 +104,8 @@ class List : public Object {
 
 class Function : public Object {
  public:
-  Function(/*ast::func_ptr func_node, */ env::env_ptr envir);
-  // ast::func_ptr func_node;
+  Function(ast::func_ptr func_node, env::env_ptr envir);
+  ast::func_ptr func_node;
   env::env_ptr envir;
 
   std::string inspect();

@@ -24,6 +24,7 @@ obj::bool_ptr evalBool(ast::bool_ptr);
 obj::opt_ptr evalOption(ast::opt_ptr, env::env_ptr);
 obj::str_ptr evalString(ast::str_ptr);
 obj::arr_ptr evalList(ast::arr_ptr, env::env_ptr);
+obj::func_ptr evalFunctionLiteral(ast::func_ptr, env::env_ptr);
 obj::obj_ptr evalInfix(ast::infix_ptr, env::env_ptr);
 obj::obj_ptr evalPrefix(ast::prefix_ptr, env::env_ptr);
 obj::obj_ptr evalAssign(ast::ident_ptr, ast::node_ptr, env::env_ptr);

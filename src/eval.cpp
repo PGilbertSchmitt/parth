@@ -44,6 +44,11 @@ obj::obj_ptr eval(ast::node_ptr node, env::env_ptr envir) {
       return evalList(arr_node, envir);
     }
 
+    case ast::FUNCTION: {
+      ast::func_ptr func_node = std::dynamic_pointer_cast<ast::Function>(node);
+      return evalFunctionLiteral(func_node, envir);
+    }
+
     case ast::PREFIX: {
       ast::prefix_ptr prefix_node =
           std::dynamic_pointer_cast<ast::Prefix>(node);
@@ -163,6 +168,10 @@ obj::arr_ptr evalList(ast::arr_ptr arr_node, env::env_ptr envir) {
     elements.push_back(eval(*cur_node, envir));
   }
   return obj::arr_ptr(new obj::List(elements));
+}
+
+obj::func_ptr evalFunctionLiteral(ast::func_ptr func_node, env::env_ptr envir) {
+  return obj::func_ptr(new obj::Function(func_node, envir));
 }
 
 obj::obj_ptr evalInfix(ast::infix_ptr infix_node, env::env_ptr envir) {
