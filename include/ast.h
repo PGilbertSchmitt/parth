@@ -33,6 +33,7 @@ enum node_type {
   IF_ELSE,
   FUNCTION,
   CALL,
+  INDEX,
   VALUE
 };
 
@@ -54,6 +55,7 @@ class Infix;
 class IfElse;
 class Function;
 class Call;
+class Index;
 class Value;
 
 typedef std::shared_ptr<Node> node_ptr;
@@ -72,9 +74,11 @@ typedef std::shared_ptr<Infix> infix_ptr;
 typedef std::shared_ptr<IfElse> ifelse_ptr;
 typedef std::shared_ptr<Function> func_ptr;
 typedef std::shared_ptr<Call> call_ptr;
+typedef std::shared_ptr<Index> index_ptr;
 typedef std::shared_ptr<Value> val_ptr;
 
 typedef std::vector<node_ptr> node_list;
+typedef std::vector<ident_ptr> param_list;
 
 /* Node:
  * Every node is an expression, meaning every expression can be stored and
@@ -218,7 +222,6 @@ class Bool : public Node {
  * identifiers after initialization, this should only ever appear in a let
  * statement.
  * NO RETURN, DOES NOT (CURRENTLY) APPEAR IN EXPRESSIONS */
-
 class Option : public Identifier {
  public:
   Option(Token token, std::string name);
@@ -233,9 +236,7 @@ class Option : public Identifier {
 
 /* String Literal
  * A representation of a string of characters
- * RETURNS: A string
- */
-
+ * RETURNS: A string */
 class String : public Node {
  public:
   String(Token token, std::string value);
@@ -250,9 +251,7 @@ class String : public Node {
 
 /* ListLiteral
  * A representation of a type-independent ordered collection
- * RETURNS: A list
- */
-
+ * RETURNS: A list */
 class List : public Node {
  public:
   List(Token token, node_list values);
@@ -334,8 +333,12 @@ class IfElse : public Node {
   void push_condition_set(node_ptr condition, block_ptr consequence);
 };
 
-typedef std::vector<ident_ptr> param_list;
-
+/* Function Literal
+ * A function consists of a list of parameters and a block. A function can be
+ * 'called' to be evaluated, where the parameters become idents that exist in a
+ * special environment local to the function with values given by the call
+ * expression. You know what a function is. Don't lie to me.
+ * RETURNS: A function object */
 class Function : public Node {
  public:
   Function(Token token, param_list params, block_ptr body);
@@ -349,6 +352,13 @@ class Function : public Node {
   bool is_reducible();
 };
 
+/* Call Expression
+ * A call expression passes values to a function object, which become a part of
+ * that function's environment for the duration of its block being evaluated.
+ * You've almost certainly called a function or method before. Why else are you
+ * reading source code?
+ * RETURNS: the value of the evalution of the function's
+ * block with the given arguments */
 class Call : public Node {
  public:
   Call(Token token, node_ptr function, node_list args);
@@ -356,6 +366,32 @@ class Call : public Node {
   Token token;
   node_ptr function;
   node_list args;
+
+  std::string to_string();
+  node_type _type();
+  bool is_reducible();
+};
+
+/* Index Expression
+ * An index expression is a way to pull a specific value from a list, string, or
+ * hash object. For lists or strings, an integer is used to grab the elements
+ * (starting at 0 of course). For hashes, any value can be used to key into it.
+ * For all of these, functions can also be used as an index, and it's treated as
+ * a mapping function. I'm very proud of this idea.
+ * RETURNS: Depends
+ * - If any is indexed with func 'x': returns mapped list/string/hash where 'x'
+ * is called with each element, char, or key-val pair as arg(s)
+ * - If list is indexed with int 'i': returns the 'i'th element
+ * - If string is indexed with int 'i': returns the 'i'th char as a string
+ * - If hash is indexed with value 'x': returns the value at key of 'x'
+ * */
+class Index : public Node {
+ public:
+  Index(Token token, node_ptr left, node_ptr index);
+
+  Token token;
+  node_ptr left;
+  node_ptr index;
 
   std::string to_string();
   node_type _type();
@@ -371,8 +407,7 @@ class Call : public Node {
  * opposed to a literal, which would be cumbersome to deal with as a value).
  * This adds complexity to the AST and to the evaluator, but saves me having to
  * write my own custom assembly-like intermediate language and interpreter
- * (which I have zero clue on how to do).
- */
+ * (which I have zero clue on how to do). */
 class Value : public Node {
  public:
   Value(Token token, obj::obj_ptr object);

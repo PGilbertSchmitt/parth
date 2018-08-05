@@ -375,7 +375,25 @@ std::string ast::Call::to_string() {
 
 ast::node_type ast::Call::_type() { return ast::CALL; }
 
-bool ast::Call::is_reducible() { return true; }
+bool ast::Call::is_reducible() { return false; }
+
+/************************/
+/*** Index Expression ***/
+/************************/
+
+ast::Index::Index(Token token, node_ptr left, node_ptr index) {
+  this->token = token;
+  this->left = left;
+  this->index = index;
+}
+
+std::string ast::Index::to_string() {
+  return left->to_string() + "[" + index->to_string() + "]";
+}
+
+ast::node_type ast::Index::_type() { return ast::INDEX; }
+
+bool ast::Index::is_reducible() { return false; }
 
 /******************/
 /*** Value Node ***/
