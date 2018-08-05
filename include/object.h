@@ -26,6 +26,8 @@ enum obj_type {
   ERROR
 };
 
+std::string type_to_string(obj_type);
+
 class Object;
 class Bool;
 class Integer;
@@ -45,6 +47,8 @@ typedef std::shared_ptr<List> arr_ptr;
 typedef std::shared_ptr<Function> func_ptr;
 typedef std::shared_ptr<ReturnVal> return_ptr;
 typedef std::shared_ptr<Error> err_ptr;
+
+typedef std::vector<obj_ptr> obj_list;
 
 class Object {
  public:
@@ -91,12 +95,10 @@ class Option : public Object {
   obj_type _type();
 };
 
-typedef std::vector<obj_ptr> internal_list;
-
 class List : public Object {
  public:
-  List(internal_list values);
-  internal_list values;
+  List(obj_list values);
+  obj_list values;
 
   std::string inspect();
   obj_type _type();

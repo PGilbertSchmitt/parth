@@ -59,4 +59,14 @@ class DivideByZeroException : public std::exception {
   }
 };
 
+class InvalidArgsException : public std::exception {
+ public:
+  explicit InvalidArgsException(const std::string &message)
+      : message(message) {}
+
+  std::string message;
+
+  virtual const char *wha() const throw() { return message.c_str(); }
+};
+
 #endif

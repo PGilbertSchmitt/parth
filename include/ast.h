@@ -32,6 +32,7 @@ enum node_type {
   INFIX,
   IF_ELSE,
   FUNCTION,
+  CALL,
   VALUE
 };
 
@@ -52,6 +53,7 @@ class Prefix;
 class Infix;
 class IfElse;
 class Function;
+class Call;
 class Value;
 
 typedef std::shared_ptr<Node> node_ptr;
@@ -69,7 +71,10 @@ typedef std::shared_ptr<Prefix> prefix_ptr;
 typedef std::shared_ptr<Infix> infix_ptr;
 typedef std::shared_ptr<IfElse> ifelse_ptr;
 typedef std::shared_ptr<Function> func_ptr;
+typedef std::shared_ptr<Call> call_ptr;
 typedef std::shared_ptr<Value> val_ptr;
+
+typedef std::vector<node_ptr> node_list;
 
 /* Node:
  * Every node is an expression, meaning every expression can be stored and
@@ -99,7 +104,7 @@ class Block : public Node {
  public:
   Block(Token token);
 
-  std::vector<node_ptr> nodes;
+  node_list nodes;
 
   std::string to_string();
   void push_node(node_ptr node);
@@ -250,10 +255,10 @@ class String : public Node {
 
 class List : public Node {
  public:
-  List(Token token, std::vector<node_ptr> values);
+  List(Token token, node_list values);
 
   Token token;
-  std::vector<node_ptr> values;
+  node_list values;
 
   std::string to_string();
   node_type _type();
@@ -338,6 +343,19 @@ class Function : public Node {
   Token token;
   param_list params;
   block_ptr body;
+
+  std::string to_string();
+  node_type _type();
+  bool is_reducible();
+};
+
+class Call : public Node {
+ public:
+  Call(Token token, node_ptr function, node_list args);
+
+  Token token;
+  node_ptr function;
+  node_list args;
 
   std::string to_string();
   node_type _type();

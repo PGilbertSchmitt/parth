@@ -48,6 +48,7 @@ Parser::Parser(Lexer* lexer) : lexer(lexer) {
   register_infix(TokenType::GT, &parse_infix);
   register_infix(TokenType::LTEQ, &parse_infix);
   register_infix(TokenType::GTEQ, &parse_infix);
+  register_infix(TokenType::LPAREN, &parse_call);
 
   this->next_token();
   this->next_token();
@@ -334,6 +335,12 @@ ast::node_ptr parse_infix(Parser& p, ast::node_ptr left_expr) {
   p.next_token();
   ast::node_ptr right_expr = p.parse_expression(prec);
   return ast::infix_ptr(new ast::Infix(tok, op, left_expr, right_expr));
+}
+
+ast::node_ptr parse_call(Parser& p, ast::node_ptr left_expr) {
+  Token tok = p.get_cur_token();
+  ast::node_list args = parse_expression_list(p, TokenType::RPAREN);
+  return ast::call_ptr(new ast::Call(tok, left_expr, args));
 }
 
 /********************************/

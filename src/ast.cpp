@@ -348,6 +348,35 @@ ast::node_type ast::Function::_type() { return ast::FUNCTION; }
 // immediately.
 bool ast::Function::is_reducible() { return false; }
 
+/***********************/
+/*** Call Expression ***/
+/***********************/
+
+ast::Call::Call(Token token, ast::node_ptr function, ast::node_list args) {
+  this->token = token;
+  this->function = function;
+  this->args = args;
+}
+
+std::string ast::Call::to_string() {
+  std::string out = function->to_string() + "(";
+
+  ast::node_list::iterator last = --(args.end());
+  for (ast::node_list::iterator iter = args.begin(); iter != args.end();
+       iter++) {
+    out += (*iter)->to_string();
+    if (iter != last) {
+      out += ", ";
+    }
+  }
+
+  return out += ")";
+}
+
+ast::node_type ast::Call::_type() { return ast::CALL; }
+
+bool ast::Call::is_reducible() { return true; }
+
 /******************/
 /*** Value Node ***/
 /******************/

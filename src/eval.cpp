@@ -60,6 +60,19 @@ obj::obj_ptr eval(ast::node_ptr node, env::env_ptr envir) {
       return evalInfix(infix_node, envir);
     } break;
 
+    case ast::CALL: {
+      ast::call_ptr call_node = std::dynamic_pointer_cast<ast::Call>(node);
+      obj::obj_ptr func_eval = eval(call_node->function, envir);
+      if (func_eval->_type() != obj::FUNCTION) {
+        throw NoSuchOperatorException("No call operation on type " +
+                                      obj::type_to_string(func_eval->_type()));
+      }
+      obj::func_ptr func_obj =
+          std::dynamic_pointer_cast<obj::Function>(func_eval);
+      obj::obj_list args = evalExpressionList(call_node->args, envir);
+      return applyFunction(func_obj, args);
+    } break;
+
     case ast::IF_ELSE: {
       ast::ifelse_ptr ifelse_node =
           std::dynamic_pointer_cast<ast::IfElse>(node);
@@ -161,12 +174,7 @@ obj::str_ptr evalString(ast::str_ptr str_node) {
 }
 
 obj::arr_ptr evalList(ast::arr_ptr arr_node, env::env_ptr envir) {
-  std::vector<obj::obj_ptr> elements;
-  std::vector<ast::node_ptr>::iterator cur_node;
-  for (cur_node = arr_node->values.begin(); cur_node != arr_node->values.end();
-       cur_node++) {
-    elements.push_back(eval(*cur_node, envir));
-  }
+  obj::obj_list elements = evalExpressionList(arr_node->values, envir);
   return obj::arr_ptr(new obj::List(elements));
 }
 
@@ -363,11 +371,12 @@ obj::obj_ptr evalListInfixOperator(Token op, obj::arr_ptr left,
     } break;
     case TokenType::PLUS: {
       // Append right list to left list
-      obj::internal_list obj_list;
-      obj_list.insert(obj_list.end(), left->values.begin(), left->values.end());
-      obj_list.insert(obj_list.end(), right->values.begin(),
-                      right->values.end());
-      return obj::arr_ptr(new obj::List(obj_list));
+      obj::obj_list new_obj_list;
+      new_obj_list.insert(new_obj_list.end(), left->values.begin(),
+                          left->values.end());
+      new_obj_list.insert(new_obj_list.end(), right->values.begin(),
+                          right->values.end());
+      return obj::arr_ptr(new obj::List(new_obj_list));
     } break;
     default: {
       throw NoSuchOperatorException("No such operator LIST " +
@@ -394,7 +403,7 @@ obj::obj_ptr evalBangOperator(obj::obj_ptr input) {
  * an optional (or a NONE is returned if there is no default), including other
  * optionals. This may change in the future.
  */
-obj::opt_ptr evalIfElse(ast::ifelse_ptr ifelse_node, env::env_ptr envir) {
+obj::obj_ptr evalIfElse(ast::ifelse_ptr ifelse_node, env::env_ptr envir) {
   std::vector<ast::condition_set>::iterator set;
   for (set = ifelse_node->list.begin(); set != ifelse_node->list.end(); set++) {
     bool execute_block = false;
@@ -407,6 +416,15 @@ obj::opt_ptr evalIfElse(ast::ifelse_ptr ifelse_node, env::env_ptr envir) {
 
     if (execute_block) {
       obj::obj_ptr consequence = eval(set->consequence, envir);
+      // if the consequence is a return type, we do not wrap anything in an
+      // option. A return should be used to break out of blocks, so we don't
+      // actually care about the optionality of the return value. This means you
+      // don't have to unwrap a function's return value unless an if-expression
+      // without a default is literally the last one in a block. If that's the
+      // case, it's absolutely your own fault for what happens :P
+      if (consequence->_type() == obj::RETURN_VAL) {
+        return consequence;
+      }
       return obj::opt_ptr(new obj::Option(consequence));
     }
   }
@@ -454,4 +472,44 @@ obj::bool_ptr truthiness(obj::obj_ptr input, bool negate) {
 
 obj::bool_ptr nativeBoolToObject(bool val) {
   return val ? TRUE_OBJ : FALSE_OBJ;
+}
+
+obj::obj_list evalExpressionList(ast::node_list exprs, env::env_ptr envir) {
+  obj::obj_list values;
+  ast::node_list::iterator cur_node;
+  for (cur_node = exprs.begin(); cur_node != exprs.end(); cur_node++) {
+    values.push_back(eval(*cur_node, envir));
+  }
+  return values;
+}
+
+obj::obj_ptr applyFunction(obj::func_ptr func_obj, obj::obj_list args) {
+  ast::param_list params = func_obj->func_node->params;
+  if (params.size() != args.size()) {
+    throw InvalidArgsException("Incorrect number of args given");
+  }
+
+  // This new environment encloses the function's environment, providing
+  // temporary access to the new argument variables
+  env::env_ptr new_env = env::env_ptr(new env::Environment(func_obj->envir));
+
+  // Filling the new environment with happy argument values.
+  ast::param_list::iterator param;
+  obj::obj_list::iterator arg_value;
+  for (param = params.begin(), arg_value = args.begin(); param != params.end();
+       param++, arg_value++) {
+    // Man, these pointers are starting to get confusing.
+    new_env->init((*param)->value, (*arg_value));
+  }
+
+  obj::obj_ptr result = eval(func_obj->func_node->body, new_env);
+  return unwrapReturn(result);
+}
+
+obj::obj_ptr unwrapReturn(obj::obj_ptr val) {
+  if (val->_type() == obj::RETURN_VAL) {
+    obj::return_ptr return_obj = std::dynamic_pointer_cast<obj::ReturnVal>(val);
+    return return_obj->value;
+  }
+  return val;
 }

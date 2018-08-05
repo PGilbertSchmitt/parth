@@ -28,14 +28,18 @@ obj::func_ptr evalFunctionLiteral(ast::func_ptr, env::env_ptr);
 obj::obj_ptr evalInfix(ast::infix_ptr, env::env_ptr);
 obj::obj_ptr evalPrefix(ast::prefix_ptr, env::env_ptr);
 obj::obj_ptr evalAssign(ast::ident_ptr, ast::node_ptr, env::env_ptr);
+
 obj::obj_ptr evalIntegerInfixOperator(Token, obj::int_ptr, obj::int_ptr);
 obj::obj_ptr evalBoolInfixOperator(Token, obj::bool_ptr, obj::bool_ptr);
 obj::obj_ptr evalStringInfixOperator(Token, obj::str_ptr, obj::str_ptr);
 obj::obj_ptr evalListInfixOperator(Token, obj::arr_ptr, obj::arr_ptr);
 obj::obj_ptr evalBangOperator(obj::obj_ptr);
 obj::obj_ptr evalMinusOperator(obj::int_ptr);
-obj::opt_ptr evalIfElse(ast::ifelse_ptr, env::env_ptr);
+obj::obj_ptr evalIfElse(ast::ifelse_ptr, env::env_ptr);
 obj::bool_ptr truthiness(obj::obj_ptr, bool = false);
 obj::bool_ptr nativeBoolToObject(bool);
+obj::obj_list evalExpressionList(ast::node_list, env::env_ptr);
+obj::obj_ptr applyFunction(obj::func_ptr, obj::obj_list);
+obj::obj_ptr unwrapReturn(obj::obj_ptr);
 
 #endif

@@ -1,6 +1,36 @@
 #include "object.h"
 #include "environment.h"
 
+std::string obj::type_to_string(obj::obj_type ot) {
+  switch (ot) {
+    case obj::INTEGER: {
+      return "INTEGER";
+    }
+    case obj::BOOLEAN: {
+      return "BOOLEAN";
+    }
+    case obj::STRING: {
+      return "STRING";
+    }
+    case obj::LIST: {
+      return "LIST";
+    }
+    case obj::OPTION: {
+      return "OPTION";
+    }
+    case obj::FUNCTION: {
+      return "FUNCTION";
+    }
+    case obj::RETURN_VAL: {
+      return "RETURN_VAL";
+    }
+    case obj::ERROR: {
+      return "ERROR";
+    }
+    default: { return "UNKNOWN"; }
+  }
+}
+
 /* Integer */
 
 obj::Integer::Integer(int64_t value) : value(value) {}
@@ -73,7 +103,9 @@ obj::obj_type obj::Function::_type() { return obj::FUNCTION; }
 /* Return Wrapper */
 
 obj::ReturnVal::ReturnVal(obj_ptr o) : value(o) {}
-std::string obj::ReturnVal::inspect() { return this->value->inspect(); }
+std::string obj::ReturnVal::inspect() {
+  return "return(" + this->value->inspect() + ")";
+}
 obj::obj_type obj::ReturnVal::_type() { return obj::RETURN_VAL; }
 
 /* Error Value */

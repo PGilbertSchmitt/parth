@@ -103,6 +103,7 @@ ast::node_ptr parse_lparen(Parser &p);
 
 // Infix parsing functions
 ast::node_ptr parse_infix(Parser &p, ast::node_ptr left_expr);
+ast::node_ptr parse_call(Parser &p, ast::node_ptr left_expr);
 
 // Other parsers
 ast::param_list parse_function_parameters(Parser &p);
