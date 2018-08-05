@@ -33,3 +33,17 @@ obj::obj_ptr Environment::get(const std::string key) {
     return nullptr;
   }
 }
+
+void Environment::inspect() {
+  std::string out = "{ ";
+
+  std::unordered_map<std::string, obj::obj_ptr>::iterator iter;
+
+  for (iter = this->store.begin(); iter != this->store.end(); iter++) {
+    out += iter->first + ": ";
+    out += iter->second->inspect();
+    out += ", ";
+  }
+
+  std::cout << out << " }\n";
+}

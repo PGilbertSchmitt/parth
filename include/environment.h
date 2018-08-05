@@ -23,6 +23,7 @@ class Environment {
   void init(const std::string&, obj::obj_ptr);
   void set(const std::string&, obj::obj_ptr);
   obj::obj_ptr get(const std::string);
+  void inspect();
 };
 
 }  // namespace env
