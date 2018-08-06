@@ -73,6 +73,11 @@ obj::obj_ptr eval(ast::node_ptr node, env::env_ptr envir) {
       return applyFunction(func_obj, args);
     } break;
 
+    case ast::INDEX: {
+      ast::index_ptr index_node = std::dynamic_pointer_cast<ast::Index>(node);
+      return evalIndex(index_node->left, index_node->index, envir);
+    } break;
+
     case ast::IF_ELSE: {
       ast::ifelse_ptr ifelse_node =
           std::dynamic_pointer_cast<ast::IfElse>(node);
@@ -266,6 +271,30 @@ obj::obj_ptr evalAssign(ast::ident_ptr left, ast::node_ptr right,
     envir->set(left->value, value);
   }
   return value;
+}
+
+obj::obj_ptr evalIndex(ast::node_ptr left_expr, ast::node_ptr index_expr,
+                       env::env_ptr envir) {
+  obj::obj_ptr left_obj = eval(left_expr, envir);
+  obj::obj_ptr index_obj = eval(index_expr, envir);
+
+  switch (left_obj->_type()) {
+    case obj::LIST: {
+      obj::arr_ptr list_obj = std::dynamic_pointer_cast<obj::List>(left_obj);
+      return indexlist(list_obj, index_obj);
+    }
+    case obj::STRING: {
+      obj::str_ptr str_obj = std::dynamic_pointer_cast<obj::String>(left_obj);
+      return indexString(str_obj, index_obj);
+    }
+    // case obj::HASH: {
+    //   // Hash goes here
+    // }
+    default: {
+      throw NoSuchOperatorException(obj::type_to_string(left_obj->_type()) +
+                                    " cannot be indexed using []");
+    }
+  }
 }
 
 obj::obj_ptr evalIntegerInfixOperator(Token op, obj::int_ptr left,
@@ -512,4 +541,46 @@ obj::obj_ptr unwrapReturn(obj::obj_ptr val) {
     return return_obj->value;
   }
   return val;
+}
+
+obj::obj_ptr indexlist(obj::arr_ptr list, obj::obj_ptr index) {
+  switch (index->_type()) {
+    case obj::INTEGER: {
+      obj::int_ptr int_obj = std::dynamic_pointer_cast<obj::Integer>(index);
+      int64_t val = int_obj->value;
+      if (val < 0 || static_cast<uint64_t>(val) >= list->values.size()) {
+        return NONE_OBJ;
+      }
+      return list->values.at(val);
+    } break;
+    // case obj::FUNCTION: {
+    //   // TODO: When 'map' builtin is written, use that here
+    // } break;
+    default: {
+      throw NoSuchOperatorException("Cannot use " +
+                                    obj::type_to_string(index->_type()) +
+                                    " to index list.");
+    }
+  }
+}
+
+obj::obj_ptr indexString(obj::str_ptr str, obj::obj_ptr index) {
+  switch (index->_type()) {
+    case obj::INTEGER: {
+      obj::int_ptr int_obj = std::dynamic_pointer_cast<obj::Integer>(index);
+      int64_t val = int_obj->value;
+      if (val < 0 || static_cast<uint64_t>(val) >= str->value.size()) {
+        return obj::str_ptr(new obj::String(""));
+      }
+      return obj::str_ptr(new obj::String(str->value.substr(val, 1)));
+    } break;
+    // case obj::FUNCTION: {
+    //   // TODO: When 'map' builtin is written, use that here
+    // } break;
+    default: {
+      throw NoSuchOperatorException("Cannot use " +
+                                    obj::type_to_string(index->_type()) +
+                                    " to index string.");
+    }
+  }
 }
