@@ -192,7 +192,7 @@ bool ast::String::is_reducible() { return false; }
 /*** List Literal ***/
 /*********************/
 
-ast::List::List(Token token, std::vector<ast::node_ptr> values) {
+ast::List::List(Token token, ast::node_list values) {
   this->token = token;
   this->values = values;
 }
@@ -200,7 +200,7 @@ ast::List::List(Token token, std::vector<ast::node_ptr> values) {
 std::string ast::List::to_string() {
   std::string out = "[";
 
-  std::vector<ast::node_ptr>::iterator iter, last;
+  ast::node_list::iterator iter, last;
   last = --(values.end());
   for (iter = values.begin(); iter != values.end(); iter++) {
     out += (*iter)->to_string();
@@ -215,6 +215,18 @@ std::string ast::List::to_string() {
 ast::node_type ast::List::_type() { return ast::LIST; }
 
 bool ast::List::is_reducible() { return false; }
+
+/*******************/
+/*** Map Literal ***/
+/*******************/
+
+ast::Map::Map(Token token) { this->token = token; }
+
+std::string ast::Map::to_string() { return "A MAP"; }
+
+ast::node_type ast::Map::_type() { return ast::MAP; }
+
+bool ast::Map::is_reducible() { return true; }
 
 /*************************/
 /*** Prefix Expression ***/
@@ -303,8 +315,9 @@ bool ast::IfElse::is_reducible() { return true; }
 void ast::IfElse::push_condition_set(node_ptr condition,
                                      block_ptr consequence) {
   // Not checking for condition after the first since a null condition ptr
-  // represents an else with no followed if. If any else-ifs follow an else, it
-  // is just unreachable code and no error is raised (TODO: Consider a warning)
+  // represents an else with no followed if. If any else-ifs follow an else,
+  // it is just unreachable code and no error is raised (TODO: Consider a
+  // warning)
   if (consequence == NULL || (list.empty() && condition == NULL)) {
     throw nullNodeExc;
   }
@@ -343,8 +356,8 @@ std::string ast::Function::to_string() {
 
 ast::node_type ast::Function::_type() { return ast::FUNCTION; }
 
-// A function literal itself is not actually reducible. When it's being called,
-// it's body is reduced, but the function literal itself is good to go
+// A function literal itself is not actually reducible. When it's being
+// called, it's body is reduced, but the function literal itself is good to go
 // immediately.
 bool ast::Function::is_reducible() { return false; }
 
