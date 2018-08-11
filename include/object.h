@@ -1,9 +1,11 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
+#include <stdlib.h>
 #include <memory>
 #include <string>
 #include <vector>
+#include "SpookyV2.h"
 #include "ast.h"
 
 // Need to forward declare environment
@@ -53,6 +55,7 @@ typedef std::vector<obj_ptr> obj_list;
 class Object {
  public:
   virtual std::string inspect() = 0;
+  virtual uint64_t hash() = 0;
   virtual obj_type _type() = 0;
 };
 
@@ -62,7 +65,11 @@ class Integer : public Object {
   const int64_t value;
 
   std::string inspect();
+  uint64_t hash();
   obj_type _type();
+
+ private:
+  uint64_t hash_cache;
 };
 
 // IMPORTANT! These should only be created once each for either bool value
@@ -73,7 +80,11 @@ class Bool : public Object {
   const bool value;
 
   std::string inspect();
+  uint64_t hash();
   obj_type _type();
+
+ private:
+  uint64_t hash_cache;
 };
 
 class String : public Object {
@@ -82,7 +93,11 @@ class String : public Object {
   const std::string value;
 
   std::string inspect();
+  uint64_t hash();
   obj_type _type();
+
+ private:
+  uint64_t hash_cache;
 };
 
 class Option : public Object {
@@ -92,15 +107,17 @@ class Option : public Object {
   obj_ptr value;
 
   std::string inspect();
+  uint64_t hash();
   obj_type _type();
 };
 
 class List : public Object {
  public:
   List(obj_list values);
-  obj_list values;
+  const obj_list values;
 
   std::string inspect();
+  uint64_t hash();
   obj_type _type();
 };
 
@@ -111,7 +128,11 @@ class Function : public Object {
   env::env_ptr envir;
 
   std::string inspect();
+  uint64_t hash();
   obj_type _type();
+
+ private:
+  uint64_t hash_cache;
 };
 
 class ReturnVal : public Object {
@@ -120,6 +141,7 @@ class ReturnVal : public Object {
   obj_ptr value;
 
   std::string inspect();
+  uint64_t hash();
   obj_type _type();
 };
 
@@ -129,6 +151,7 @@ class Error : public Object {
   std::string err;
 
   std::string inspect();
+  uint64_t hash();
   obj_type _type();
 };
 
