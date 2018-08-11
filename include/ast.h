@@ -6,6 +6,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <vector>
 #include "token.h"
 
@@ -28,6 +29,7 @@ enum node_type {
   OPTION,
   STRING,
   LIST,
+  MAP,
   PREFIX,
   INFIX,
   IF_ELSE,
@@ -50,13 +52,13 @@ class Bool;
 class Option;
 class String;
 class List;
+class Map;
 class Prefix;
 class Infix;
 class IfElse;
 class Function;
 class Call;
 class Index;
-class Value;
 
 typedef std::shared_ptr<Node> node_ptr;
 typedef std::shared_ptr<Block> block_ptr;
@@ -69,16 +71,17 @@ typedef std::shared_ptr<Bool> bool_ptr;
 typedef std::shared_ptr<Option> opt_ptr;
 typedef std::shared_ptr<String> str_ptr;
 typedef std::shared_ptr<List> arr_ptr;
+typedef std::shared_ptr<Map> map_ptr;
 typedef std::shared_ptr<Prefix> prefix_ptr;
 typedef std::shared_ptr<Infix> infix_ptr;
 typedef std::shared_ptr<IfElse> ifelse_ptr;
 typedef std::shared_ptr<Function> func_ptr;
 typedef std::shared_ptr<Call> call_ptr;
 typedef std::shared_ptr<Index> index_ptr;
-typedef std::shared_ptr<Value> val_ptr;
 
 typedef std::vector<node_ptr> node_list;
 typedef std::vector<ident_ptr> param_list;
+typedef std::unordered_map<uint64_t, node_ptr> hash_map;
 
 /* Node:
  * Every node is an expression, meaning every expression can be stored and
@@ -187,7 +190,7 @@ class Return : public Node {
 
 /* Integer Expression
  * Any integer number
- * RETURNS: an integer */
+ * RETURNS: an integer object */
 class Integer : public Node {
  public:
   Integer(Token token, int64_t value);
@@ -202,7 +205,7 @@ class Integer : public Node {
 
 /* Bool Literal
  * A representation of true or false
- * RETURNS: the bool value of the expression */
+ * RETURNS: a bool object (precreated singletons) */
 class Bool : public Node {
  public:
   Bool(Token token, bool value);
@@ -221,7 +224,8 @@ class Bool : public Node {
  * possibility of no internal value. Since optionals are referenced by
  * identifiers after initialization, this should only ever appear in a let
  * statement.
- * NO RETURN, DOES NOT (CURRENTLY) APPEAR IN EXPRESSIONS */
+ * NO RETURN, DOES NOT (CURRENTLY) APPEAR IN EXPRESSIONS OTHER THAN
+ * LET-EXPRESSIONS */
 class Option : public Identifier {
  public:
   Option(Token token, std::string name);
@@ -236,7 +240,7 @@ class Option : public Identifier {
 
 /* String Literal
  * A representation of a string of characters
- * RETURNS: A string */
+ * RETURNS: A string object */
 class String : public Node {
  public:
   String(Token token, std::string value);
@@ -249,9 +253,9 @@ class String : public Node {
   bool is_reducible();
 };
 
-/* ListLiteral
+/* List Literal
  * A representation of a type-independent ordered collection
- * RETURNS: A list */
+ * RETURNS: A list object */
 class List : public Node {
  public:
   List(Token token, node_list values);
@@ -264,10 +268,32 @@ class List : public Node {
   bool is_reducible();
 };
 
+/* Map Literal
+ * A literal representation of key-value pairs which instantiate a hash-map
+ * object called a Map, similar to Ruby's hashes or Javascript's plain objects.
+ * An important note about my Maps is that any normal object value (obviously
+ * excluding obj::ReturnVal and obj::Error) can be used as a key, since every
+ * object has a hash() method which produces the Map key, which allows for deep
+ * equality. It may be beneficial at some time to create my own implementation
+ * rather than rely on the standard library's unordered_map, which will rehash
+ * my hashes.
+ * RETURNS: A Map object
+ */
+class Map : public Node {
+ public:
+  Map(Token token);
+
+  Token token;
+
+  std::string to_string();
+  node_type _type();
+  bool is_reducible();
+};
+
 /* Prefix Expression
  * An expression where a unary operator prepends the operand
  * eg. !(x), -(5)
- * RETURNS: the value of the expression */
+ * RETURNS: the object containing value of the expression */
 class Prefix : public Node {
  public:
   Prefix(Token token, Token op, node_ptr right);
@@ -284,7 +310,7 @@ class Prefix : public Node {
 /* Infix Expression
  * An expression where a binary operator separates two operands
  * eg. (x) + (4), (5) % (y)
- * RETURNS: the value of the expression */
+ * RETURNS: an object containing the value of the expression */
 class Infix : public Node {
  public:
   Infix(Token token, Token op, node_ptr left, node_ptr right);
@@ -309,7 +335,7 @@ struct condition_set {
 /* IfElse Expression
  * A branching expression with at least one conditional statement and block, but
  * can have indefinitely many if {} else if {} else if...
- * RETURNS: An Option containing the value
+ * RETURNS: An Option object containing the value
  * returned by the block expression paired with the first conditional that
  * returns true. If there is no
  * default and none of the conditions return true, a None option is returned. A
@@ -392,28 +418,6 @@ class Index : public Node {
   Token token;
   node_ptr left;
   node_ptr index;
-
-  std::string to_string();
-  node_type _type();
-  bool is_reducible();
-};
-
-/* Value Node
- * The value node is unique, in that it is not something that is put into the
- * AST by the parser but by the evaluator. In order to handle step-by-step
- * evaluation, I've decided to design the AST so that the tree can be reduced in
- * discrete steps. When the lowest node with irreducible children is evaluated,
- * it is replaced by a value node containing the object recording a value (as
- * opposed to a literal, which would be cumbersome to deal with as a value).
- * This adds complexity to the AST and to the evaluator, but saves me having to
- * write my own custom assembly-like intermediate language and interpreter
- * (which I have zero clue on how to do). */
-class Value : public Node {
- public:
-  Value(Token token, obj::obj_ptr object);
-
-  Token token;
-  obj::obj_ptr object;
 
   std::string to_string();
   node_type _type();

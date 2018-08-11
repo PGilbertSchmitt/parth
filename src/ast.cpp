@@ -395,21 +395,6 @@ ast::node_type ast::Index::_type() { return ast::INDEX; }
 
 bool ast::Index::is_reducible() { return false; }
 
-/******************/
-/*** Value Node ***/
-/******************/
-
-ast::Value::Value(Token token, obj::obj_ptr object) {
-  this->token = token;
-  this->object = object;
-}
-
-std::string ast::Value::to_string() { return this->object->inspect(); }
-
-ast::node_type ast::Value::_type() { return ast::VALUE; }
-
-bool ast::Value::is_reducible() { return false; }
-
 /***************/
 /*** Helpers ***/
 /***************/
