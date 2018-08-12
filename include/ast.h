@@ -6,15 +6,9 @@
 #include <iostream>
 #include <memory>
 #include <string>
-#include <unordered_map>
+#include <utility>
 #include <vector>
 #include "token.h"
-
-// Need to forward declare object
-namespace obj {
-class Object;
-typedef std::shared_ptr<Object> obj_ptr;
-}  // namespace obj
 
 namespace ast {
 
@@ -81,7 +75,10 @@ typedef std::shared_ptr<Index> index_ptr;
 
 typedef std::vector<node_ptr> node_list;
 typedef std::vector<ident_ptr> param_list;
-typedef std::unordered_map<uint64_t, node_ptr> hash_map;
+
+// Key-value pairs for the Map literal node
+typedef std::pair<node_ptr, node_ptr> kv_pair;
+typedef std::vector<kv_pair> kv_list;
 
 /* Node:
  * Every node is an expression, meaning every expression can be stored and
@@ -273,6 +270,7 @@ class Map : public Node {
   Map(Token token);
 
   Token token;
+  kv_list key_value_pairs;
 
   std::string to_string();
   node_type _type();

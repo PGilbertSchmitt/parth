@@ -22,14 +22,14 @@ std::string ast::Block::to_string() {
   std::string out;
 
   int nodes_size = nodes.size();
-  out += "{ ";
+  out += "{\n";
   for (int i = 0; i < nodes_size; i++) {
     out += nodes[i]->to_string();
     if (i < nodes_size - 1) {
-      out += ", ";
+      out += ",\n";
     }
   }
-  out += " }";
+  out += "\n}";
 
   return out;
 }
@@ -202,7 +202,31 @@ ast::node_type ast::List::_type() { return ast::LIST; }
 
 ast::Map::Map(Token token) { this->token = token; }
 
-std::string ast::Map::to_string() { return "A MAP"; }
+std::string ast::Map::to_string() {
+  size_t pair_size = this->key_value_pairs.size();
+  if (pair_size == 0) {
+    return "(MAP){}";
+  }
+
+  ast::kv_list pairs = this->key_value_pairs;
+  std::string out = "(MAP){ ";
+
+  ast::kv_list::iterator iter, last;
+  last = --(pairs.begin());
+  for (iter = pairs.begin(); iter != pairs.end(); iter++) {
+    out += iter->first->to_string();
+    out += ": ";
+    out += iter->first->to_string();
+
+    if (iter != last) {
+      out += ", ";
+    } else {
+      out += " }";
+    }
+  }
+
+  return out;
+}
 
 ast::node_type ast::Map::_type() { return ast::MAP; }
 
