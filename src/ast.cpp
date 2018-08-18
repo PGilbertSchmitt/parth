@@ -47,7 +47,7 @@ ast::Identifier::Identifier(Token token, std::string value) {
   this->value = value;
 }
 
-std::string ast::Identifier::to_string() { return value; }
+std::string ast::Identifier::to_string() { return "IDENT(" + value + ")"; }
 
 ast::node_type ast::Identifier::_type() { return ast::IDENT; }
 
@@ -211,14 +211,14 @@ std::string ast::Map::to_string() {
   ast::kv_list pairs = this->key_value_pairs;
   std::string out = "(MAP){ ";
 
-  ast::kv_list::iterator iter, last;
-  last = --(pairs.begin());
-  for (iter = pairs.begin(); iter != pairs.end(); iter++) {
+  uint i;
+  ast::kv_list::iterator iter;
+  for (iter = pairs.begin(), i = 1; iter != pairs.end(); iter++, i++) {
     out += iter->first->to_string();
     out += ": ";
-    out += iter->first->to_string();
+    out += iter->second->to_string();
 
-    if (iter != last) {
+    if (i < pairs.size()) {
       out += ", ";
     } else {
       out += " }";
@@ -229,6 +229,11 @@ std::string ast::Map::to_string() {
 }
 
 ast::node_type ast::Map::_type() { return ast::MAP; }
+
+void ast::Map::push_kv_pair(ast::node_ptr k, ast::node_ptr v) {
+  ast::kv_pair new_kv = ast::kv_pair(k, v);
+  this->key_value_pairs.push_back(new_kv);
+}
 
 /*************************/
 /*** Prefix Expression ***/

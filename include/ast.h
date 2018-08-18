@@ -274,6 +274,7 @@ class Map : public Node {
 
   std::string to_string();
   node_type _type();
+  void push_kv_pair(ast::node_ptr k, ast::node_ptr v);
 };
 
 /* Prefix Expression

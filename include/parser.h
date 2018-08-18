@@ -47,6 +47,9 @@ class Parser {
   void expect_peek(TokenType);
   void expect_end();
   void eat_newlines();
+  // Like ::eat_newlines, but the next non-newline token is set as the peek
+  // instead
+  void ignore_newlines();
   Token after_paren();
 
   enum rank {
@@ -98,6 +101,7 @@ ast::node_ptr parse_bool(Parser &p);
 ast::node_ptr parse_option(Parser &p);
 ast::node_ptr parse_string(Parser &p);
 ast::node_ptr parse_list_literal(Parser &p);
+ast::node_ptr parse_map_literal(Parser &p);
 ast::node_ptr parse_if_else(Parser &p);
 ast::node_ptr parse_lparen(Parser &p);
 
@@ -111,8 +115,8 @@ ast::param_list parse_function_parameters(Parser &p);
 ast::node_ptr parse_function_literal(Parser &p);
 ast::node_ptr parse_group(Parser &p);
 ast::block_ptr parse_block(Parser &p);
-std::vector<ast::node_ptr> parse_expression_list(Parser &p,
-                                                 TokenType end_token);
+ast::node_list parse_expression_list(Parser &p, TokenType end_token);
+ast::kv_pair parse_expression_pair(Parser &p);
 
 // Errors
 class UnexpectedException : public std::exception {

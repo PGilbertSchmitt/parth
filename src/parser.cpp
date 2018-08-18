@@ -28,6 +28,7 @@ Parser::Parser(Lexer* lexer) : lexer(lexer) {
   register_prefix(TokenType::STRING, &parse_string);
   register_prefix(TokenType::LBRACKET, &parse_list_literal);
   register_prefix(TokenType::LPAREN, &parse_lparen);
+  register_prefix(TokenType::LBRACE, &parse_map_literal);
   register_prefix(TokenType::IF, &parse_if_else);
 
   // Register Infix Parsing functions here
@@ -105,7 +106,13 @@ void Parser::expect_end() {
 
 void Parser::eat_newlines() {
   while (cur_token_is(TokenType::NEWLINE)) {
-    next_token();
+    this->next_token();
+  }
+}
+
+void Parser::ignore_newlines() {
+  while (peek_token_is(TokenType::NEWLINE)) {
+    this->next_token();
   }
 }
 
@@ -185,6 +192,7 @@ ast::node_ptr Parser::parse_line() {
 }
 
 ast::node_ptr Parser::parse_expression(rank r) {
+  this->eat_newlines();
   TokenType cur_type = this->cur_token.get_type();
   prefix_map::iterator prefix = this->prefix_parsers.find(int(cur_type));
   if (prefix == this->prefix_parsers.end()) {
@@ -281,9 +289,49 @@ ast::node_ptr parse_string(Parser& p) {
 
 ast::node_ptr parse_list_literal(Parser& p) {
   Token cur = p.get_cur_token();
-  std::vector<ast::node_ptr> values =
-      parse_expression_list(p, TokenType::RBRACKET);
+  ast::node_list values = parse_expression_list(p, TokenType::RBRACKET);
   return ast::arr_ptr(new ast::List(cur, values));
+}
+
+ast::node_ptr parse_map_literal(Parser& p) {
+  Token cur = p.get_cur_token();
+  ast::map_ptr map = ast::map_ptr(new ast::Map(cur));
+
+  if (p.peek_token_is(TokenType::RBRACE)) {
+    p.next_token();
+    return map;
+  }
+
+  ast::kv_list initial_kvs;
+  while (true) {
+    p.next_token();
+    ast::node_ptr key_expr = p.parse_expression(Parser::LOWEST);
+
+    // There is a special note to make here. In a literal, an ident literal is
+    // interpreted as being a string for simplicity and cleanliness (and let's
+    // be honest, to look like JavaScript)
+    if (key_expr->_type() == ast::IDENT) {
+      std::string str =
+          std::dynamic_pointer_cast<ast::Identifier>(key_expr)->value;
+      key_expr = ast::str_ptr(new ast::String(p.get_cur_token(), str));
+    }
+
+    p.expect_peek(TokenType::COLON);
+    p.next_token();
+    ast::node_ptr val_expr = p.parse_expression(Parser::LOWEST);
+
+    map->push_kv_pair(key_expr, val_expr);
+
+    p.eat_newlines();
+    if (!p.peek_token_is(TokenType::COMMA)) {
+      break;
+    }
+    p.next_token();
+  }
+
+  p.ignore_newlines();
+  p.expect_peek(TokenType::RBRACE);
+  return map;
 }
 
 ast::node_ptr parse_if_else(Parser& p) {
@@ -379,9 +427,8 @@ ast::block_ptr parse_block(Parser& p) {
   return block;
 }
 
-std::vector<ast::node_ptr> parse_expression_list(Parser& p,
-                                                 TokenType end_token) {
-  std::vector<ast::node_ptr> list;
+ast::node_list parse_expression_list(Parser& p, TokenType end_token) {
+  ast::node_list list;
 
   if (p.peek_token_is(end_token)) {
     p.next_token();
@@ -398,9 +445,19 @@ std::vector<ast::node_ptr> parse_expression_list(Parser& p,
     list.push_back(p.parse_expression(Parser::LOWEST));
   }
 
+  p.ignore_newlines();
   p.expect_peek(end_token);
 
   return list;
+}
+
+ast::kv_pair parse_expression_pair(Parser& p) {
+  ast::kv_pair pair;
+  pair.first = p.parse_expression(Parser::LOWEST);
+  p.expect_peek(TokenType::COLON);
+  p.next_token();
+  pair.second = p.parse_expression(Parser::LOWEST);
+  return pair;
 }
 
 ast::param_list parse_function_parameters(Parser& p) {
