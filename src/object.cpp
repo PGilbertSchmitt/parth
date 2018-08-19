@@ -173,15 +173,11 @@ std::string obj::Map::inspect() {
   obj::obj_map::const_iterator iter;
   size_t i;
   std::cout << "We started from the bottom\n";
-  for (iter = this->pairs.begin(), i = 0; iter != this->pairs.end();
+  for (iter = this->pairs.begin(), i = 1; iter != this->pairs.end();
        iter++, i++) {
-    // Okay, so I've kinda made a mistake in that I don't actually track the
-    // keys, ony the keys' hashes. I will track them in the future, but for
-    // now we must suffer with inspect() only showing the hash string. Oopsie
-    // doodle.
-    out += std::to_string(iter->first);
+    out += iter->second.first->inspect();
     out += ": ";
-    out += iter->second->inspect();
+    out += iter->second.second->inspect();
     if (i < this->pairs.size()) {
       out += ", ";
     }
@@ -199,7 +195,7 @@ uint64_t obj::Map::hash() {
   obj::obj_map::const_iterator iter;
   for (iter = this->pairs.begin(); iter != this->pairs.end(); iter++) {
     uint64_t key_hash = iter->first;
-    obj_ptr val_obj = iter->second;
+    obj_ptr val_obj = iter->second.second;
     uint64_t val_hash = val_obj->hash();
     uint64_t element_hash =
         SpookyHash::Hash64(&val_hash, sizeof(val_hash), key_hash);

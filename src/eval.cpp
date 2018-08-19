@@ -194,12 +194,16 @@ obj::map_ptr evalMap(ast::map_ptr map_node, env::env_ptr envir) {
   ast::kv_list::iterator iter;
   for (iter = map_node->key_value_pairs.begin();
        iter < map_node->key_value_pairs.end(); iter++) {
-    // The value of the key isn't actually important at the moment (since we're
-    // not doing any additional equality checking and just relying on the
-    // hashes)
-    uint64_t key_hash = eval(iter->first, envir)->hash();
-    obj::obj_ptr value = eval(iter->second, envir);
-    evaluated_kvs[key_hash] = value;
+    obj::obj_ptr key_obj, val_obj;
+    key_obj = eval(iter->first, envir);
+    val_obj = eval(iter->second, envir);
+
+    obj::obj_pair kv_pair;
+    kv_pair.first = key_obj;
+    kv_pair.second = val_obj;
+
+    uint64_t key_hash = key_obj->hash();
+    evaluated_kvs[key_hash] = kv_pair;
   }
 
   return obj::map_ptr(new obj::Map(evaluated_kvs));

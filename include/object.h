@@ -55,7 +55,14 @@ typedef std::shared_ptr<ReturnVal> return_ptr;
 typedef std::shared_ptr<Error> err_ptr;
 
 typedef std::vector<obj_ptr> obj_list;
-typedef std::unordered_map<uint64_t, obj_ptr> obj_map;
+// Might later look for a less convoluted way to represent the keys and values,
+// but currenty, accessing the key of an obj_map looks like:
+// => obj_map->second.first
+// While accessing the value looks like:
+// => obj_map->second.second
+// I know it's gross, I'll figure something out. Maybe it's own class...
+typedef std::pair<obj_ptr, obj_ptr> obj_pair;
+typedef std::unordered_map<uint64_t, obj_pair> obj_map;
 
 class Object {
  public:
