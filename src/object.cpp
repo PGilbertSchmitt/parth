@@ -15,6 +15,9 @@ std::string obj::type_to_string(obj::obj_type ot) {
     case obj::LIST: {
       return "LIST";
     }
+    case obj::MAP: {
+      return "MAP";
+    }
     case obj::OPTION: {
       return "OPTION";
     }
@@ -117,7 +120,7 @@ obj::obj_type obj::Option::_type() { return obj::OPTION; }
 /* List */
 /********/
 
-obj::List::List(std::vector<obj::obj_ptr> values) : values(values){};
+obj::List::List(obj::obj_list values) : values(values){};
 
 std::string obj::List::inspect() {
   std::string out = "[";
@@ -156,6 +159,57 @@ uint64_t obj::List::hash() {
 }
 
 obj::obj_type obj::List::_type() { return obj::LIST; }
+
+/*******/
+/* MAP */
+/*******/
+
+obj::Map::Map(obj::obj_map pairs) : pairs(pairs) {}
+
+std::string obj::Map::inspect() {
+  // TODO: Switch to stringstream to optimize string concatenation, you fool
+  std::string out = "MAP( ";
+
+  obj::obj_map::const_iterator iter;
+  size_t i;
+  std::cout << "We started from the bottom\n";
+  for (iter = this->pairs.begin(), i = 0; iter != this->pairs.end();
+       iter++, i++) {
+    // Okay, so I've kinda made a mistake in that I don't actually track the
+    // keys, ony the keys' hashes. I will track them in the future, but for
+    // now we must suffer with inspect() only showing the hash string. Oopsie
+    // doodle.
+    out += std::to_string(iter->first);
+    out += ": ";
+    out += iter->second->inspect();
+    if (i < this->pairs.size()) {
+      out += ", ";
+    }
+  }
+
+  return out + " )";
+}
+
+uint64_t obj::Map::hash() {
+  uint8_t zero = 0;
+  uint64_t out = SpookyHash::Hash64(&zero, sizeof(zero), obj::MAP);
+
+  // Since there's no order to a hashmap (or rather, there shouldn't be), each
+  // element's seed is just the key hash, and the message is the value hash
+  obj::obj_map::const_iterator iter;
+  for (iter = this->pairs.begin(); iter != this->pairs.end(); iter++) {
+    uint64_t key_hash = iter->first;
+    obj_ptr val_obj = iter->second;
+    uint64_t val_hash = val_obj->hash();
+    uint64_t element_hash =
+        SpookyHash::Hash64(&val_hash, sizeof(val_hash), key_hash);
+    out ^= element_hash;
+  }
+
+  return out;
+}
+
+obj::obj_type obj::Map::_type() { return obj::MAP; }
 
 /************/
 /* Function */

@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <vector>
 #include "SpookyV2.h"
 #include "ast.h"
@@ -22,6 +23,7 @@ enum obj_type {
   BOOLEAN,
   STRING,
   LIST,
+  MAP,
   OPTION,
   FUNCTION,
   RETURN_VAL,
@@ -36,6 +38,7 @@ class Integer;
 class String;
 class Option;
 class List;
+class Map;
 class Function;
 class ReturnVal;
 class Error;
@@ -46,11 +49,13 @@ typedef std::shared_ptr<Integer> int_ptr;
 typedef std::shared_ptr<String> str_ptr;
 typedef std::shared_ptr<Option> opt_ptr;
 typedef std::shared_ptr<List> arr_ptr;
+typedef std::shared_ptr<Map> map_ptr;
 typedef std::shared_ptr<Function> func_ptr;
 typedef std::shared_ptr<ReturnVal> return_ptr;
 typedef std::shared_ptr<Error> err_ptr;
 
 typedef std::vector<obj_ptr> obj_list;
+typedef std::unordered_map<uint64_t, obj_ptr> obj_map;
 
 class Object {
  public:
@@ -115,6 +120,16 @@ class List : public Object {
  public:
   List(obj_list values);
   const obj_list values;
+
+  std::string inspect();
+  uint64_t hash();
+  obj_type _type();
+};
+
+class Map : public Object {
+ public:
+  Map(obj_map pairs);
+  const obj_map pairs;
 
   std::string inspect();
   uint64_t hash();

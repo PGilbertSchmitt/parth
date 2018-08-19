@@ -44,6 +44,11 @@ obj::obj_ptr eval(ast::node_ptr node, env::env_ptr envir) {
       return evalList(arr_node, envir);
     }
 
+    case ast::MAP: {
+      ast::map_ptr map_node = std::dynamic_pointer_cast<ast::Map>(node);
+      return evalMap(map_node, envir);
+    }
+
     case ast::FUNCTION: {
       ast::func_ptr func_node = std::dynamic_pointer_cast<ast::Function>(node);
       return evalFunctionLiteral(func_node, envir);
@@ -183,6 +188,23 @@ obj::arr_ptr evalList(ast::arr_ptr arr_node, env::env_ptr envir) {
   return obj::arr_ptr(new obj::List(elements));
 }
 
+obj::map_ptr evalMap(ast::map_ptr map_node, env::env_ptr envir) {
+  obj::obj_map evaluated_kvs;
+
+  ast::kv_list::iterator iter;
+  for (iter = map_node->key_value_pairs.begin();
+       iter < map_node->key_value_pairs.end(); iter++) {
+    // The value of the key isn't actually important at the moment (since we're
+    // not doing any additional equality checking and just relying on the
+    // hashes)
+    uint64_t key_hash = eval(iter->first, envir)->hash();
+    obj::obj_ptr value = eval(iter->second, envir);
+    evaluated_kvs[key_hash] = value;
+  }
+
+  return obj::map_ptr(new obj::Map(evaluated_kvs));
+}
+
 obj::func_ptr evalFunctionLiteral(ast::func_ptr func_node, env::env_ptr envir) {
   return obj::func_ptr(new obj::Function(func_node, envir));
 }
@@ -267,7 +289,10 @@ obj::obj_ptr evalAssign(ast::ident_ptr left, ast::node_ptr right,
   obj::obj_ptr value = eval(right, envir);
   if (value->_type() != obj::ERROR) {
     // We will need to do some checks to make sure certain types are cloned so
-    // that they aren't passed around by reference (int, float, bool, string)
+    // that they aren't passed around by reference (int, float, bool, string).
+    // This might be unnecessary if these "cloned" types are immutable simply by
+    // having no method of changing them. However, it could still be safer to
+    // clone explicitly, if a bit inefficient.
     envir->set(left->value, value);
   }
   return value;
