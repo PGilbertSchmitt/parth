@@ -45,5 +45,6 @@ obj::obj_ptr applyFunction(obj::func_ptr, obj::obj_list);
 obj::obj_ptr unwrapReturn(obj::obj_ptr);
 obj::obj_ptr indexlist(obj::arr_ptr, obj::obj_ptr);
 obj::obj_ptr indexString(obj::str_ptr, obj::obj_ptr);
+obj::obj_ptr indexMap(obj::map_ptr, obj::obj_ptr);
 
 #endif

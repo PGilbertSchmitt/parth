@@ -316,9 +316,10 @@ obj::obj_ptr evalIndex(ast::node_ptr left_expr, ast::node_ptr index_expr,
       obj::str_ptr str_obj = std::dynamic_pointer_cast<obj::String>(left_obj);
       return indexString(str_obj, index_obj);
     }
-    // case obj::HASH: {
-    //   // Hash goes here
-    // }
+    case obj::MAP: {
+      obj::map_ptr map_obj = std::dynamic_pointer_cast<obj::Map>(left_obj);
+      return indexMap(map_obj, index_obj);
+    }
     default: {
       throw NoSuchOperatorException(obj::type_to_string(left_obj->_type()) +
                                     " cannot be indexed using []");
@@ -612,4 +613,13 @@ obj::obj_ptr indexString(obj::str_ptr str, obj::obj_ptr index) {
                                     " to index string.");
     }
   }
+}
+
+obj::obj_ptr indexMap(obj::map_ptr map, obj::obj_ptr index) {
+  uint64_t key_hash = index->hash();
+  if (map->pairs.size() == 0 || map->pairs.count(key_hash) == 0) {
+    return NONE_OBJ;
+  }
+  const obj::obj_pair kv = (map->pairs).at(key_hash);
+  return kv.second;
 }
