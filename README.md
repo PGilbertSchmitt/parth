@@ -6,3 +6,13 @@ This project is a small interpreter for the Parth programming language. This lan
 My C++ skills are a bit rusty and were never polished in the first place, so I wouldn't expect this code to be a paragon of structure and design. This is also technically my first interpreter (though I did first implement it in much cleaner Golang, and this started as a migration from that). Because of that, and the fact that I don't have a fancy college degree, Parth will not be the most optimized or the most complete language. However, I've got spunk, free time, and a handful of ideas, and those are the most delicious ingredients in the recipe we call life.
 
 A specification will probably be eventually written maybe (I hope).
+
+## Building
+
+First, clone/fork this repo, then grab the googletest subrepo:
+```bash
+$ git clone git@github.com:PGilbertSchmitt/parth.git
+$ git submodule update --init
+```
+
+Tests are run with `$ make tests`, run main with `$ make run`. I've had trouble with updating the googletest subrepo from the makefile, so it has to be done manually for now.

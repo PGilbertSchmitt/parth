@@ -10,7 +10,8 @@ INC=-I include
 
 #*** GTEST ***#
 
-GTEST_DIR = lib/googletest
+# Need to run git submodules update --init first
+GTEST_DIR = googletest/googletest
 GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
                 $(GTEST_DIR)/include/gtest/internal/*.h
 GTEST_SRCS_ = $(GTEST_DIR)/src/*.cc $(GTEST_DIR)/src/*.h $(GTEST_HEADERS)
