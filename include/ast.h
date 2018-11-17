@@ -26,11 +26,11 @@ enum node_type {
   MAP,
   PREFIX,
   INFIX,
+  GROUP,
   IF_ELSE,
   FUNCTION,
   CALL,
-  INDEX,
-  VALUE
+  INDEX
 };
 
 std::string node_type_string(node_type);
@@ -49,6 +49,7 @@ class List;
 class Map;
 class Prefix;
 class Infix;
+class Group;
 class IfElse;
 class Function;
 class Call;
@@ -68,6 +69,7 @@ typedef std::shared_ptr<List> arr_ptr;
 typedef std::shared_ptr<Map> map_ptr;
 typedef std::shared_ptr<Prefix> prefix_ptr;
 typedef std::shared_ptr<Infix> infix_ptr;
+typedef std::shared_ptr<Group> grp_ptr;
 typedef std::shared_ptr<IfElse> ifelse_ptr;
 typedef std::shared_ptr<Function> func_ptr;
 typedef std::shared_ptr<Call> call_ptr;
@@ -305,6 +307,21 @@ class Infix : public Node {
   Token op;
   node_ptr left;
   node_ptr right;
+
+  std::string to_string();
+  node_type _type();
+};
+
+/* Group Expression
+ * An expression wrapped in parens, which restarts precedence
+ * RETURNS: The internal expression */
+
+class Group : public Node {
+ public:
+  Group(Token token, node_ptr expr);
+
+  Token token;
+  node_ptr expr;
 
   std::string to_string();
   node_type _type();

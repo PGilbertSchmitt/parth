@@ -65,6 +65,11 @@ obj::obj_ptr eval(ast::node_ptr node, env::env_ptr envir) {
       return evalInfix(infix_node, envir);
     } break;
 
+    case ast::GROUP: {
+      ast::grp_ptr group_node = std::dynamic_pointer_cast<ast::Group>(node);
+      return eval(group_node->expr, envir);
+    }
+
     case ast::CALL: {
       ast::call_ptr call_node = std::dynamic_pointer_cast<ast::Call>(node);
       obj::obj_ptr func_eval = eval(call_node->function, envir);

@@ -279,6 +279,21 @@ std::string ast::Infix::to_string() {
 
 ast::node_type ast::Infix::_type() { return ast::INFIX; }
 
+/************************/
+/*** Group Expression ***/
+/************************/
+
+ast::Group::Group(Token token, ast::node_ptr expr) {
+  this->token = token;
+  this->expr = expr;
+}
+
+std::string ast::Group::to_string() {
+  return "(" + this->expr->to_string() + ")";
+}
+
+ast::node_type ast::Group::_type() { return ast::GROUP; }
+
 /*************************/
 /*** IfElse Expression ***/
 /*************************/
@@ -425,12 +440,26 @@ std::string ast::node_type_string(node_type _type) {
       return "BOOLEAN";
     case ast::OPTION:
       return "OPTION";
+    case ast::STRING:
+      return "STRING";
+    case ast::LIST:
+      return "LIST";
+    case ast::MAP:
+      return "MAP";
     case ast::PREFIX:
       return "PREFIX";
     case ast::INFIX:
       return "INFIX";
+    case ast::GROUP:
+      return "GROUP";
     case ast::IF_ELSE:
       return "IF_ELSE";
+    case ast::FUNCTION:
+      return "FUNCTION";
+    case ast::CALL:
+      return "CALL";
+    case ast::INDEX:
+      return "INDEX";
     default:
       return "UNKNOWN";
   }

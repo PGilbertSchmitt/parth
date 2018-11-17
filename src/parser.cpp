@@ -493,12 +493,22 @@ ast::node_ptr parse_function_literal(Parser& p) {
   return ast::func_ptr(new ast::Function(tok, params, body));
 }
 
-// There is no group node type, since a group is just an expression that has
-// been wrapped in parens. It parses the sub expression with the lowest
-// precedence, to shelter it from surrounding expressions
+// The group node type was added mostly as a convenience for map literals, where
+// you can wrap an expression with a group to indicate that the value can be
+// used for the map key. That way, you can use this to set the key to a string
+// of "a":
+// {
+//   a: "value 1"
+// }
+//
+// While here, you can set the key to be the value of variable a:
+// {
+//   (a): "value 1"
+// }
 ast::node_ptr parse_group(Parser& p) {
+  Token cur = p.get_cur_token();
   p.next_token();
   ast::node_ptr expr = p.parse_expression(Parser::LOWEST);
   p.expect_peek(TokenType::RPAREN);
-  return expr;
+  return ast::grp_ptr(new ast::Group(cur, expr));
 }
