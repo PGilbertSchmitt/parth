@@ -126,7 +126,7 @@ class Option : public Object {
 class List : public Object {
  public:
   List(obj_list values);
-  const obj_list values;
+  obj_list values;
 
   std::string inspect();
   uint64_t hash();
@@ -136,7 +136,7 @@ class List : public Object {
 class Map : public Object {
  public:
   Map(obj_map pairs);
-  const obj_map pairs;
+  obj_map pairs;
 
   std::string inspect();
   uint64_t hash();

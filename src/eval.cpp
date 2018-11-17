@@ -229,6 +229,11 @@ obj::obj_ptr evalInfix(ast::infix_ptr infix_node, env::env_ptr envir) {
     return evalAssign(left, right_node, envir);
   }
 
+  if (left_node->_type() == ast::INDEX && op.get_type() == TokenType::ASSIGN) {
+    ast::index_ptr left = std::dynamic_pointer_cast<ast::Index>(left_node);
+    return evalIndexAssign(left, right_node, envir);
+  }
+
   obj::obj_ptr left_eval = eval(left_node, envir);
   obj::obj_ptr right_eval = eval(right_node, envir);
 
@@ -307,6 +312,30 @@ obj::obj_ptr evalAssign(ast::ident_ptr left, ast::node_ptr right,
   return value;
 }
 
+obj::obj_ptr evalIndexAssign(ast::index_ptr left, ast::node_ptr right,
+                             env::env_ptr envir) {
+  obj::obj_ptr left_obj = eval(left->left, envir);
+  obj::obj_ptr index = eval(left->index, envir);
+  obj::obj_ptr value = eval(right, envir);
+
+  switch (left_obj->_type()) {
+    case obj::LIST: {
+      obj::arr_ptr list_obj = std::dynamic_pointer_cast<obj::List>(left_obj);
+      return indexList(list_obj, index, value);
+    }
+    case obj::MAP: {
+      obj::map_ptr map_obj = std::dynamic_pointer_cast<obj::Map>(left_obj);
+      return indexMap(map_obj, index, value);
+    }
+    default: {
+      throw NoSuchOperatorException(obj::type_to_string(left_obj->_type()) +
+                                    " cannot be indexed using []");
+    }
+  }
+
+  return value;
+}
+
 obj::obj_ptr evalIndex(ast::node_ptr left_expr, ast::node_ptr index_expr,
                        env::env_ptr envir) {
   obj::obj_ptr left_obj = eval(left_expr, envir);
@@ -315,7 +344,7 @@ obj::obj_ptr evalIndex(ast::node_ptr left_expr, ast::node_ptr index_expr,
   switch (left_obj->_type()) {
     case obj::LIST: {
       obj::arr_ptr list_obj = std::dynamic_pointer_cast<obj::List>(left_obj);
-      return indexlist(list_obj, index_obj);
+      return indexList(list_obj, index_obj);
     }
     case obj::STRING: {
       obj::str_ptr str_obj = std::dynamic_pointer_cast<obj::String>(left_obj);
@@ -578,15 +607,24 @@ obj::obj_ptr unwrapReturn(obj::obj_ptr val) {
   return val;
 }
 
-obj::obj_ptr indexlist(obj::arr_ptr list, obj::obj_ptr index) {
+obj::obj_ptr indexList(obj::arr_ptr list, obj::obj_ptr index,
+                       obj::obj_ptr value) {
   switch (index->_type()) {
     case obj::INTEGER: {
       obj::int_ptr int_obj = std::dynamic_pointer_cast<obj::Integer>(index);
-      int64_t val = int_obj->value;
-      if (val < 0 || static_cast<uint64_t>(val) >= list->values.size()) {
+      int64_t ind = int_obj->value;
+      if (ind < 0 || static_cast<uint64_t>(ind) >= list->values.size()) {
         return NONE_OBJ;
       }
-      return list->values.at(val);
+
+      // Return value if not an assignment
+      if (value != nullptr) {
+        return list->values.at(ind);
+      }
+
+      // Set list value at index and return passed value if assignment
+      list->values.assign(ind, value);
+      return value;
     } break;
     // case obj::FUNCTION: {
     //   // TODO: When 'map' builtin is written, use that here
@@ -620,11 +658,25 @@ obj::obj_ptr indexString(obj::str_ptr str, obj::obj_ptr index) {
   }
 }
 
-obj::obj_ptr indexMap(obj::map_ptr map, obj::obj_ptr index) {
+obj::obj_ptr indexMap(obj::map_ptr map, obj::obj_ptr index,
+                      obj::obj_ptr value) {
   uint64_t key_hash = index->hash();
-  if (map->pairs.size() == 0 || map->pairs.count(key_hash) == 0) {
-    return NONE_OBJ;
+
+  bool has_key = map->pairs.count(key_hash) > 0;
+
+  if (value == nullptr) {
+    if (map->pairs.size() == 0 || !has_key) {
+      return NONE_OBJ;
+    }
+
+    const obj::obj_pair kv = (map->pairs).at(key_hash);
+    return kv.second;
   }
-  const obj::obj_pair kv = (map->pairs).at(key_hash);
-  return kv.second;
+
+  obj::obj_pair new_kv_pair;
+  new_kv_pair.first = index;
+  new_kv_pair.second = value;
+
+  (map->pairs).at(key_hash) = new_kv_pair;
+  return value;
 }
