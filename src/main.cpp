@@ -9,7 +9,31 @@
 
 int main() {
   std::string input = R"INPUT(
-let a = len("yo")
+print("int:", 1)
+
+print("bool:", false)
+
+print("string")
+
+print("list:", [0, 1, 2])
+
+let m = {
+  foo: "bar",
+  baz: "flu"
+}
+print("map:", m)
+
+let f = (a, b) => {
+  c = a * a
+  c + b
+}
+print("func:", f)
+
+let havent?
+print("none:", havent)
+
+let have? = 9
+print("opt:", have)
 )INPUT";
 
   Lexer l = Lexer(input);

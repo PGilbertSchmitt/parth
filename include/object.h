@@ -71,9 +71,16 @@ typedef obj::obj_ptr (*BI)(obj::obj_list);
 
 class Object {
  public:
+  // Print is meant for pretty printing by the print-based builtins
+  virtual std::string print() = 0;
+  // Inspect is uglier and intended for code inspection. Some objects make more
+  // contextual sense when inspected, such as strings being surrounded by quotes
   virtual std::string inspect() = 0;
   virtual uint64_t hash() = 0;
   virtual obj_type _type() = 0;
+
+ protected:
+  std::string wrap(std::string);
 };
 
 class Integer : public Object {
@@ -81,6 +88,7 @@ class Integer : public Object {
   Integer(int64_t value);
   const int64_t value;
 
+  std::string print();
   std::string inspect();
   uint64_t hash();
   obj_type _type();
@@ -96,6 +104,7 @@ class Bool : public Object {
   Bool(bool value);
   const bool value;
 
+  std::string print();
   std::string inspect();
   uint64_t hash();
   obj_type _type();
@@ -109,6 +118,7 @@ class String : public Object {
   String(std::string value);
   const std::string value;
 
+  std::string print();
   std::string inspect();
   uint64_t hash();
   obj_type _type();
@@ -123,6 +133,7 @@ class Option : public Object {
   Option(obj_ptr);
   obj_ptr value;
 
+  std::string print();
   std::string inspect();
   uint64_t hash();
   obj_type _type();
@@ -133,6 +144,7 @@ class List : public Object {
   List(obj_list values);
   obj_list values;
 
+  std::string print();
   std::string inspect();
   uint64_t hash();
   obj_type _type();
@@ -143,6 +155,7 @@ class Map : public Object {
   Map(obj_map pairs);
   obj_map pairs;
 
+  std::string print();
   std::string inspect();
   uint64_t hash();
   obj_type _type();
@@ -154,6 +167,7 @@ class Function : public Object {
   ast::func_ptr func_node;
   env::env_ptr envir;
 
+  std::string print();
   std::string inspect();
   uint64_t hash();
   obj_type _type();
@@ -167,6 +181,7 @@ class Builtin : public Object {
   Builtin(BI);
   BI fn;
 
+  std::string print();
   std::string inspect();
   uint64_t hash();
   obj_type _type();
@@ -177,6 +192,7 @@ class ReturnVal : public Object {
   ReturnVal(obj_ptr o);
   obj_ptr value;
 
+  std::string print();
   std::string inspect();
   uint64_t hash();
   obj_type _type();
@@ -187,6 +203,7 @@ class Error : public Object {
   Error(std::string err);
   std::string err;
 
+  std::string print();
   std::string inspect();
   uint64_t hash();
   obj_type _type();

@@ -12,6 +12,7 @@
 #include "lexer.h"
 #include "token.h"
 #include "token_type.h"
+#include "util.h"
 
 // This parser is a Pratt parser, which is an improved recursive descent,
 // top-down method of parsing a token stream using operator precedence. To be

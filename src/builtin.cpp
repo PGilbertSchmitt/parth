@@ -73,7 +73,7 @@ obj::obj_ptr print(obj::obj_list args) {
 
   std::ostringstream oss;
   for (auto arg = args.begin(); arg != args.end(); arg++) {
-    oss << (*arg)->inspect();
+    oss << (*arg)->print();
     if (next(arg) != args.end()) {
       oss << " ";
     }

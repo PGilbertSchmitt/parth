@@ -37,6 +37,14 @@ std::string obj::type_to_string(obj::obj_type ot) {
   }
 }
 
+/**********/
+/* Object */
+/**********/
+
+std::string obj::Object::wrap(std::string wrapper) {
+  return (wrapper + "(" + this->print() + ")");
+}
+
 /***********/
 /* Integer */
 /***********/
@@ -46,7 +54,9 @@ obj::Integer::Integer(int64_t _value) : value(_value) {
       SpookyHash::Hash64(&(_value), sizeof(_value), obj::INTEGER);
 }
 
-std::string obj::Integer::inspect() { return std::to_string(this->value); }
+std::string obj::Integer::print() { return std::to_string(this->value); }
+
+std::string obj::Integer::inspect() { return wrap("INT"); }
 
 uint64_t obj::Integer::hash() { return this->hash_cache; }
 
@@ -61,13 +71,15 @@ obj::Bool::Bool(bool _value) : value(_value) {
       SpookyHash::Hash64(&(_value), sizeof(_value), obj::BOOLEAN);
 }
 
-std::string obj::Bool::inspect() {
+std::string obj::Bool::print() {
   if (this->value) {
     return "true";
   } else {
     return "false";
   }
 }
+
+std::string obj::Bool::inspect() { return wrap("BOOL"); }
 
 uint64_t obj::Bool::hash() { return this->hash_cache; }
 
@@ -82,7 +94,9 @@ obj::String::String(std::string _value) : value(_value) {
       SpookyHash::Hash64(_value.c_str(), _value.length(), obj::STRING);
 }
 
-std::string obj::String::inspect() { return "\"" + this->value + "\""; }
+std::string obj::String::print() { return this->value; }
+
+std::string obj::String::inspect() { return wrap("STR"); }
 
 uint64_t obj::String::hash() { return this->hash_cache; }
 
@@ -95,6 +109,16 @@ obj::obj_type obj::String::_type() { return obj::STRING; }
 obj::Option::Option() : value(nullptr){};
 
 obj::Option::Option(obj_ptr value) : value(value){};
+
+std::string obj::Option::print() {
+  // For pretty printing, I just want to show the internals. The surrounding
+  // option construct is more necessary for inspection.
+  if (this->value == nullptr) {
+    return "NONE";
+  } else {
+    return this->value->print();
+  }
+}
 
 std::string obj::Option::inspect() {
   if (this->value == nullptr) {
@@ -125,19 +149,22 @@ obj::obj_type obj::Option::_type() { return obj::OPTION; }
 
 obj::List::List(obj::obj_list values) : values(values){};
 
-std::string obj::List::inspect() {
-  std::string out = "[";
+std::string obj::List::inspect() { return wrap("LIST"); }
 
-  std::vector<obj::obj_ptr>::const_iterator element, last;
-  last = --(values.cend());
-  for (element = values.begin(); element != values.end(); element++) {
-    out += (*element)->inspect();
-    if (element != last) {
-      out += ", ";
+std::string obj::List::print() {
+  std::ostringstream oss;
+  oss << "[ ";
+
+  // std::vector<obj::obj_ptr>::const_iterator element, last;
+  for (auto element = values.begin(); element != values.end(); element++) {
+    oss << (*element)->print();
+    if (next(element) != values.end()) {
+      oss << ", ";
     }
   }
 
-  return out + "]";
+  oss << " ]";
+  return oss.str();
 }
 
 // Proud of this one (assuming it works). Much like options, the hash is
@@ -170,23 +197,43 @@ obj::obj_type obj::List::_type() { return obj::LIST; }
 obj::Map::Map(obj::obj_map pairs) : pairs(pairs) {}
 
 std::string obj::Map::inspect() {
-  // TODO: Switch to stringstream to optimize string concatenation, you fool
-  std::string out = "MAP( ";
+  std::ostringstream oss;
+  oss << "MAP( ";
 
   obj::obj_map::const_iterator iter;
   size_t i;
-  std::cout << "We started from the bottom\n";
   for (iter = this->pairs.begin(), i = 1; iter != this->pairs.end();
        iter++, i++) {
-    out += iter->second.first->inspect();
-    out += ": ";
-    out += iter->second.second->inspect();
+    oss << iter->second.first->inspect();
+    oss << ": ";
+    oss << iter->second.second->inspect();
     if (i < this->pairs.size()) {
-      out += ", ";
+      oss << ", ";
     }
   }
 
-  return out + " )";
+  oss << " )";
+  return oss.str();
+}
+
+std::string obj::Map::print() {
+  std::ostringstream oss;
+  oss << "{ ";
+
+  obj::obj_map::const_iterator iter;
+  size_t i;
+  for (iter = this->pairs.begin(), i = 1; iter != this->pairs.end();
+       iter++, i++) {
+    oss << iter->second.first->print();
+    oss << ": ";
+    oss << iter->second.second->print();
+    if (i < this->pairs.size()) {
+      oss << ", ";
+    }
+  }
+
+  oss << " }";
+  return oss.str();
 }
 
 uint64_t obj::Map::hash() {
@@ -228,7 +275,12 @@ obj::Function::Function(ast::func_ptr func_node, env::env_ptr envir)
       SpookyHash::Hash64(&rand_seed, sizeof(rand_seed), obj::FUNCTION);
 }
 
-std::string obj::Function::inspect() { return func_node->to_string(); }
+// This is the ugly print that I'm worried about, but I don't feel like printing
+// functions is an essential capability. For all intents and purposes, printing
+// a function is equivalent to inspection
+std::string obj::Function::print() { return func_node->to_string(); }
+
+std::string obj::Function::inspect() { return wrap("FUNC"); }
 
 uint64_t obj::Function::hash() { return this->hash_cache; }
 
@@ -240,7 +292,10 @@ obj::obj_type obj::Function::_type() { return obj::FUNCTION; }
 
 obj::Builtin::Builtin(BI bi) : fn(bi) {}
 
-std::string obj::Builtin::inspect() { return "Builtin"; }
+// Not sure about printing for builtins. May need to add name member
+std::string obj::Builtin::print() { return "BI"; }
+
+std::string obj::Builtin::inspect() { return "BI"; }
 
 uint64_t obj::Builtin::hash() { return 0; }
 
@@ -252,8 +307,10 @@ obj::obj_type obj::Builtin::_type() { return obj::BUILTIN; }
 
 obj::ReturnVal::ReturnVal(obj_ptr o) : value(o) {}
 
+std::string obj::ReturnVal::print() { return this->value->print(); }
+
 std::string obj::ReturnVal::inspect() {
-  return "return(" + this->value->inspect() + ")";
+  return "RETURN(" + this->value->inspect() + ")";
 }
 
 uint64_t obj::ReturnVal::hash() {
@@ -271,7 +328,9 @@ obj::obj_type obj::ReturnVal::_type() { return obj::RETURN_VAL; }
 
 obj::Error::Error(std::string err) : err(err) {}
 
-std::string obj::Error::inspect() { return this->err; }
+std::string obj::Error::print() { return this->err; }
+
+std::string obj::Error::inspect() { return wrap("ERR"); }
 
 uint64_t obj::Error::hash() {
   // Errors don't really need a hash value, and aren't even being used yet
