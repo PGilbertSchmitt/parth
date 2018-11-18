@@ -26,6 +26,7 @@ enum obj_type {
   MAP,
   OPTION,
   FUNCTION,
+  BUILTIN,
   RETURN_VAL,
   ERROR
 };
@@ -40,6 +41,7 @@ class Option;
 class List;
 class Map;
 class Function;
+class Builtin;
 class ReturnVal;
 class Error;
 
@@ -51,6 +53,7 @@ typedef std::shared_ptr<Option> opt_ptr;
 typedef std::shared_ptr<List> arr_ptr;
 typedef std::shared_ptr<Map> map_ptr;
 typedef std::shared_ptr<Function> func_ptr;
+typedef std::shared_ptr<Builtin> builtin_ptr;
 typedef std::shared_ptr<ReturnVal> return_ptr;
 typedef std::shared_ptr<Error> err_ptr;
 
@@ -63,6 +66,8 @@ typedef std::vector<obj_ptr> obj_list;
 // I know it's gross, I'll figure something out. Maybe it's own class...
 typedef std::pair<obj_ptr, obj_ptr> obj_pair;
 typedef std::unordered_map<uint64_t, obj_pair> obj_map;
+// Forward declaration of builtin type for builtin object
+typedef obj::obj_ptr (*BI)(obj::obj_list);
 
 class Object {
  public:
@@ -155,6 +160,16 @@ class Function : public Object {
 
  private:
   uint64_t hash_cache;
+};
+
+class Builtin : public Object {
+ public:
+  Builtin(BI);
+  BI fn;
+
+  std::string inspect();
+  uint64_t hash();
+  obj_type _type();
 };
 
 class ReturnVal : public Object {

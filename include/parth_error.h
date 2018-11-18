@@ -66,7 +66,7 @@ class InvalidArgsException : public std::exception {
 
   std::string message;
 
-  virtual const char *wha() const throw() { return message.c_str(); }
+  virtual const char *what() const throw() { return message.c_str(); }
 };
 
 #endif

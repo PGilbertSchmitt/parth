@@ -4,13 +4,10 @@
 #include <memory>
 #include <vector>
 #include "ast.h"
+#include "builtin.h"
 #include "environment.h"
 #include "object.h"
 #include "parth_error.h"
-
-const obj::bool_ptr TRUE_OBJ = obj::bool_ptr(new obj::Bool(true));
-const obj::bool_ptr FALSE_OBJ = obj::bool_ptr(new obj::Bool(false));
-const obj::opt_ptr NONE_OBJ = obj::opt_ptr(new obj::Option());
 
 obj::obj_ptr eval(ast::node_ptr, env::env_ptr);
 
@@ -42,10 +39,13 @@ obj::obj_ptr evalIfElse(ast::ifelse_ptr, env::env_ptr);
 obj::bool_ptr truthiness(obj::obj_ptr, bool = false);
 obj::bool_ptr nativeBoolToObject(bool);
 obj::obj_list evalExpressionList(ast::node_list, env::env_ptr);
-obj::obj_ptr applyFunction(obj::func_ptr, obj::obj_list);
+obj::obj_ptr applyFunction(obj::obj_ptr, obj::obj_list);
 obj::obj_ptr unwrapReturn(obj::obj_ptr);
 obj::obj_ptr indexList(obj::arr_ptr, obj::obj_ptr, obj::obj_ptr = nullptr);
 obj::obj_ptr indexString(obj::str_ptr, obj::obj_ptr);
 obj::obj_ptr indexMap(obj::map_ptr, obj::obj_ptr, obj::obj_ptr = nullptr);
+
+// For quick debugging-via-prints;
+void bust(std::string);
 
 #endif

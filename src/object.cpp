@@ -24,6 +24,9 @@ std::string obj::type_to_string(obj::obj_type ot) {
     case obj::FUNCTION: {
       return "FUNCTION";
     }
+    case obj::BUILTIN: {
+      return "BUILTIN";
+    }
     case obj::RETURN_VAL: {
       return "RETURN_VAL";
     }
@@ -230,6 +233,18 @@ std::string obj::Function::inspect() { return func_node->to_string(); }
 uint64_t obj::Function::hash() { return this->hash_cache; }
 
 obj::obj_type obj::Function::_type() { return obj::FUNCTION; }
+
+/***********/
+/* Builtin */
+/***********/
+
+obj::Builtin::Builtin(BI bi) : fn(bi) {}
+
+std::string obj::Builtin::inspect() { return "Builtin"; }
+
+uint64_t obj::Builtin::hash() { return 0; }
+
+obj::obj_type obj::Builtin::_type() { return obj::BUILTIN; }
 
 /******************/
 /* Return Wrapper */

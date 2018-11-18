@@ -72,15 +72,16 @@ obj::obj_ptr eval(ast::node_ptr node, env::env_ptr envir) {
 
     case ast::CALL: {
       ast::call_ptr call_node = std::dynamic_pointer_cast<ast::Call>(node);
-      obj::obj_ptr func_eval = eval(call_node->function, envir);
-      if (func_eval->_type() != obj::FUNCTION) {
+      obj::obj_ptr callable = eval(call_node->function, envir);
+
+      if (callable->_type() != obj::FUNCTION &&
+          callable->_type() != obj::BUILTIN) {
         throw NoSuchOperatorException("No call operation on type " +
-                                      obj::type_to_string(func_eval->_type()));
+                                      obj::type_to_string(callable->_type()));
       }
-      obj::func_ptr func_obj =
-          std::dynamic_pointer_cast<obj::Function>(func_eval);
+
       obj::obj_list args = evalExpressionList(call_node->args, envir);
-      return applyFunction(func_obj, args);
+      return applyFunction(callable, args);
     } break;
 
     case ast::INDEX: {
@@ -106,7 +107,7 @@ obj::obj_ptr eval(ast::node_ptr node, env::env_ptr envir) {
 obj::obj_ptr evalBlock(ast::block_ptr block_node, env::env_ptr envir) {
   obj::obj_ptr result;
 
-  std::vector<ast::node_ptr>::iterator node = block_node->nodes.begin();
+  ast::node_list::iterator node = block_node->nodes.begin();
   while (node != block_node->nodes.end()) {
     // Dereferencing a smart pointer seems like an oxymoron
     result = eval(*node, envir);
@@ -125,7 +126,15 @@ obj::obj_ptr evalBlock(ast::block_ptr block_node, env::env_ptr envir) {
 }
 
 obj::obj_ptr evalIdent(ast::ident_ptr ident, env::env_ptr envir) {
+  // First gotta check if this ident belongs to a builtin
+
+  if (Builtins::is_builtin(ident->value)) {
+    BI bi = Builtins::get_builtin(ident->value);
+    return obj::builtin_ptr(new obj::Builtin(bi));
+  }
+
   obj::obj_ptr value = envir->get(ident->value);
+
   if (value != nullptr) {
     return value;
   } else {
@@ -576,7 +585,15 @@ obj::obj_list evalExpressionList(ast::node_list exprs, env::env_ptr envir) {
   return values;
 }
 
-obj::obj_ptr applyFunction(obj::func_ptr func_obj, obj::obj_list args) {
+obj::obj_ptr applyFunction(obj::obj_ptr callable, obj::obj_list args) {
+  if (callable->_type() == obj::BUILTIN) {
+    obj::builtin_ptr builtin =
+        std::dynamic_pointer_cast<obj::Builtin>(callable);
+    return builtin->fn(args);
+  }
+
+  // If not a builtin, can only be a regular function
+  obj::func_ptr func_obj = std::dynamic_pointer_cast<obj::Function>(callable);
   ast::param_list params = func_obj->func_node->params;
   if (params.size() != args.size()) {
     throw InvalidArgsException("Incorrect number of args given");
@@ -680,3 +697,5 @@ obj::obj_ptr indexMap(obj::map_ptr map, obj::obj_ptr index,
   (map->pairs).at(key_hash) = new_kv_pair;
   return value;
 }
+
+void bust(std::string str) { std::cout << str << std::endl; }
