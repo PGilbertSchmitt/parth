@@ -3,7 +3,10 @@
 builtin_map Builtins::all_builtins = {
     // Builtin mappings
     {"len", &len},
-    {"print", &print}};
+    {"size", &len},
+    {"count", &len},
+    {"print", &print},
+};
 
 bool Builtins::is_builtin(std::string name) {
   return Builtins::all_builtins.count(name) > 0;
@@ -20,6 +23,7 @@ BI Builtins::get_builtin(std::string name) {
 // len() accepts one argument that can only be a list, string, map, or option.
 // Returns the length of the string/array as an integer object, or number of
 // key/value pairs in the map, or 1/0 for a filled/none option respectively.
+// Alias: size, count
 
 obj::obj_ptr len(obj::obj_list args) {
   if (args.size() != 1) {
