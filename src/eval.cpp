@@ -161,14 +161,14 @@ obj::obj_ptr evalIdentLet(ast::let_ptr let, env::env_ptr envir) {
 }
 
 obj::obj_ptr evalOptLet(ast::let_ptr let, env::env_ptr envir) {
+  // Casting is required. Attempting to access `value` won't work otherwise. I'm
+  // not certain why this is, but I do not question Bjarne Stroustrup
+  std::string name = std::dynamic_pointer_cast<ast::Option>(let->name)->value;
+
   if (let->expression != nullptr) {
     obj::obj_ptr right = eval(let->expression, envir);
     if (right->_type() != obj::ERROR) {
       obj::opt_ptr opt = obj::opt_ptr(new obj::Option(right));
-      // Casting is required. Attempting to access `value` won't work otherwise.
-      // I'm not certain why this is, but I do not question Bjarne Stroustrup
-      std::string name =
-          std::dynamic_pointer_cast<ast::Option>(let->name)->value;
       envir->init(name, opt);
       return opt;
     } else {
@@ -176,7 +176,7 @@ obj::obj_ptr evalOptLet(ast::let_ptr let, env::env_ptr envir) {
     }
   } else {
     obj::opt_ptr opt = NONE_OBJ;
-    envir->init(let->name->value, opt);
+    envir->init(name, opt);
     return opt;
   }
 }
@@ -697,5 +697,3 @@ obj::obj_ptr indexMap(obj::map_ptr map, obj::obj_ptr index,
   (map->pairs).at(key_hash) = new_kv_pair;
   return value;
 }
-
-void bust(std::string str) { std::cout << str << std::endl; }
