@@ -264,6 +264,16 @@ obj::obj_type obj::Map::_type() { return obj::MAP; }
 /* Range */
 /*********/
 
+bool obj::Range::forward() { return end->value >= start->value; }
+
+bool obj::Range::between(int64_t x) {
+  if (forward()) {
+    return start->value <= x && x <= end->value;
+  } else {
+    return end->value <= x && x <= start->value;
+  }
+}
+
 obj::Range::Range(obj::int_ptr start, obj::int_ptr end)
     : start(start), end(end) {}
 

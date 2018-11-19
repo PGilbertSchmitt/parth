@@ -383,6 +383,11 @@ obj::obj_ptr evalIndex(ast::node_ptr left_expr, ast::node_ptr index_expr,
       obj::map_ptr map_obj = std::dynamic_pointer_cast<obj::Map>(left_obj);
       return indexMap(map_obj, index_obj);
     }
+    case obj::RANGE: {
+      obj::range_ptr range_obj =
+          std::dynamic_pointer_cast<obj::Range>(left_obj);
+      return indexRange(range_obj, index_obj);
+    }
     default: {
       throw NoSuchOperatorException(obj::type_to_string(left_obj->_type()) +
                                     " cannot be indexed using []");
@@ -630,7 +635,7 @@ obj::bool_ptr truthiness(obj::obj_ptr input, bool negate) {
     } break;
     case obj::RANGE: {
       obj::range_ptr range_obj = std::dynamic_pointer_cast<obj::Range>(input);
-      new_val = range_obj->start->value <= range_obj->end->value;
+      new_val = range_obj->forward();
     } break;
     default: {}
   }
@@ -761,4 +766,30 @@ obj::obj_ptr indexMap(obj::map_ptr map, obj::obj_ptr index,
 
   (map->pairs).at(key_hash) = new_kv_pair;
   return value;
+}
+
+obj::obj_ptr indexRange(obj::range_ptr range, obj::obj_ptr index) {
+  switch (index->_type()) {
+    case obj::INTEGER: {
+      obj::int_ptr int_obj = std::dynamic_pointer_cast<obj::Integer>(index);
+      int64_t key = int_obj->value;
+      if (!range->forward()) {
+        key *= -1;
+      }
+      int64_t potential_value = range->start->value + key;
+      if (range->between(potential_value)) {
+        return obj::int_ptr(new obj::Integer(potential_value));
+      }
+
+      return NONE_OBJ;
+    } break;
+    // case obj::FUNCTION: {
+
+    // } break;
+    default: {
+      throw NoSuchOperatorException("Cannot use " +
+                                    obj::type_to_string(index->_type()) +
+                                    " to index range.");
+    }
+  }
 }

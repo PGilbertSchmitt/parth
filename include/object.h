@@ -8,6 +8,7 @@
 #include <vector>
 #include "SpookyV2.h"
 #include "ast.h"
+#include "util.h"
 
 // Need to forward declare environment
 namespace env {
@@ -169,6 +170,9 @@ class Range : public Object {
   Range(int_ptr start, int_ptr end);
   const int_ptr start;
   const int_ptr end;
+
+  bool forward();
+  bool between(int64_t);
 
   std::string print();
   std::string inspect();

@@ -46,5 +46,6 @@ obj::obj_ptr unwrapReturn(obj::obj_ptr);
 obj::obj_ptr indexList(obj::arr_ptr, obj::obj_ptr, obj::obj_ptr = nullptr);
 obj::obj_ptr indexString(obj::str_ptr, obj::obj_ptr);
 obj::obj_ptr indexMap(obj::map_ptr, obj::obj_ptr, obj::obj_ptr = nullptr);
+obj::obj_ptr indexRange(obj::range_ptr, obj::obj_ptr);
 
 #endif
