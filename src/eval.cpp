@@ -227,11 +227,16 @@ obj::func_ptr evalFunctionLiteral(ast::func_ptr func_node, env::env_ptr envir) {
   return obj::func_ptr(new obj::Function(func_node, envir));
 }
 
+// There may be a cleaner way to evaluate infix expressions, but that's for
+// another day
 obj::obj_ptr evalInfix(ast::infix_ptr infix_node, env::env_ptr envir) {
   // Special cases first
   Token op = infix_node->op;
   ast::node_ptr left_node = infix_node->left;
   ast::node_ptr right_node = infix_node->right;
+
+  // Assignment needs to be checked first, since we don't want to evaluate the
+  // variable
 
   if (left_node->_type() == ast::IDENT && op.get_type() == TokenType::ASSIGN) {
     ast::ident_ptr left = std::dynamic_pointer_cast<ast::Identifier>(left_node);
@@ -246,12 +251,21 @@ obj::obj_ptr evalInfix(ast::infix_ptr infix_node, env::env_ptr envir) {
   obj::obj_ptr left_eval = eval(left_node, envir);
   obj::obj_ptr right_eval = eval(right_node, envir);
 
+  // Next, we can check any other operator-dependent expressions
+
   if (op.get_type() == TokenType::DOUBLE_AMP ||
       op.get_type() == TokenType::DOUBLE_PIPE) {
     obj::bool_ptr left_bool = truthiness(left_eval);
     obj::bool_ptr right_bool = truthiness(right_eval);
     return evalBoolInfixOperator(op, left_bool, right_bool);
   }
+
+  if (op.get_type() == TokenType::DOUBLE_DOT ||
+      op.get_type() == TokenType::TRIPLE_DOT) {
+    return evalRangeInfixOperator(op, left_eval, right_eval);
+  }
+
+  // Lastly, the operand types determine which kind of expression this could be
 
   if (left_eval->_type() == obj::INTEGER &&
       right_eval->_type() == obj::INTEGER) {
@@ -487,6 +501,34 @@ obj::obj_ptr evalListInfixOperator(Token op, obj::arr_ptr left,
   }
 }
 
+obj::obj_ptr evalRangeInfixOperator(Token op, obj::obj_ptr left,
+                                    obj::obj_ptr right) {
+  // Doing validation here to keep the evalInfix function a little cleaner
+  if (left->_type() != obj::INTEGER || right->_type() != obj::INTEGER) {
+    throw InvalidArgsException("Range expression expects int types, received " +
+                               obj::type_to_string(left->_type()) + ".." +
+                               obj::type_to_string(right->_type()));
+  }
+
+  obj::int_ptr start = std::dynamic_pointer_cast<obj::Integer>(left);
+  obj::int_ptr end = std::dynamic_pointer_cast<obj::Integer>(right);
+
+  // Triple-dot range means it excludes the end integer, and only includes up to
+  // the integer before the end. For a backwards range, we gotta add to the end
+  // value rather than subtract. The exception is if the start and end are the
+  // same, in which case it's always a range of 1. These decisions may seem
+  // arbitrary, and that's because they kinda are.
+  if (op.get_type() == TokenType::TRIPLE_DOT && start->value != end->value) {
+    int8_t mod = 1;
+    if (start->value < end->value) {
+      mod *= -1;
+    }
+    end = obj::int_ptr(new obj::Integer(end->value + mod));
+  }
+
+  return obj::range_ptr(new obj::Range(start, end));
+}
+
 obj::obj_ptr evalMinusOperator(obj::int_ptr num) {
   return obj::int_ptr(new obj::Integer(-1 * num->value));
 }
@@ -543,8 +585,16 @@ obj::obj_ptr evalIfElse(ast::ifelse_ptr ifelse_node, env::env_ptr envir) {
 // - 0     (int)
 // - ""    (string)
 // - []    (list)
-// - {}    (hash)
+// - {}    (map)
 // - none  (option)
+// - 2..1  (backwards range)
+
+// NOTE: Since a range will always contain at least one integer (3...4 , 3..3),
+// I've decided that the most gratifying way to consider a range truthy or falsy
+// was whether or not it goes backwards. So (1..3) is truthy while (3..1) is
+// falsy. That seems like a useful shortcut. A range with the same start and end
+// is considered truthy.
+
 obj::bool_ptr truthiness(obj::obj_ptr input, bool negate) {
   bool new_val = false;
   switch (input->_type()) {
@@ -555,18 +605,27 @@ obj::bool_ptr truthiness(obj::obj_ptr input, bool negate) {
       obj::int_ptr int_obj = std::dynamic_pointer_cast<obj::Integer>(input);
       new_val = int_obj->value != 0;
     } break;
-    case obj::OPTION: {
-      obj::opt_ptr opt_obj = std::dynamic_pointer_cast<obj::Option>(input);
-      new_val = opt_obj->value != nullptr;
-    } break;
     case obj::STRING: {
       obj::str_ptr str_obj = std::dynamic_pointer_cast<obj::String>(input);
       new_val = str_obj->value != "";
     } break;
     case obj::LIST: {
       obj::arr_ptr arr_obj = std::dynamic_pointer_cast<obj::List>(input);
-      new_val = !(arr_obj->values.size() == 0);
-    }
+      new_val = arr_obj->values.size() != 0;
+    } break;
+    case obj::MAP: {
+      obj::map_ptr map_obj = std::dynamic_pointer_cast<obj::Map>(input);
+      // Hoping this works, I'll have to test this
+      new_val = map_obj->pairs.size() != 0;
+    } break;
+    case obj::OPTION: {
+      obj::opt_ptr opt_obj = std::dynamic_pointer_cast<obj::Option>(input);
+      new_val = opt_obj->value != nullptr;
+    } break;
+    case obj::RANGE: {
+      obj::range_ptr range_obj = std::dynamic_pointer_cast<obj::Range>(input);
+      new_val = range_obj->start->value <= range_obj->end->value;
+    } break;
     default: {}
   }
   return nativeBoolToObject(new_val ^ negate);

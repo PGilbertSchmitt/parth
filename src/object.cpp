@@ -5,34 +5,37 @@ std::string obj::type_to_string(obj::obj_type ot) {
   switch (ot) {
     case obj::INTEGER: {
       return "INTEGER";
-    }
+    } break;
     case obj::BOOLEAN: {
       return "BOOLEAN";
-    }
+    } break;
     case obj::STRING: {
       return "STRING";
-    }
+    } break;
     case obj::LIST: {
       return "LIST";
-    }
+    } break;
     case obj::MAP: {
       return "MAP";
-    }
+    } break;
+    case obj::RANGE: {
+      return "RANGE";
+    } break;
     case obj::OPTION: {
       return "OPTION";
-    }
+    } break;
     case obj::FUNCTION: {
       return "FUNCTION";
-    }
+    } break;
     case obj::BUILTIN: {
       return "BUILTIN";
-    }
+    } break;
     case obj::RETURN_VAL: {
       return "RETURN_VAL";
-    }
+    } break;
     case obj::ERROR: {
       return "ERROR";
-    }
+    } break;
     default: { return "UNKNOWN"; }
   }
 }
@@ -256,6 +259,26 @@ uint64_t obj::Map::hash() {
 }
 
 obj::obj_type obj::Map::_type() { return obj::MAP; }
+
+/*********/
+/* Range */
+/*********/
+
+obj::Range::Range(obj::int_ptr start, obj::int_ptr end)
+    : start(start), end(end) {}
+
+std::string obj::Range::print() { return start->print() + ".." + end->print(); }
+
+std::string obj::Range::inspect() { return wrap("RANGE"); }
+
+// Range hash is simply the start int hash xor'd against a shifted end int hash.
+uint64_t obj::Range::hash() {
+  uint64_t start_hash = start->hash();
+  uint64_t end_hash = end->hash();
+  return start_hash ^ (end_hash << 1);
+}
+
+obj::obj_type obj::Range::_type() { return obj::RANGE; }
 
 /************/
 /* Function */

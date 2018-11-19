@@ -8,10 +8,12 @@ rank_map Parser::precedences{
     {TokenType::EQ, rank::EQUALS},         {TokenType::NEQ, rank::EQUALS},
     {TokenType::LT, rank::COMPARE},        {TokenType::GT, rank::COMPARE},
     {TokenType::LTEQ, rank::COMPARE},      {TokenType::GTEQ, rank::COMPARE},
+    {TokenType::DOUBLE_DOT, rank::RANGE},  {TokenType::TRIPLE_DOT, rank::RANGE},
     {TokenType::PLUS, rank::SUM},          {TokenType::MINUS, rank::SUM},
     {TokenType::ASTERISK, rank::PRODUCT},  {TokenType::SLASH, rank::PRODUCT},
     {TokenType::MODULO, rank::PRODUCT},    {TokenType::LPAREN, rank::CALL},
-    {TokenType::LBRACKET, rank::INDEX}};
+    {TokenType::LBRACKET, rank::INDEX},
+};
 
 Parser::Parser(Lexer* lexer) : lexer(lexer) {
   // Register Prefix Parsing functions here
@@ -49,6 +51,8 @@ Parser::Parser(Lexer* lexer) : lexer(lexer) {
   register_infix(TokenType::GT, &parse_infix);
   register_infix(TokenType::LTEQ, &parse_infix);
   register_infix(TokenType::GTEQ, &parse_infix);
+  register_infix(TokenType::DOUBLE_DOT, &parse_infix);
+  register_infix(TokenType::TRIPLE_DOT, &parse_infix);
   register_infix(TokenType::LPAREN, &parse_call);
   register_infix(TokenType::LBRACKET, &parse_index);
 

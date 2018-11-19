@@ -34,6 +34,18 @@ print("none:", havent)
 
 let have? = 9
 print("opt:", have)
+
+let r1 = (3 .. 9)
+print("range 1:", r1)
+
+let r2 = 4...10
+print("range 2:", r2)
+
+let r3 = 12..3
+print("range 3:", r3)
+
+let r4 = 11...5
+print("range 4:", r4)
 )INPUT";
 
   Lexer l = Lexer(input);

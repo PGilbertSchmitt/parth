@@ -1,5 +1,4 @@
 #include "lexer.h"
-#include <iostream>
 
 Lexer::Lexer(const std::string &_input) {
   input = _input;
@@ -66,7 +65,7 @@ Token Lexer::next_token() {
       lit = "\n";
       break;
 
-    // Dual char tokens
+    // Multi char tokens
     case '&':
       if (peak_char() == '&') {
         read_char();
@@ -131,6 +130,24 @@ Token Lexer::next_token() {
         lit = ">";
       }
       break;
+    case '.':
+      // Yeah, it's nested deep, but I won't have many triple-wide
+      // operators, so...
+      if (peak_char() == '.') {
+        read_char();
+        if (peak_char() == '.') {
+          read_char();
+          tok = TokenType::TRIPLE_DOT;
+          lit = "...";
+        } else {
+          tok = TokenType::DOUBLE_DOT;
+          lit = "..";
+        }
+      } else {
+        tok = TokenType::DOT;
+        lit = ".";
+      }
+      break;
 
     // Braces
     case '(':
@@ -143,7 +160,7 @@ Token Lexer::next_token() {
       break;
     case '[':
       tok = TokenType::LBRACKET;
-      lit = "]";
+      lit = "[";
       break;
     case ']':
       tok = TokenType::RBRACKET;

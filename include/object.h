@@ -24,6 +24,7 @@ enum obj_type {
   STRING,
   LIST,
   MAP,
+  RANGE,
   OPTION,
   FUNCTION,
   BUILTIN,
@@ -40,6 +41,7 @@ class String;
 class Option;
 class List;
 class Map;
+class Range;
 class Function;
 class Builtin;
 class ReturnVal;
@@ -52,6 +54,7 @@ typedef std::shared_ptr<String> str_ptr;
 typedef std::shared_ptr<Option> opt_ptr;
 typedef std::shared_ptr<List> arr_ptr;
 typedef std::shared_ptr<Map> map_ptr;
+typedef std::shared_ptr<Range> range_ptr;
 typedef std::shared_ptr<Function> func_ptr;
 typedef std::shared_ptr<Builtin> builtin_ptr;
 typedef std::shared_ptr<ReturnVal> return_ptr;
@@ -154,6 +157,18 @@ class Map : public Object {
  public:
   Map(obj_map pairs);
   obj_map pairs;
+
+  std::string print();
+  std::string inspect();
+  uint64_t hash();
+  obj_type _type();
+};
+
+class Range : public Object {
+ public:
+  Range(int_ptr start, int_ptr end);
+  const int_ptr start;
+  const int_ptr end;
 
   std::string print();
   std::string inspect();

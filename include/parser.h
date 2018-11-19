@@ -60,6 +60,7 @@ class Parser {
     BITWISE,  // & | ^
     EQUALS,   // ==
     COMPARE,  // > < >= <=
+    RANGE,    // .. ...
     SUM,      // + -
     PRODUCT,  // * / %
     PREFIX,   // !x -y

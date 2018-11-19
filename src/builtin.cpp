@@ -49,7 +49,19 @@ obj::obj_ptr len(obj::obj_list args) {
     case obj::OPTION: {
       obj::opt_ptr opt = std::dynamic_pointer_cast<obj::Option>(arg);
       output = (int)(opt != NONE_OBJ);
-    }
+    } break;
+    case obj::RANGE: {
+      obj::range_ptr range = std::dynamic_pointer_cast<obj::Range>(arg);
+      int64_t start, end;
+      start = range->start->value;
+      end = range->end->value;
+      // Adding one since no matter what, a range is inclusive
+      if (start < end) {
+        output = end - start + 1;
+      } else {
+        output = start - end + 1;
+      }
+    } break;
     default: {
       throw InvalidArgsException("len(): Invalid argument type " +
                                  obj::type_to_string(arg->_type()) +
