@@ -209,7 +209,13 @@ obj::map_ptr evalMap(ast::map_ptr map_node, env::env_ptr envir) {
   for (iter = map_node->key_value_pairs.begin();
        iter < map_node->key_value_pairs.end(); iter++) {
     obj::obj_ptr key_obj, val_obj;
+
     key_obj = eval(iter->first, envir);
+    if (key_obj->_type() == obj::FUNCTION || key_obj->_type() == obj::BUILTIN) {
+      throw InvalidKeyException("Cannot have map key of type: " +
+                                obj::type_to_string(key_obj->_type()));
+    }
+
     val_obj = eval(iter->second, envir);
 
     obj::obj_pair kv_pair;
