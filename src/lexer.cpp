@@ -307,8 +307,9 @@ bool Lexer::read_string(std::string &str) {
 bool Lexer::isDigit(char ch) { return '0' <= ch && ch <= '9'; }
 
 bool Lexer::isLetter(char ch) {
-  return ('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'Z');
+  return ('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'Z') || ch == '_';
 }
+
 void Lexer::bump_line() {
   cur_line++;
   cur_column = 0;
