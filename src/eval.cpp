@@ -665,7 +665,9 @@ obj::obj_ptr applyFunction(obj::obj_ptr callable, obj::obj_list args) {
   // If not a builtin, can only be a regular function
   obj::func_ptr func_obj = std::dynamic_pointer_cast<obj::Function>(callable);
   ast::param_list params = func_obj->func_node->params;
-  if (params.size() != args.size()) {
+  // Providing too many arguments is fine, since additional ones can just be
+  // ignored. However, too few arguments will always be wrong, so it's an error
+  if (params.size() > args.size()) {
     throw InvalidArgsException("Incorrect number of args given");
   }
 
